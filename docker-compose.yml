@@ -1,11 +1,9 @@
-version: '3.8'
-
 services:
   postgres:
     image: postgres:13
     container_name: valedasartes-db
     environment:
-      POSTG-RES_USER: valedasartes
+      POSTGRES_USER: valedasartes     
       POSTGRES_PASSWORD: valedasartes
       POSTGRES_DB: valedasartesdb
     ports:
@@ -15,3 +13,4 @@ services:
 
 volumes:
   postgres_data:
+
