@@ -2,14 +2,31 @@ package br.com.valedasartes.domain.produto.dto;
 
 import java.math.BigDecimal;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.Size;
+
 public class ProdutoRequestDTO {
 
+    @NotBlank(message = "O nome do produto é obrigatório.")
+    @Size(min = 3, max = 100, message = "O nome do produto deve ter entre 3 e 100 caracteres.")
     private String nome;
-    private String descricao;
-    private BigDecimal preco;
-    private String categoria;
-    private Long artistaId; 
 
+    @NotBlank(message = "A descrição é obrigatória.")
+    private String descricao;
+
+    @NotNull(message = "O preço é obrigatório.")
+    @Positive(message = "O preço deve ser um valor positivo.")
+    private BigDecimal preco;
+
+    @NotBlank(message = "A categoria é obrigatória.")
+    private String categoria;
+
+    @NotNull(message = "O ID do artista é obrigatório.")
+    private Long artistaId;
+
+    // Getters e Setters
     public String getNome() { return nome; }
     public void setNome(String nome) { this.nome = nome; }
     public String getDescricao() { return descricao; }

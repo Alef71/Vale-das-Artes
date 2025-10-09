@@ -2,7 +2,7 @@ package br.com.valedasartes.controller;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Autowired; // Import necessário
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import br.com.valedasartes.domain.avaliacao.dto.AvaliacaoRequestDTO;
 import br.com.valedasartes.domain.avaliacao.dto.AvaliacaoResponseDTO;
 import br.com.valedasartes.domain.avaliacao.service.AvaliacaoService;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/avaliacoes")
@@ -30,7 +31,7 @@ public class AvaliacaoController {
     }
 
     @PostMapping
-    public ResponseEntity<AvaliacaoResponseDTO> criarAvaliacao(@RequestBody AvaliacaoRequestDTO dto) {
+    public ResponseEntity<AvaliacaoResponseDTO> criarAvaliacao(@Valid @RequestBody AvaliacaoRequestDTO dto) { // Adicionado @Valid
         AvaliacaoResponseDTO novaAvaliacao = avaliacaoService.criarAvaliacao(dto);
         return new ResponseEntity<>(novaAvaliacao, HttpStatus.CREATED);
     }
@@ -49,7 +50,7 @@ public class AvaliacaoController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<AvaliacaoResponseDTO> atualizarAvaliacao(@PathVariable Long id, @RequestBody AvaliacaoRequestDTO dto) {
+    public ResponseEntity<AvaliacaoResponseDTO> atualizarAvaliacao(@PathVariable Long id, @Valid @RequestBody AvaliacaoRequestDTO dto) { // Adicionado @Valid
         AvaliacaoResponseDTO avaliacaoAtualizada = avaliacaoService.atualizarAvaliacao(id, dto);
         if (avaliacaoAtualizada != null) {
             return ResponseEntity.ok(avaliacaoAtualizada);
@@ -59,11 +60,7 @@ public class AvaliacaoController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletarAvaliacao(@PathVariable Long id) {
-        try {
-            avaliacaoService.deletarAvaliacao(id);
-            return ResponseEntity.noContent().build();
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
-        }
+        avaliacaoService.deletarAvaliacao(id);
+        return ResponseEntity.noContent().build();
     }
 }

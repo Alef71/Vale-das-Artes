@@ -2,13 +2,28 @@ package br.com.valedasartes.domain.avaliacao.dto;
 
 import java.math.BigDecimal;
 
+import jakarta.validation.constraints.DecimalMax;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+
 public class AvaliacaoRequestDTO {
 
+    @NotNull(message = "A nota é obrigatória.")
+    @DecimalMin(value = "1.0", message = "A nota mínima é 1.0.")
+    @DecimalMax(value = "5.0", message = "A nota máxima é 5.0.")
     private BigDecimal nota;
-    private String comentario;
+
+    @Size(max = 500, message = "O comentário deve ter no máximo 500 caracteres.")
+    private String comentario; // Comentário é opcional, mas se enviado, tem um limite de tamanho
+
+    @NotNull(message = "O ID do produto é obrigatório.")
     private Long produtoId;
+
+    @NotNull(message = "O ID do cliente é obrigatório.")
     private Long clienteId;
 
+    // Getters e Setters
     public BigDecimal getNota() {
         return nota;
     }

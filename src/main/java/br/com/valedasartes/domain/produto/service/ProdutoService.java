@@ -41,14 +41,17 @@ public class ProdutoService {
         return new ProdutoResponseDTO(produtoSalvo);
     }
 
+    // MÉTODO ATUALIZADO: Agora só retorna produtos ativos
     public List<ProdutoResponseDTO> listarTodosOsProdutos() {
         return produtoRepository.findAll()
                 .stream()
+                .filter(Produto::isAtivo) // Filtra para pegar apenas produtos com 'ativo = true'
                 .map(ProdutoResponseDTO::new)
                 .collect(Collectors.toList());
     }
 
     public Optional<ProdutoResponseDTO> buscarProdutoPorId(Long id) {
+        // Retorna o produto mesmo que esteja inativo, para que possa ser consultado individualmente
         return produtoRepository.findById(id)
                 .map(ProdutoResponseDTO::new);
     }
@@ -70,10 +73,11 @@ public class ProdutoService {
             }).orElse(null);
     }
 
+    // MÉTODO ATUALIZADO: Agora inativa o produto em vez de deletar
     public void deletarProduto(Long id) {
-        if (!produtoRepository.existsById(id)) {
-            throw new RuntimeException("Produto com ID " + id + " não encontrado.");
-        }
-        produtoRepository.deleteById(id);
+        produtoRepository.findById(id).ifPresent(produto -> {
+            produto.setAtivo(false);
+            produtoRepository.save(produto);
+        });
     }
 }

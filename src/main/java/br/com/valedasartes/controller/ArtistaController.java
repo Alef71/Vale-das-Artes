@@ -2,7 +2,7 @@ package br.com.valedasartes.controller;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Autowired; // Import necessário
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import br.com.valedasartes.domain.artista.dto.ArtistaRequestDTO;
 import br.com.valedasartes.domain.artista.dto.ArtistaResponseDTO;
 import br.com.valedasartes.domain.artista.service.ArtistaService;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/artistas")
@@ -30,7 +31,7 @@ public class ArtistaController {
     }
 
     @PostMapping
-    public ResponseEntity<ArtistaResponseDTO> criarArtista(@RequestBody ArtistaRequestDTO dto) {
+    public ResponseEntity<ArtistaResponseDTO> criarArtista(@Valid @RequestBody ArtistaRequestDTO dto) { // Adicionado @Valid
         ArtistaResponseDTO novoArtista = artistaService.criarArtista(dto);
         return new ResponseEntity<>(novoArtista, HttpStatus.CREATED);
     }
@@ -49,7 +50,7 @@ public class ArtistaController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ArtistaResponseDTO> atualizarArtista(@PathVariable Long id, @RequestBody ArtistaRequestDTO dto) {
+    public ResponseEntity<ArtistaResponseDTO> atualizarArtista(@PathVariable Long id, @Valid @RequestBody ArtistaRequestDTO dto) { // Adicionado @Valid
         ArtistaResponseDTO artistaAtualizado = artistaService.atualizarArtista(id, dto);
         if (artistaAtualizado != null) {
             return ResponseEntity.ok(artistaAtualizado);
@@ -59,11 +60,7 @@ public class ArtistaController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletarArtista(@PathVariable Long id) {
-        try {
-            artistaService.deletarArtista(id);
-            return ResponseEntity.noContent().build();
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
-        }
+        artistaService.deletarArtista(id);
+        return ResponseEntity.noContent().build();
     }
 }

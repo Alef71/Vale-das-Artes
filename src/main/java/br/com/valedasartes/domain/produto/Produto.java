@@ -14,7 +14,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
-
 @Entity(name = "Produto")
 @Table(name = "produto")
 public class Produto {
@@ -36,10 +35,12 @@ public class Produto {
     @Column(nullable = false)
     private String categoria;
 
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_artista")
     private Artista artista;
+
+    @Column(name = "ativo", nullable = false)
+    private boolean ativo = true; // Novo campo para exclusão lógica
 
     public Produto() {
     }
@@ -51,7 +52,6 @@ public class Produto {
         this.categoria = categoria;
         this.artista = artista;
     }
-
 
     public Long getId() {
         return id;
@@ -99,6 +99,15 @@ public class Produto {
 
     public void setArtista(Artista artista) {
         this.artista = artista;
+    }
+
+    // Novos Getters e Setters para o campo 'ativo'
+    public boolean isAtivo() {
+        return ativo;
+    }
+
+    public void setAtivo(boolean ativo) {
+        this.ativo = ativo;
     }
 
     @Override

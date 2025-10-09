@@ -2,7 +2,7 @@ package br.com.valedasartes.controller;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Autowired; // Import necessário
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import br.com.valedasartes.domain.administrador.dto.AdministradorRequestDTO;
 import br.com.valedasartes.domain.administrador.dto.AdministradorResponseDTO;
 import br.com.valedasartes.domain.administrador.service.AdministradorService;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/administradores")
@@ -30,7 +31,7 @@ public class AdministradorController {
     }
 
     @PostMapping
-    public ResponseEntity<AdministradorResponseDTO> criarAdministrador(@RequestBody AdministradorRequestDTO dto) {
+    public ResponseEntity<AdministradorResponseDTO> criarAdministrador(@Valid @RequestBody AdministradorRequestDTO dto) { // Adicionado @Valid
         AdministradorResponseDTO novoAdmin = administradorService.criarAdministrador(dto);
         return new ResponseEntity<>(novoAdmin, HttpStatus.CREATED);
     }
@@ -49,7 +50,7 @@ public class AdministradorController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<AdministradorResponseDTO> atualizarAdministrador(@PathVariable Long id, @RequestBody AdministradorRequestDTO dto) {
+    public ResponseEntity<AdministradorResponseDTO> atualizarAdministrador(@PathVariable Long id, @Valid @RequestBody AdministradorRequestDTO dto) { // Adicionado @Valid
         AdministradorResponseDTO adminAtualizado = administradorService.atualizarAdministrador(id, dto);
         if (adminAtualizado != null) {
             return ResponseEntity.ok(adminAtualizado);
@@ -59,11 +60,7 @@ public class AdministradorController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletarAdministrador(@PathVariable Long id) {
-        try {
-            administradorService.deletarAdministrador(id);
-            return ResponseEntity.noContent().build();
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
-        }
+        administradorService.deletarAdministrador(id);
+        return ResponseEntity.noContent().build();
     }
 }
