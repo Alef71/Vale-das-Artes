@@ -20,7 +20,7 @@ public class CredencialService {
     }
 
     public Credencial criarCredencial(Credencial credencial) {
-        // Lógica de criptografia de senha sera adicionada aqui
+        
         return credencialRepository.save(credencial);
     }
 
@@ -36,7 +36,7 @@ public class CredencialService {
         return credencialRepository.findById(id)
             .map(credencialExistente -> {
                 credencialExistente.setEmail(credencialAtualizada.getEmail());
-                credencialExistente.setSenha(credencialAtualizada.getSenha()); // Criptografar antes de salvar
+                credencialExistente.setSenha(credencialAtualizada.getSenha()); 
                 return credencialRepository.save(credencialExistente);
             }).orElse(null);
     }

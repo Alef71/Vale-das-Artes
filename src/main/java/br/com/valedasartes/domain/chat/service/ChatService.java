@@ -23,11 +23,6 @@ public class ChatService {
         this.chatRepository = chatRepository;
     }
 
-    /**
-     * Cria e salva uma nova mensagem no banco de dados.
-     * @param dto Os dados da mensagem a ser enviada.
-     * @return Um DTO com os dados da mensagem salva.
-     */
     @Transactional
     public ChatResponseDTO enviarMensagem(ChatRequestDTO dto) {
         Chat novaMensagem = new Chat();
@@ -40,12 +35,6 @@ public class ChatService {
         return new ChatResponseDTO(mensagemSalva);
     }
 
-    /**
-     * Busca o histórico de mensagens entre dois usuários.
-     * @param user1Id ID do primeiro usuário.
-     * @param user2Id ID do segundo usuário.
-     * @return Uma lista de DTOs com as mensagens da conversa.
-     */
     public List<ChatResponseDTO> buscarConversa(Long user1Id, Long user2Id) {
         List<Chat> conversa = chatRepository.findConversaEntreUsuarios(user1Id, user2Id);
         return conversa.stream()
@@ -53,10 +42,6 @@ public class ChatService {
                 .collect(Collectors.toList());
     }
 
-    /**
-     * Deleta uma mensagem específica pelo seu ID.
-     * @param id O ID da mensagem a ser deletada.
-     */
     public void deletarMensagem(Long id) {
         chatRepository.deleteById(id);
     }

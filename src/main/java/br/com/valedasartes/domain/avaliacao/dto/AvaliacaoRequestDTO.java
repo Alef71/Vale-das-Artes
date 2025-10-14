@@ -15,7 +15,7 @@ public class AvaliacaoRequestDTO {
     private BigDecimal nota;
 
     @Size(max = 500, message = "O comentário deve ter no máximo 500 caracteres.")
-    private String comentario; // Comentário é opcional, mas se enviado, tem um limite de tamanho
+    private String comentario; 
 
     @NotNull(message = "O ID do produto é obrigatório.")
     private Long produtoId;
@@ -23,7 +23,7 @@ public class AvaliacaoRequestDTO {
     @NotNull(message = "O ID do cliente é obrigatório.")
     private Long clienteId;
 
-    // Getters e Setters
+
     public BigDecimal getNota() {
         return nota;
     }

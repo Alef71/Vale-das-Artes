@@ -1,5 +1,3 @@
-// Caminho: br/com/valedasartes/domain/pedido/Pedido.java
-
 package br.com.valedasartes.domain.pedido;
 
 import java.math.BigDecimal;
@@ -62,7 +60,7 @@ public class Pedido {
     @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PedidoProduto> itens = new ArrayList<>();
 
-    // Getters e Setters
+    
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     public BigDecimal getValorTotal() { return valorTotal; }

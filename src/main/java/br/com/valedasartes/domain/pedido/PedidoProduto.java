@@ -1,5 +1,6 @@
 package br.com.valedasartes.domain.pedido;
 
+import java.math.BigDecimal;
 import java.util.Objects;
 
 import br.com.valedasartes.domain.produto.Produto;
@@ -32,6 +33,15 @@ public class PedidoProduto {
     @Column(nullable = false)
     private int quantidade;
 
+    @Column(name = "preco_unitario_venda", nullable = false)
+    private BigDecimal precoUnitarioVenda; 
+
+    @Column(name = "valor_comissao", nullable = false)
+    private BigDecimal valorComissao; 
+
+    @Column(name = "valor_repasse_artesao", nullable = false)
+    private BigDecimal valorRepasseArtesao; 
+
     public PedidoProduto() {
     }
 
@@ -41,37 +51,21 @@ public class PedidoProduto {
         this.quantidade = quantidade;
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Pedido getPedido() {
-        return pedido;
-    }
-
-    public void setPedido(Pedido pedido) {
-        this.pedido = pedido;
-    }
-
-    public Produto getProduto() {
-        return produto;
-    }
-
-    public void setProduto(Produto produto) {
-        this.produto = produto;
-    }
-
-    public int getQuantidade() {
-        return quantidade;
-    }
-
-    public void setQuantidade(int quantidade) {
-        this.quantidade = quantidade;
-    }
+    
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+    public Pedido getPedido() { return pedido; }
+    public void setPedido(Pedido pedido) { this.pedido = pedido; }
+    public Produto getProduto() { return produto; }
+    public void setProduto(Produto produto) { this.produto = produto; }
+    public int getQuantidade() { return quantidade; }
+    public void setQuantidade(int quantidade) { this.quantidade = quantidade; }
+    public BigDecimal getPrecoUnitarioVenda() { return precoUnitarioVenda; }
+    public void setPrecoUnitarioVenda(BigDecimal precoUnitarioVenda) { this.precoUnitarioVenda = precoUnitarioVenda; }
+    public BigDecimal getValorComissao() { return valorComissao; }
+    public void setValorComissao(BigDecimal valorComissao) { this.valorComissao = valorComissao; }
+    public BigDecimal getValorRepasseArtesao() { return valorRepasseArtesao; }
+    public void setValorRepasseArtesao(BigDecimal valorRepasseArtesao) { this.valorRepasseArtesao = valorRepasseArtesao; }
 
     @Override
     public boolean equals(Object o) {
@@ -86,3 +80,4 @@ public class PedidoProduto {
         return Objects.hash(id);
     }
 }
+

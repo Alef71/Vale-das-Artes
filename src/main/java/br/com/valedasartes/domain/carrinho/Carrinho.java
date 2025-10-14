@@ -38,7 +38,7 @@ public class Carrinho {
     @Column(name = "data_criacao", nullable = false)
     private LocalDateTime dataCriacao;
 
-    @Enumerated(EnumType.STRING) // Diz ao JPA para salvar o nome do status (ex: "ATIVO") no banco
+    @Enumerated(EnumType.STRING) 
     @Column(name = "status_carrinho", nullable = false)
     private CarrinhoStatus status;
 

@@ -13,18 +13,18 @@ public class ArtistaRequestDTO {
     private String nomeArtista;
 
     @NotBlank(message = "O CPF do artista é obrigatório.")
-    @CPF(message = "O CPF informado é inválido.") // Validação específica para CPF brasileiro
+    @CPF(message = "O CPF informado é inválido.") 
     private String cpfArtista;
 
-    @CNPJ(message = "O CNPJ informado é inválido.") // Valida o CNPJ apenas se ele for preenchido
-    private String cnpjArtista; // Não é obrigatório
+    @CNPJ(message = "O CNPJ informado é inválido.") 
+    private String cnpjArtista; 
 
     @NotBlank(message = "O telefone do artista é obrigatório.")
     private String telefoneArtista;
 
-    private String nomeEmpresa; // Opcional
+    private String nomeEmpresa; 
 
-    // Getters e Setters
+    
     public String getNomeArtista() {
         return nomeArtista;
     }

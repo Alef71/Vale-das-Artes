@@ -5,6 +5,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder; // 1. Import necessário
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,17 +20,22 @@ import br.com.valedasartes.domain.security.Credencial;
 public class AdministradorService {
 
     private final AdministradorRepository administradorRepository;
+    private final PasswordEncoder passwordEncoder; // 2. Adiciona o encoder
 
     @Autowired
-    public AdministradorService(AdministradorRepository administradorRepository) {
+    public AdministradorService(AdministradorRepository administradorRepository, PasswordEncoder passwordEncoder) { // 3. Injeta no construtor
         this.administradorRepository = administradorRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Transactional
     public AdministradorResponseDTO criarAdministrador(AdministradorRequestDTO dto) {
         Credencial credencial = new Credencial();
         credencial.setEmail(dto.getCredencial().getEmail());
-        credencial.setSenha(dto.getCredencial().getSenha());
+
+        
+        String senhaCriptografada = passwordEncoder.encode(dto.getCredencial().getSenha());
+        credencial.setSenha(senhaCriptografada);
 
         Endereco endereco = new Endereco();
         endereco.setLogradouro(dto.getEndereco().getLogradouro());

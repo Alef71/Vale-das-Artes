@@ -5,6 +5,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder; 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,20 +20,23 @@ import br.com.valedasartes.domain.security.Credencial;
 public class ClienteService {
 
     private final ClienteRepository clienteRepository;
+    private final PasswordEncoder passwordEncoder; 
 
     @Autowired
-    public ClienteService(ClienteRepository clienteRepository) {
+    public ClienteService(ClienteRepository clienteRepository, PasswordEncoder passwordEncoder) { 
         this.clienteRepository = clienteRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Transactional
     public ClienteResponseDTO criarCliente(ClienteRequestDTO dto) {
-        // Converte o DTO de Credencial para a entidade Credencial
         Credencial credencial = new Credencial();
         credencial.setEmail(dto.getCredencial().getEmail());
-        credencial.setSenha(dto.getCredencial().getSenha()); // Em um projeto real, criptografaríamos a senha aqui
+        
+        
+        String senhaCriptografada = passwordEncoder.encode(dto.getCredencial().getSenha());
+        credencial.setSenha(senhaCriptografada);
 
-        // Converte o DTO de Endereço para a entidade Endereco
         Endereco endereco = new Endereco();
         endereco.setLogradouro(dto.getEndereco().getLogradouro());
         endereco.setNumero(dto.getEndereco().getNumero());
@@ -43,7 +47,6 @@ public class ClienteService {
         endereco.setCep(dto.getEndereco().getCep());
         endereco.setTelefone(dto.getEndereco().getTelefone());
 
-        // Cria a entidade principal do Cliente
         Cliente novoCliente = new Cliente();
         novoCliente.setNome(dto.getNome());
         novoCliente.setCpf(dto.getCpf());
@@ -74,9 +77,6 @@ public class ClienteService {
                 clienteExistente.setNome(dto.getNome());
                 clienteExistente.setCpf(dto.getCpf());
                 clienteExistente.setTelefone(dto.getTelefone());
-
-                // A lógica de atualização de endereço e credencial pode ser mais complexa,
-                // mas para este CRUD vamos manter simples.
                 
                 Cliente clienteAtualizado = clienteRepository.save(clienteExistente);
                 return new ClienteResponseDTO(clienteAtualizado);

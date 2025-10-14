@@ -1,6 +1,3 @@
-// Crie a pasta 'dto' dentro de 'chat'
-// Caminho: br/com/valedasartes/domain/chat/dto/ChatRequestDTO.java
-
 package br.com.valedasartes.domain.chat.dto;
 
 public class ChatRequestDTO {
@@ -9,7 +6,7 @@ public class ChatRequestDTO {
     private Long destinatarioId;
     private String mensagem;
 
-    // Getters e Setters
+    
     public Long getRemetenteId() {
         return remetenteId;
     }

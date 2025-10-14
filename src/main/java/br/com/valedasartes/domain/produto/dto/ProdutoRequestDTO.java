@@ -26,7 +26,7 @@ public class ProdutoRequestDTO {
     @NotNull(message = "O ID do artista é obrigatório.")
     private Long artistaId;
 
-    // Getters e Setters
+    
     public String getNome() { return nome; }
     public void setNome(String nome) { this.nome = nome; }
     public String getDescricao() { return descricao; }

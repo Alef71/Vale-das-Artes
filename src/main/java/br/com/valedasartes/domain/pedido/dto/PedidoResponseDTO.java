@@ -27,7 +27,6 @@ public class PedidoResponseDTO {
                 .collect(Collectors.toList());
     }
 
-    // Getters
     public Long getId() { return id; }
     public Long getClienteId() { return clienteId; }
     public LocalDateTime getDataCriacao() { return dataCriacao; }

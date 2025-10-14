@@ -23,14 +23,14 @@ public class ClienteRequestDTO {
     private String telefone;
 
     @NotNull(message = "O endereço é obrigatório.")
-    @Valid // <-- IMPORTANTE: Diz ao validador para validar os campos DENTRO de EnderecoRequestDTO
+    @Valid 
     private EnderecoRequestDTO endereco;
 
     @NotNull(message = "As credenciais são obrigatórias.")
-    @Valid // <-- IMPORTANTE: Diz ao validador para validar os campos DENTRO de CredencialRequestDTO
+    @Valid 
     private CredencialRequestDTO credencial;
 
-    // Getters e Setters
+    
     public String getNome() { return nome; }
     public void setNome(String nome) { this.nome = nome; }
     public String getCpf() { return cpf; }

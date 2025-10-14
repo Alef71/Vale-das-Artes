@@ -1,38 +1,56 @@
 package br.com.valedasartes.config;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
-    // Lista de caminhos que o Swagger utiliza e que devem ser públicos
+    @Autowired
+    private SecurityFilter securityFilter;
+
     private static final String[] SWAGGER_WHITELIST = {
-        "/v3/api-docs/**",
-        "/swagger-ui.html",
-        "/swagger-ui/**",
-        "/swagger-resources/**",
-        "/webjars/**"
+        "/v3/api-docs/**", "/swagger-ui.html", "/swagger-ui/**"
     };
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-            .csrf(csrf -> csrf.disable()) // Desabilita proteção CSRF, comum em APIs REST
+        return http
+            .csrf(csrf -> csrf.disable())
+            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) 
             .authorizeHttpRequests(auth -> auth
-                // 1. Libera explicitamente os caminhos do Swagger
+                
                 .requestMatchers(SWAGGER_WHITELIST).permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/clientes").permitAll() 
                 
-                // 2. Mantém a regra de permitir todos os outros endpoints por agora
-                .requestMatchers("/**").permitAll() 
                 
-                // No futuro, quando formos implementar o login, trocaremos a linha acima por:
-                // .anyRequest().authenticated()
-            );
-        return http.build();
+                .anyRequest().authenticated() 
+            )
+            
+            .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
+            .build();
+    }
+    
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+    
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
     }
 }

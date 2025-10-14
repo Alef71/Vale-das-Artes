@@ -20,7 +20,7 @@ public class OpenApiConfig {
                         .description("API para o e-commerce social Vale das Artes, focado na valorização e comercialização do artesanato do Vale do Jequitinhonha.")
                         .contact(new Contact()
                                 .name("Alef")
-                                .email("afra@aluno.ifnmg.edu.br")) // Coloque seu e-mail aqui
+                                .email("afra@aluno.ifnmg.edu.br")) 
                         .license(new License()
                                 .name("Apache 2.0")
                                 .url("http://springdoc.org")));

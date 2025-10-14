@@ -30,7 +30,7 @@ public class CarrinhoResponseDTO {
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
-    // Getters
+    
     public Long getId() { return id; }
     public Long getClienteId() { return clienteId; }
     public LocalDateTime getDataCriacao() { return dataCriacao; }

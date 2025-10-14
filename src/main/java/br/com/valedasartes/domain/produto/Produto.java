@@ -40,7 +40,7 @@ public class Produto {
     private Artista artista;
 
     @Column(name = "ativo", nullable = false)
-    private boolean ativo = true; // Novo campo para exclusão lógica
+    private boolean ativo = true; 
 
     public Produto() {
     }
@@ -101,7 +101,6 @@ public class Produto {
         this.artista = artista;
     }
 
-    // Novos Getters e Setters para o campo 'ativo'
     public boolean isAtivo() {
         return ativo;
     }

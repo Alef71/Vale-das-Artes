@@ -11,7 +11,7 @@ public class EnderecoRequestDTO {
     @NotBlank(message = "O logradouro é obrigatório.")
     private String logradouro;
 
-    private String complemento; // Complemento é opcional
+    private String complemento; 
 
     @NotBlank(message = "O telefone de contato do endereço é obrigatório.")
     private String telefone;
@@ -31,7 +31,7 @@ public class EnderecoRequestDTO {
     private String estado;
 
     @NotBlank(message = "O CEP é obrigatório.")
-    @Pattern(regexp = "\\d{5}-?\\d{3}", message = "O CEP informado é inválido.") // Valida formatos como 12345-678 ou 12345678
+    @Pattern(regexp = "\\d{5}-?\\d{3}", message = "O CEP informado é inválido.") 
     private String cep;
 
     // Getters e Setters

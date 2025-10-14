@@ -20,7 +20,7 @@ public class ChatResponseDTO {
         this.dataEnvio = chat.getDataEnvio();
     }
 
-    // Getters
+    
     public Long getId() { return id; }
     public Long getRemetenteId() { return remetenteId; }
     public Long getDestinatarioId() { return destinatarioId; }
