@@ -2,16 +2,23 @@ package br.com.valedasartes.domain.security;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import br.com.valedasartes.domain.administrador.Administrador;
+import br.com.valedasartes.domain.artista.Artista;
+import br.com.valedasartes.domain.cliente.Cliente;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 
 @Entity
@@ -28,8 +35,19 @@ public class Credencial implements UserDetails {
 
     @Column(name = "senha_credencial", nullable = false)
     private String senha;
-
     
+    // Relações inversas (já estava correto)
+    @OneToOne(mappedBy = "credencial", fetch = FetchType.LAZY)
+    private Cliente cliente;
+    
+    @OneToOne(mappedBy = "credencial", fetch = FetchType.LAZY)
+    private Artista artista;
+    
+    @OneToOne(mappedBy = "credencial", fetch = FetchType.LAZY)
+    private Administrador administrador;
+    
+    
+    // Getters e setters para id, email, senha (já estava correto)
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     public String getEmail() { return email; }
@@ -37,14 +55,30 @@ public class Credencial implements UserDetails {
     public String getSenha() { return senha; }
     public void setSenha(String senha) { this.senha = senha; }
     
-    
 
+    // --- 1. GETTERS ADICIONADOS AQUI ---
+    // (O AuthenticationService precisa disso para pegar o ID correto)
+    public Cliente getCliente() { return cliente; }
+    public Artista getArtista() { return artista; }
+    public Administrador getAdministrador() { return administrador; }
+
+
+    // Lógica de Roles (já estava correto)
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        
+        if (this.administrador != null) {
+            return List.of(new SimpleGrantedAuthority("ROLE_ADMIN"));
+        }
+        if (this.artista != null) {
+            return List.of(new SimpleGrantedAuthority("ROLE_ARTISTA"));
+        }
+        if (this.cliente != null) {
+            return List.of(new SimpleGrantedAuthority("ROLE_CLIENTE"));
+        }
         return Collections.emptyList();
     }
 
+    // Métodos do UserDetails (já estava correto)
     @Override
     public String getPassword() {
         return this.senha;
@@ -52,17 +86,16 @@ public class Credencial implements UserDetails {
 
     @Override
     public String getUsername() {
-        
         return this.email;
     }
     
-   
     @Override public boolean isAccountNonExpired() { return true; }
     @Override public boolean isAccountNonLocked() { return true; }
     @Override public boolean isCredentialsNonExpired() { return true; }
     @Override public boolean isEnabled() { return true; }
     
     
+    // Equals e hashCode (já estava correto)
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vale das Artes - Login e Cadastro</title>
+    
+    </head>
+<body>
+
+    <header id="header-placeholder"></header>
+
+    <main>
+        <section id="auth-page">
+            <div id="login-container">
+                <h2>Acessar sua Conta</h2>
+                <form id="form-login">
+                    <div>
+                        <label for="login-email">Email:</label>
+                        <input type="email" id="login-email" name="email" required>
+                    </div>
+                    <div>
+                        <label for="login-senha">Senha:</label>
+                        <input type="password" id="login-senha" name="senha" required>
+                    </div>
+                    <button type="submit">Entrar</button>
+                </form>
+            </div>
+
+            <hr> <div id="cadastro-container">
+                <h2>Criar nova conta</h2>
+                <form id="form-cadastro">
+                    
+                    <div>
+                        <label>Eu sou:</label>
+                        <input type="radio" id="tipo-cliente" name="tipoConta" value="cliente" checked>
+                        <label for="tipo-cliente">Cliente</label>
+                        
+                        <input type="radio" id="tipo-artesao" name="tipoConta" value="artesao">
+                        <label for="tipo-artesao">Artesão</label>
+                    </div>
+
+                    <fieldset id="campos-cliente">
+                        <div>
+                            <label for="cliente-nome">Nome Completo:</label>
+                            <input type="text" id="cliente-nome" name="nome" required>
+                        </div>
+                        <div>
+                            <label for="cliente-cpf">CPF:</label>
+                            <input type="text" id="cliente-cpf" name="cpf" required>
+                        </div>
+                        <div>
+                            <label for="cliente-telefone">Telefone:</label>
+                            <input type="text" id="cliente-telefone" name="telefone" required>
+                        </div>
+                    </fieldset>
+
+                    <fieldset id="campos-artesao" style="display: none;">
+                        <div>
+                            <label for="artesao-nome-empresa">Nome do Ateliê/Empresa (Opcional):</label>
+                            <input type="text" id="artesao-nome-empresa" name="nome_empresa">
+                        </div>
+                        <div>
+                            <label for="artesao-cnpj">CNPJ (Opcional):</label>
+                            <input type="text" id="artesao-cnpj" name="cnpj">
+                        </div>
+                    </fieldset>
+
+                    <fieldset id="campos-credenciais">
+                        <div>
+                            <label for="cadastro-email">Email:</label>
+                            <input type="email" id="cadastro-email" name="email" required>
+                        </div>
+                        <div>
+                            <label for="cadastro-senha">Senha:</label>
+                            <input type="password" id="cadastro-senha" name="senha" required>
+                        </div>
+                    </fieldset>
+
+                    <fieldset id="campos-endereco">
+                        <legend>Endereço</legend>
+                        <div>
+                            <label for="end-logradouro">Logradouro (Rua/Av.):</label>
+                            <input type="text" id="end-logradouro" name="logradouro" required>
+                        </div>
+                        <div>
+                            <label for="end-numero">Número:</label>
+                            <input type="text" id="end-numero" name="numero" required>
+                        </div>
+                        <div>
+                            <label for="end-complemento">Complemento:</label>
+                            <input type="text" id="end-complemento" name="complemento">
+                        </div>
+                        <div>
+                            <label for="end-bairro">Bairro:</label>
+                            <input type="text" id="end-bairro" name="bairro" required>
+                        </div>
+                        <div>
+                            <label for="end-cidade">Cidade:</label>
+                            <input type="text" id="end-cidade" name="cidade" required>
+                        </div>
+                        <div>
+                            <label for="end-estado">Estado (UF):</label>
+                            <input type="text" id="end-estado" name="estado" maxlength="2" required>
+                        </div>
+                        <div>
+                            <label for="end-cep">CEP:</label>
+                            <input type="text" id="end-cep" name="cep" required>
+                        </div>
+                        <div>
+                            <label for="end-telefone">Telefone (para contato/entrega):</label>
+                            <input type="text" id="end-telefone" name="telefoneEndereco" required>
+                        </div>
+                    </fieldset>
+                    
+                    <button type="submit">Criar Conta</button>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    <footer id="footer-placeholder"></footer>
+
+    <script src="js/main.js"></script>
+    
+    <script src="js/auth.js"></script>
+
+</body>
+</html>

@@ -23,8 +23,7 @@ public class ProdutoRequestDTO {
     @NotBlank(message = "A categoria é obrigatória.")
     private String categoria;
 
-    @NotNull(message = "O ID do artista é obrigatório.")
-    private Long artistaId;
+    // --- O campo 'artistaId' FOI REMOVIDO DESTE ARQUIVO ---
 
     
     public String getNome() { return nome; }
@@ -35,6 +34,6 @@ public class ProdutoRequestDTO {
     public void setPreco(BigDecimal preco) { this.preco = preco; }
     public String getCategoria() { return categoria; }
     public void setCategoria(String categoria) { this.categoria = categoria; }
-    public Long getArtistaId() { return artistaId; }
-    public void setArtistaId(Long artistaId) { this.artistaId = artistaId; }
+    
+    // --- O GETTER/SETTER de 'artistaId' FOI REMOVIDO DESTE ARQUIVO ---
 }

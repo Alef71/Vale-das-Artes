@@ -31,3 +31,7 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Uploads do Projeto (Adicionado) ###
+# Ignora a pasta de uploads de usuário
+/uploads/

@@ -8,43 +8,42 @@ public class ClienteResponseDTO {
     private final String nome;
     private final String cpf;
     private final String telefone;
-    private final String email;
-    private final String enderecoCompleto;
+    
+    // --- MUDANÇA AQUI ---
+    // Trocamos 'email' e 'enderecoCompleto' pelos objetos reais
+    // que o nosso formulário JavaScript precisa.
+    private final CredencialDTO credencial;
+    private final Endereco endereco;
 
     public ClienteResponseDTO(Cliente cliente) {
         this.id = cliente.getId();
         this.nome = cliente.getNome();
         this.cpf = cliente.getCpf();
         this.telefone = cliente.getTelefone();
+        this.endereco = cliente.getEndereco(); // <-- ENVIA O OBJETO INTEIRO
 
+        // Cria um DTO para a credencial (enviando apenas o email)
         if (cliente.getCredencial() != null) {
-            this.email = cliente.getCredencial().getEmail();
+            this.credencial = new CredencialDTO(cliente.getCredencial().getEmail());
         } else {
-            this.email = null;
-        }
-
-        if (cliente.getEndereco() != null) {
-            this.enderecoCompleto = formatarEndereco(cliente.getEndereco());
-        } else {
-            this.enderecoCompleto = null;
+            this.credencial = null;
         }
     }
-
-    private String formatarEndereco(Endereco endereco) {
-        return String.format("%s, %d - %s, %s/%s - CEP: %s",
-            endereco.getLogradouro(),
-            endereco.getNumero(),
-            endereco.getBairro(),
-            endereco.getCidade(),
-            endereco.getEstado(),
-            endereco.getCep());
-    }
-
     
+    // Sub-classe DTO para enviar apenas o email (mais seguro)
+    public static class CredencialDTO {
+        private final String email;
+        public CredencialDTO(String email) { this.email = email; }
+        public String getEmail() { return email; }
+    }
+
+    // (O método formatarEndereco() não é mais necessário)
+
+    // --- GETTERS ATUALIZADOS ---
     public Long getId() { return id; }
     public String getNome() { return nome; }
     public String getCpf() { return cpf; }
     public String getTelefone() { return telefone; }
-    public String getEmail() { return email; }
-    public String getEnderecoCompleto() { return enderecoCompleto; }
+    public CredencialDTO getCredencial() { return credencial; }
+    public Endereco getEndereco() { return endereco; }
 }

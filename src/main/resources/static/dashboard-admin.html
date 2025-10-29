@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vale das Artes - Painel do Administrador</title>
+    
+    </head>
+<body>
+
+    <header id="header-placeholder"></header>
+
+    <main>
+        <section id="dashboard">
+            <h1>Painel de Administração</h1>
+
+            <hr>
+
+            <section id="gerenciar-destaques">
+                <h2>Criar Novo Destaque</h2>
+                <p>O destaque mais recente aparecerá no topo da página inicial.</p>
+                
+                <form id="form-novo-destaque">
+                    <div>
+                        <label for="destaque-titulo">Título do Destaque:</label>
+                        <input type="text" id="destaque-titulo" name="titulo" required>
+                    </div>
+                    <div>
+                        <label for="destaque-texto">Texto (Descrição):</label>
+                        <textarea id="destaque-texto" name="texto" rows="4"></textarea>
+                    </div>
+                    <div>
+                        <label for="destaque-link">Link (Ex: /produto-detalhe.html?id=10):</label>
+                        <input type="text" id="destaque-link" name="link">
+                    </div>
+                    <div>
+                        <label for="destaque-imagem">Imagem de Fundo (Opcional):</label>
+                        <input type="file" id="destaque-imagem" name="imagem">
+                    </div>
+                    <button type="submit">Publicar Destaque</button>
+                </form>
+            </section>
+
+            <hr>
+
+            <section id="gerenciar-usuarios">
+                <h2>Gerenciar Usuários</h2>
+                <p>(Placeholder para futuras funções, como aprovar novos artesãos,
+                   visualizar clientes, etc.)</p>
+            </section>
+
+        </section>
+    </main>
+
+    <footer id="footer-placeholder"></footer>
+
+    <script src="js/main.js"></script>
+    
+    </body>
+</html>
