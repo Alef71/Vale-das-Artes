@@ -34,14 +34,31 @@ public class CarrinhoService {
         this.clienteRepository = cliRepo;
     }
 
+    /**
+     * --- MÉTODO CORRIGIDO ---
+     * Agora ele busca um carrinho ativo, e SÓ cria um novo se não existir.
+     */
     @Transactional
     public Carrinho criarCarrinhoParaCliente(Long clienteId) {
+        
+        // 1. TENTA BUSCAR UM CARRINHO ATIVO
+        Optional<Carrinho> carrinhoExistente = carrinhoRepository
+                .findByClienteIdAndStatus(clienteId, CarrinhoStatus.ATIVO);
+
+        // 2. SE O CARRINHO EXISTE, APENAS RETORNA ELE
+        if (carrinhoExistente.isPresent()) {
+            return carrinhoExistente.get();
+        }
+
+        // 3. SE NÃO EXISTE, CRIA UM NOVO
         Cliente cliente = clienteRepository.findById(clienteId)
-            .orElseThrow(() -> new RuntimeException("Cliente não encontrado!"));
+                .orElseThrow(() -> new RuntimeException("Cliente não encontrado!"));
+        
         Carrinho carrinho = new Carrinho();
         carrinho.setCliente(cliente);
         carrinho.setDataCriacao(LocalDateTime.now());
         carrinho.setStatus(CarrinhoStatus.ATIVO);
+        
         return carrinhoRepository.save(carrinho);
     }
 
@@ -52,35 +69,35 @@ public class CarrinhoService {
     @Transactional
     public Carrinho adicionarItem(Long carrinhoId, ItemCarrinhoDTO itemDTO) {
         Carrinho carrinho = carrinhoRepository.findById(carrinhoId)
-            .orElseThrow(() -> new RuntimeException("Carrinho não encontrado!"));
+                .orElseThrow(() -> new RuntimeException("Carrinho não encontrado!"));
         Produto produto = produtoRepository.findById(itemDTO.getProdutoId())
-            .orElseThrow(() -> new RuntimeException("Produto não encontrado!"));
+                .orElseThrow(() -> new RuntimeException("Produto não encontrado!"));
 
         carrinho.getItens().stream()
-            .filter(item -> item.getProduto().getId().equals(produto.getId()))
-            .findFirst()
-            .ifPresentOrElse(
-                itemExistente -> itemExistente.setQuantidade(itemExistente.getQuantidade() + itemDTO.getQuantidade()),
-                () -> {
-                    CarrinhoProduto novoItem = new CarrinhoProduto();
-                    novoItem.setCarrinho(carrinho);
-                    novoItem.setProduto(produto);
-                    novoItem.setQuantidade(itemDTO.getQuantidade());
-                    carrinho.getItens().add(novoItem);
-                }
-            );
+                .filter(item -> item.getProduto().getId().equals(produto.getId()))
+                .findFirst()
+                .ifPresentOrElse(
+                        itemExistente -> itemExistente.setQuantidade(itemExistente.getQuantidade() + itemDTO.getQuantidade()),
+                        () -> {
+                            CarrinhoProduto novoItem = new CarrinhoProduto();
+                            novoItem.setCarrinho(carrinho);
+                            novoItem.setProduto(produto);
+                            novoItem.setQuantidade(itemDTO.getQuantidade());
+                            carrinho.getItens().add(novoItem);
+                        }
+                );
         return carrinhoRepository.save(carrinho);
     }
 
     @Transactional
     public Carrinho removerItem(Long carrinhoId, ItemCarrinhoDTO itemDTO) {
         Carrinho carrinho = carrinhoRepository.findById(carrinhoId)
-            .orElseThrow(() -> new RuntimeException("Carrinho não encontrado!"));
+                .orElseThrow(() -> new RuntimeException("Carrinho não encontrado!"));
         
         CarrinhoProduto itemParaRemover = carrinho.getItens().stream()
-            .filter(item -> item.getProduto().getId().equals(itemDTO.getProdutoId()))
-            .findFirst()
-            .orElseThrow(() -> new RuntimeException("Item não encontrado no carrinho!"));
+                .filter(item -> item.getProduto().getId().equals(itemDTO.getProdutoId()))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Item não encontrado no carrinho!"));
 
         int novaQuantidade = itemParaRemover.getQuantidade() - itemDTO.getQuantidade();
 
@@ -96,7 +113,7 @@ public class CarrinhoService {
     @Transactional
     public Carrinho limparCarrinho(Long carrinhoId) {
         Carrinho carrinho = carrinhoRepository.findById(carrinhoId)
-            .orElseThrow(() -> new RuntimeException("Carrinho não encontrado!"));
+                .orElseThrow(() -> new RuntimeException("Carrinho não encontrado!"));
         
         carrinhoProdutoRepository.deleteAll(carrinho.getItens());
         carrinho.getItens().clear();

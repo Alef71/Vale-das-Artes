@@ -4,7 +4,9 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -12,11 +14,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import br.com.valedasartes.domain.cliente.dto.ClienteRequestDTO;
 import br.com.valedasartes.domain.cliente.dto.ClienteResponseDTO;
 import br.com.valedasartes.domain.cliente.service.ClienteService;
+import br.com.valedasartes.domain.security.Credencial;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -35,10 +40,10 @@ public class ClienteController {
         this.clienteService = clienteService;
     }
 
-    @Operation(summary = "Cria um novo cliente", description = "Registra um novo cliente no sistema, incluindo seus dados pessoais, endereço e credenciais de acesso.")
+    @Operation(summary = "Cria um novo cliente")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "201", description = "Cliente criado com sucesso"),
-        @ApiResponse(responseCode = "400", description = "Dados de entrada inválidos (ex: CPF inválido, e-mail já existente)")
+        @ApiResponse(responseCode = "400", description = "Dados de entrada inválidos")
     })
     @PostMapping
     public ResponseEntity<ClienteResponseDTO> criarCliente(@Valid @RequestBody ClienteRequestDTO dto) {
@@ -46,7 +51,7 @@ public class ClienteController {
         return new ResponseEntity<>(novoCliente, HttpStatus.CREATED);
     }
 
-    @Operation(summary = "Lista todos os clientes", description = "Retorna uma lista com todos os clientes cadastrados no sistema.")
+    @Operation(summary = "Lista todos os clientes")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Lista de clientes retornada com sucesso")
     })
@@ -56,7 +61,7 @@ public class ClienteController {
         return ResponseEntity.ok(clientes);
     }
 
-    @Operation(summary = "Busca um cliente por ID", description = "Retorna os detalhes de um cliente específico com base no seu ID.")
+    @Operation(summary = "Busca um cliente por ID")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Cliente encontrado com sucesso"),
         @ApiResponse(responseCode = "404", description = "Cliente não encontrado")
@@ -68,7 +73,7 @@ public class ClienteController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @Operation(summary = "Atualiza um cliente existente", description = "Atualiza os dados cadastrais de um cliente. A atualização de endereço e senha deve ser feita em endpoints específicos (futuramente).")
+    @Operation(summary = "Atualiza um cliente existente")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Cliente atualizado com sucesso"),
         @ApiResponse(responseCode = "400", description = "Dados de entrada inválidos"),
@@ -83,7 +88,39 @@ public class ClienteController {
         return ResponseEntity.notFound().build();
     }
 
-    @Operation(summary = "Deleta um cliente", description = "Remove permanentemente um cliente e todos os seus dados associados do sistema.")
+    @Operation(summary = "Upload de foto de perfil do cliente")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Foto atualizada com sucesso"),
+        @ApiResponse(responseCode = "404", description = "Cliente não encontrado")
+    })
+    @PostMapping(value = "/{id}/foto", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ClienteResponseDTO> uploadFoto(
+            @PathVariable Long id, 
+            @RequestParam("foto") MultipartFile file,
+            Authentication authentication) {
+        
+        Credencial credencial = (Credencial) authentication.getPrincipal();
+        
+        ClienteResponseDTO clienteAtualizado = clienteService.uploadFoto(id, file, credencial);
+        return ResponseEntity.ok(clienteAtualizado);
+    }
+    
+    @Operation(summary = "Remove a foto de perfil do cliente")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Foto removida com sucesso"),
+        @ApiResponse(responseCode = "404", description = "Cliente não encontrado")
+    })
+    @DeleteMapping(value = "/{id}/foto")
+    public ResponseEntity<ClienteResponseDTO> removerFoto(
+            @PathVariable Long id,
+            Authentication authentication) {
+        
+        Credencial credencial = (Credencial) authentication.getPrincipal();
+        ClienteResponseDTO clienteAtualizado = clienteService.removerFoto(id, credencial);
+        return ResponseEntity.ok(clienteAtualizado);
+    }
+
+    @Operation(summary = "Deleta um cliente")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "204", description = "Cliente deletado com sucesso"),
         @ApiResponse(responseCode = "404", description = "Cliente não encontrado")

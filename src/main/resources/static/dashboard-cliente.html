@@ -13,12 +13,30 @@
     <main>
         <section id="dashboard">
             
-            <div class="profile-picture-container">
-                <img src="https://via.placeholder.com/150" alt="Foto do Perfil" id="profile-pic" style="border-radius: 50%;">
-                <br>
-                <a href="#" id="btn-change-photo">Alterar Foto</a> 
-            </div>
-
+            <section class="perfil-foto-container">
+                <h3>Minha Foto de Perfil</h3>
+                
+                <img id="foto-preview-cliente" 
+                     src="https://via.placeholder.com/150?text=Carregando..." 
+                     alt="Foto do Perfil" 
+                     class="profile-pic-preview" 
+                     style="border-radius: 50%;">
+            
+                <input type="file" id="input-foto-cliente" accept="image/png, image/jpeg" style="display: none;">
+            
+                <div id="foto-options-menu-cliente" class="profile-pic-menu" style="display: none;">
+                    <p>Alterar foto de perfil</p>
+                    
+                    <button id="btn-adicionar-foto-cliente" class="menu-option">Adicionar foto</button>
+                    <button id="btn-atualizar-foto-cliente" class="menu-option">Atualizar foto</button>
+                    <button id="btn-remover-foto-cliente" class="menu-option danger">Remover foto</button>
+                    
+                    <hr>
+                    <button id="btn-cancelar-foto-cliente" class="menu-option">Cancelar</button>
+                </div>
+                
+                <p id="upload-status-cliente"></p>
+            </section>
             <h1 id="dashboard-title">Painel do Cliente - Carregando...</h1>
 
             <a href="chat.html">Ver minhas mensagens (Chat)</a>

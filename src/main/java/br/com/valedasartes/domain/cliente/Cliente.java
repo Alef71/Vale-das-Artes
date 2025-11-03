@@ -32,6 +32,9 @@ public class Cliente {
     @Column(name = "telefone_cliente", nullable = false)
     private String telefone;
 
+    @Column(name = "foto_url")
+    private String fotoUrl;
+
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "id_endereco", referencedColumnName = "id_endereco")
     private Endereco endereco;
@@ -97,6 +100,14 @@ public class Cliente {
 
     public void setCredencial(Credencial credencial) {
         this.credencial = credencial;
+    }
+
+    public String getFotoUrl() {
+        return fotoUrl;
+    }
+
+    public void setFotoUrl(String fotoUrl) {
+        this.fotoUrl = fotoUrl;
     }
 
     @Override

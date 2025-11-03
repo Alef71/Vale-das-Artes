@@ -45,17 +45,22 @@ public class Artista {
     @Column(name = "nome_empresa")
     private String nomeEmpresa;
 
-    // --- 2. ADICIONAR A ANOTAÇÃO AQUI ---
-    @JsonManagedReference // Diz ao Java: "Você é o 'pai' desta relação."
+    @Column(columnDefinition = "TEXT")
+    private String biografia;
+
+    // --- 1. MUDANÇA ADICIONADA ---
+    @Column(name = "foto_url")
+    private String fotoUrl;
+    // --- FIM DA MUDANÇA ---
+
+    @JsonManagedReference
     @OneToMany(mappedBy = "artista", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Produto> produtos = new ArrayList<>();
 
-    // Campo de Credencial (já estava OK)
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "id_credencial", referencedColumnName = "id_credencial", unique = true)
     private Credencial credencial;
 
-    // Campo de Endereço (já estava OK)
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "id_endereco", referencedColumnName = "id_endereco", unique = true)
     private Endereco endereco;
@@ -64,7 +69,6 @@ public class Artista {
     public Artista() {
     }
 
-    // (Construtor OK)
     public Artista(String cpf, String cnpj, String telefone, String nome, String nomeEmpresa) {
         this.cpf = cpf;
         this.cnpj = cnpj;
@@ -73,7 +77,7 @@ public class Artista {
         this.nomeEmpresa = nomeEmpresa;
     }
 
-    // (Getters e Setters existentes OK)
+    // (Getters e Setters existentes)
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     public String getCpf() { return cpf; }
@@ -92,18 +96,18 @@ public class Artista {
     public void setCredencial(Credencial credencial) { this.credencial = credencial; }
     public Endereco getEndereco() { return endereco; }
     public void setEndereco(Endereco endereco) { this.endereco = endereco; }
+    public String getBiografia() { return biografia; }
+    public void setBiografia(String biografia) { this.biografia = biografia; }
 
-    // (Equals e HashCode OK)
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Artista artista = (Artista) o;
-        return Objects.equals(id, artista.id);
-    }
+    // --- 2. MUDANÇA ADICIONADA ---
+    // Getters e Setters para o novo campo fotoUrl
+    public String getFotoUrl() { return fotoUrl; }
+    public void setFotoUrl(String fotoUrl) { this.fotoUrl = fotoUrl; }
+    // --- FIM DA MUDANÇA ---
+
 
     @Override
-    public int hashCode() {
-        return Objects.hash(id);
-    }
+    public boolean equals(Object o) { return Objects.equals(id, ((Artista) o).id); }
+    @Override
+    public int hashCode() { return Objects.hash(id); }
 }

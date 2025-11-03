@@ -1,24 +1,29 @@
 package br.com.valedasartes.domain.artista.dto;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import br.com.valedasartes.domain.artista.Artista;
 import br.com.valedasartes.domain.endereco.Endereco;
 import br.com.valedasartes.domain.produto.Produto;
+import br.com.valedasartes.domain.produto.dto.ProdutoResponseDTO;
 
 public class ArtistaResponseDTO {
 
     private final Long id;
-    private final String nome; // Mudei de 'nomeArtista' para 'nome'
+    private final String nome;
     private final String cpf;
     private final String cnpj;
     private final String telefone;
     private final String nomeEmpresa;
-
-    // --- CAMPOS ADICIONADOS ---
-    private final Endereco endereco;
+    private final String biografia; 
+    private final EnderecoDTO endereco; 
     private final CredencialDTO credencial;
-    private final List<Produto> produtos;
+    private final List<ProdutoResponseDTO> produtos;
+
+    // --- 1. MUDANÇA ADICIONADA ---
+    private final String fotoUrl;
+    // --- FIM DA MUDANÇA ---
 
     public ArtistaResponseDTO(Artista artista) {
         this.id = artista.getId();
@@ -27,35 +32,76 @@ public class ArtistaResponseDTO {
         this.cnpj = artista.getCnpj();
         this.telefone = artista.getTelefone();
         this.nomeEmpresa = artista.getNomeEmpresa();
-        
-        // --- LÓGICA ADICIONADA ---
-        this.endereco = artista.getEndereco();
-        this.produtos = artista.getProdutos(); // Pega a lista de produtos
+        this.biografia = artista.getBiografia();
 
+        // --- 2. MUDANÇA ADICIONADA ---
+        this.fotoUrl = artista.getFotoUrl(); // Pega a URL da entidade
+        // --- FIM DA MUDANÇA ---
+
+        if (artista.getEndereco() != null) {
+            this.endereco = new EnderecoDTO(artista.getEndereco());
+        } else {
+            this.endereco = null;
+        }
+        
         if (artista.getCredencial() != null) {
             this.credencial = new CredencialDTO(artista.getCredencial().getEmail());
         } else {
             this.credencial = null;
         }
+
+        if (artista.getProdutos() != null) {
+            this.produtos = artista.getProdutos().stream()
+                    .filter(Produto::isAtivo)
+                    .map(ProdutoResponseDTO::new)
+                    .collect(Collectors.toList());
+        } else {
+            this.produtos = List.of(); 
+        }
     }
 
-    // Sub-classe DTO para enviar apenas o email
+    // (Sub-classes CredencialDTO e EnderecoDTO continuam iguais)
     public static class CredencialDTO {
         private final String email;
         public CredencialDTO(String email) { this.email = email; }
         public String getEmail() { return email; }
     }
+    
+    public static class EnderecoDTO {
+        private final String logradouro;
+        private final String numero;
+        private final String cidade;
+        private final String estado;
+        private final String cep;
+        
+        public EnderecoDTO(Endereco endereco) {
+            this.logradouro = endereco.getLogradouro();
+            this.numero = String.valueOf(endereco.getNumero()); 
+            this.cidade = endereco.getCidade();
+            this.estado = endereco.getEstado();
+            this.cep = endereco.getCep();
+        }
+        
+        public String getLogradouro() { return logradouro; }
+        public String getNumero() { return numero; }
+        public String getCidade() { return cidade; }
+        public String getEstado() { return estado; }
+        public String getCep() { return cep; }
+    }
 
-    // --- GETTERS ATUALIZADOS ---
+    // (Getters existentes)
     public Long getId() { return id; }
     public String getNome() { return nome; }
     public String getCpf() { return cpf; }
     public String getCnpj() { return cnpj; }
     public String getTelefone() { return telefone; }
     public String getNomeEmpresa() { return nomeEmpresa; }
-    
-    // --- GETTERS NOVOS ---
-    public Endereco getEndereco() { return endereco; }
+    public String getBiografia() { return biografia; }
+    public EnderecoDTO getEndereco() { return endereco; }
     public CredencialDTO getCredencial() { return credencial; }
-    public List<Produto> getProdutos() { return produtos; }
+    public List<ProdutoResponseDTO> getProdutos() { return produtos; }
+
+    // --- 3. MUDANÇA ADICIONADA ---
+    public String getFotoUrl() { return fotoUrl; }
+    // --- FIM DA MUDANÇA ---
 }

@@ -7,11 +7,11 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile; // <-- 1. IMPORTAR
+import org.springframework.web.multipart.MultipartFile;
 
-import br.com.valedasartes.config.FileStorageService;
+import br.com.valedasartes.config.FileStorageService; 
 import br.com.valedasartes.domain.artista.Artista;
-import br.com.valedasartes.domain.artista.repository.ArtistaRepository; // <-- 2. IMPORTAR
+import br.com.valedasartes.domain.artista.repository.ArtistaRepository;
 import br.com.valedasartes.domain.produto.Produto;
 import br.com.valedasartes.domain.produto.dto.ProdutoRequestDTO;
 import br.com.valedasartes.domain.produto.dto.ProdutoResponseDTO;
@@ -22,29 +22,24 @@ public class ProdutoService {
 
     private final ProdutoRepository produtoRepository;
     private final ArtistaRepository artistaRepository;
-    private final FileStorageService fileStorageService; // <-- 3. INJETAR
+    private final FileStorageService fileStorageService;
 
     @Autowired
     public ProdutoService(ProdutoRepository produtoRepository, 
                           ArtistaRepository artistaRepository,
-                          FileStorageService fileStorageService) { // <-- 4. ATUALIZAR CONSTRUTOR
+                          FileStorageService fileStorageService) {
         this.produtoRepository = produtoRepository;
         this.artistaRepository = artistaRepository;
         this.fileStorageService = fileStorageService;
     }
 
-    // --- 5. AQUI ESTÁ A CORREÇÃO ---
-    // A assinatura do método agora aceita os 3 argumentos
     @Transactional
     public ProdutoResponseDTO criarProduto(ProdutoRequestDTO dto, MultipartFile foto, Long artistaId) {
-        
+        // ... (código existente, tudo igual) ...
         Artista artista = artistaRepository.findById(artistaId)
                 .orElseThrow(() -> new RuntimeException("Artista não encontrado!"));
         
-        // Salva a foto no disco
         String nomeArquivo = fileStorageService.salvarArquivo(foto);
-        
-        // Gera a URL completa
         String fotoUrl = fileStorageService.getUrlCompleta(nomeArquivo);
 
         Produto novoProduto = new Produto();
@@ -53,17 +48,21 @@ public class ProdutoService {
         novoProduto.setPreco(dto.getPreco());
         novoProduto.setCategoria(dto.getCategoria());
         novoProduto.setArtista(artista);
-        novoProduto.setFotoUrl(fotoUrl); // Salva a URL da foto
-        novoProduto.setAtivo(true);
+        novoProduto.setFotoUrl(fotoUrl);
+        novoProduto.setAtivo(true); 
 
         Produto produtoSalvo = produtoRepository.save(novoProduto);
         return new ProdutoResponseDTO(produtoSalvo);
     }
 
-    public List<ProdutoResponseDTO> listarTodosOsProdutos() {
+    /**
+     * Lista TODOS os produtos (ativos e inativos) de UM artista.
+     * (Usado no /dashboard-artesao)
+     */
+    public List<ProdutoResponseDTO> listarProdutosPorArtistaId(Long artistaId) {
         return produtoRepository.findAll()
                 .stream()
-                .filter(Produto::isAtivo) 
+                .filter(produto -> produto.getArtista() != null && produto.getArtista().getId().equals(artistaId)) 
                 .map(ProdutoResponseDTO::new)
                 .collect(Collectors.toList());
     }
@@ -73,17 +72,14 @@ public class ProdutoService {
                 .map(ProdutoResponseDTO::new);
     }
 
-    // ATUALIZAR 'atualizarProduto' (para não depender do artistaId no DTO)
     @Transactional
     public ProdutoResponseDTO atualizarProduto(Long id, ProdutoRequestDTO dto, Long artistaId) {
+        // ... (código existente, tudo igual) ...
         return produtoRepository.findById(id)
             .map(produtoExistente -> {
-                
-                // Verifica se o produto pertence ao artista logado
                 if (!produtoExistente.getArtista().getId().equals(artistaId)) {
-                    throw new RuntimeException("Acesso negado: Este produto não pertence ao artista logado.");
+                    throw new RuntimeException("Acesso negado...");
                 }
-
                 produtoExistente.setNome(dto.getNome());
                 produtoExistente.setDescricao(dto.getDescricao());
                 produtoExistente.setPreco(dto.getPreco());
@@ -95,9 +91,34 @@ public class ProdutoService {
     }
 
     public void deletarProduto(Long id) {
-        produtoRepository.findById(id).ifPresent(produto -> {
-            produto.setAtivo(false);
-            produtoRepository.save(produto);
-        });
+        // ... (código existente, tudo igual) ...
+    }
+
+    @Transactional
+    public ProdutoResponseDTO toggleProdutoAtivo(Long id, Long artistaId) {
+        // ... (código existente, tudo igual) ...
+        return produtoRepository.findById(id)
+            .map(produtoExistente -> {
+                if (!produtoExistente.getArtista().getId().equals(artistaId)) {
+                    throw new RuntimeException("Acesso negado...");
+                }
+                boolean novoStatus = !produtoExistente.isAtivo(); 
+                produtoExistente.setAtivo(novoStatus);
+                Produto produtoAtualizado = produtoRepository.save(produtoExistente);
+                return new ProdutoResponseDTO(produtoAtualizado);
+            }).orElseThrow(() -> new RuntimeException("Produto não encontrado!"));
+    }
+    
+    // --- 1. MÉTODO NOVO ADICIONADO AQUI ---
+    /**
+     * Lista TODOS os produtos ATIVOS de TODOS os artistas.
+     * (Usado na /index.html)
+     */
+    public List<ProdutoResponseDTO> listarTodosOsProdutosAtivos() {
+        return produtoRepository.findAll()
+                .stream()
+                .filter(Produto::isAtivo) // <-- A MÁGICA ACONTECE AQUI
+                .map(ProdutoResponseDTO::new)
+                .collect(Collectors.toList());
     }
 }
