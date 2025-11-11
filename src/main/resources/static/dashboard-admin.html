@@ -4,8 +4,31 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vale das Artes - Painel do Administrador</title>
-    
-    </head>
+    <style>
+        /* CSS mínimo para o menu de fotos funcionar (exemplo) */
+        .foto-manager-menu {
+            position: relative; /* Necessário para o menu absoluto */
+        }
+        #foto-options-menu-destaque {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            border: 1px solid #ccc;
+            padding: 10px;
+            z-index: 100;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            border-radius: 5px;
+        }
+        #foto-options-menu-destaque button {
+            display: block;
+            width: 100%;
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
 <body>
 
     <header id="header-placeholder"></header>
@@ -26,27 +49,40 @@
                         <input type="text" id="destaque-titulo" name="titulo" required>
                     </div>
                     <div>
-                        <label for="destaque-texto">Texto (Descrição):</label>
-                        <textarea id="destaque-texto" name="texto" rows="4"></textarea>
-                    </div>
-                    <div>
                         <label for="destaque-link">Link (Ex: /produto-detalhe.html?id=10):</label>
-                        <input type="text" id="destaque-link" name="link">
+                        <input type="text" id="destaque-link" name="link" placeholder="/caminho-ou-link-externo">
                     </div>
                     <div>
-                        <label for="destaque-imagem">Imagem de Fundo (Opcional):</label>
-                        <input type="file" id="destaque-imagem" name="imagem">
+                        <p class="aviso-form">Observação: A imagem do destaque é adicionada ou editada após a publicação do registro.</p>
                     </div>
                     <button type="submit">Publicar Destaque</button>
+                    <p id="novo-destaque-status" style="margin-top: 10px;"></p>
                 </form>
+                
+                <h3 style="margin-top: 40px;">Destaques Publicados</h3>
+                <div id="lista-destaques-ativos">
+                    <p>Carregando lista de destaques...</p>
+                </div>
             </section>
 
             <hr>
 
             <section id="gerenciar-usuarios">
                 <h2>Gerenciar Usuários</h2>
-                <p>(Placeholder para futuras funções, como aprovar novos artesãos,
-                   visualizar clientes, etc.)</p>
+                <p>Lista de Artesãos Pendentes de Aprovação:</p>
+                <div id="lista-artesaos-pendentes">
+                    <p>Carregando...</p>
+                </div>
+
+                <p style="margin-top: 20px;">Lista de TODOS os Artesãos (Aprovados, Pendentes, Reprovados):</p>
+                <div id="lista-artesaos-todos">
+                    <p>Carregando...</p>
+                </div>
+                
+                <p style="margin-top: 20px;">Lista de Clientes Cadastrados:</p>
+                <div id="lista-clientes">
+                    <p>Carregando...</p>
+                </div>
             </section>
 
         </section>
@@ -54,7 +90,57 @@
 
     <footer id="footer-placeholder"></footer>
 
-    <script src="js/main.js"></script>
+    <div id="editDestaqueModal" class="modal-custom" style="display:none;">
+        <div class="modal-content-custom">
+            <h3>Editar Destaque <span id="edit-destaque-id-display"></span></h3>
+            <span class="close-button" id="close-destaque-modal-button">&times;</span>
+
+            <form id="form-editar-destaque">
+                <input type="hidden" id="edit-destaque-id" name="id">
+                
+                <div>
+                    <label for="edit-destaque-titulo">Título:</label>
+                    <input type="text" id="edit-destaque-titulo" name="titulo" required>
+                </div>
+                <div>
+                    <label for="edit-destaque-link">Link:</label>
+                    <input type="text" id="edit-destaque-link" name="link">
+                </div>
+                <div>
+                    <label>
+                        <input type="checkbox" id="edit-destaque-ativo" name="ativo"> Destaque Ativo
+                    </label>
+                </div>
+                <button type="submit" class="btn btn-success">Salvar Alterações</button>
+            </form>
+
+            <hr style="margin: 20px 0;">
+
+            <h4>Gerenciar Imagem</h4>
+            <div class="foto-manager-menu">
+                
+                <img id="destaque-foto-preview-menu" 
+                     src="https://via.placeholder.com/200?text=Sem+Foto" 
+                     alt="Foto do Destaque" 
+                     style="width: 300px; height: 150px; object-fit: cover; cursor: pointer; border-radius: 5px; border: 1px solid #ddd;">
+
+                <div id="foto-options-menu-destaque">
+                    <button id="btn-adicionar-foto-destaque">Adicionar Foto</button>
+                    <button id="btn-atualizar-foto-destaque">Mudar Foto</button>
+                    <button id="btn-remover-foto-destaque">Remover Foto</button>
+                    <button id="btn-cancelar-foto-destaque" class="btn-secondary">Cancelar</button>
+                </div>
+
+                <input type="file" id="input-foto-destaque" accept="image/*" style="display: none;">
+
+                <p id="upload-status-destaque" style="margin-top: 10px;"></p>
+            </div>
+            <button class="btn btn-secondary" id="btn-fechar-destaque-modal" style="margin-top: 20px;">Fechar</button>
+        </div>
+    </div>
     
-    </body>
+    <script src="js/main.js"></script>
+    <script src="js/dashboard-admin.js"></script> 
+    
+</body>
 </html>

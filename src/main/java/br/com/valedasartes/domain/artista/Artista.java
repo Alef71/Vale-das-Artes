@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import org.hibernate.annotations.ColumnDefault;
+
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import br.com.valedasartes.domain.endereco.Endereco;
@@ -12,6 +14,8 @@ import br.com.valedasartes.domain.security.Credencial;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -19,7 +23,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.Table; // ⬅️ IMPORTANTE: Adicionado o import
 
 @Entity(name = "Artista")
 @Table(name = "artista")
@@ -48,10 +52,15 @@ public class Artista {
     @Column(columnDefinition = "TEXT")
     private String biografia;
 
-    // --- 1. MUDANÇA ADICIONADA ---
     @Column(name = "foto_url")
     private String fotoUrl;
-    // --- FIM DA MUDANÇA ---
+    
+    // --- NOVO CAMPO: STATUS DE APROVAÇÃO (CORRIGIDO) ---
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status_aprovacao", nullable = false)
+    @ColumnDefault("'PENDENTE'") // ⬅️ CORREÇÃO CRÍTICA: Define o valor padrão para migração
+    private ArtistaStatus statusAprovacao = ArtistaStatus.PENDENTE;
+    // --- FIM NOVO CAMPO ---
 
     @JsonManagedReference
     @OneToMany(mappedBy = "artista", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -77,7 +86,7 @@ public class Artista {
         this.nomeEmpresa = nomeEmpresa;
     }
 
-    // (Getters e Setters existentes)
+    // --- GETTERS E SETTERS ---
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     public String getCpf() { return cpf; }
@@ -98,13 +107,12 @@ public class Artista {
     public void setEndereco(Endereco endereco) { this.endereco = endereco; }
     public String getBiografia() { return biografia; }
     public void setBiografia(String biografia) { this.biografia = biografia; }
-
-    // --- 2. MUDANÇA ADICIONADA ---
-    // Getters e Setters para o novo campo fotoUrl
     public String getFotoUrl() { return fotoUrl; }
     public void setFotoUrl(String fotoUrl) { this.fotoUrl = fotoUrl; }
-    // --- FIM DA MUDANÇA ---
-
+    
+    // --- GETTERS E SETTERS DO STATUS ---
+    public ArtistaStatus getStatusAprovacao() { return statusAprovacao; }
+    public void setStatusAprovacao(ArtistaStatus statusAprovacao) { this.statusAprovacao = statusAprovacao; }
 
     @Override
     public boolean equals(Object o) { return Objects.equals(id, ((Artista) o).id); }

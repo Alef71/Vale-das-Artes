@@ -1,11 +1,11 @@
 /*
- * js/main.js (VERSÃO ATUALIZADA)
+ * js/main.js (VERSÃO CORRIGIDA)
  *
- * CORRIGIDO: Agora usa 'userToken' em vez de 'authToken' para
- * ser consistente com 'auth.js' e 'dashboard-cliente.js'.
+ * Este arquivo contém a função 'apiClient' e NÃO tem o SyntaxError na linha 109.
+ * Este é o "par" correto para o dashboard-admin.js (v3.1).
  */
 
-const API_URL = 'http://localhost:8080/api';
+const API_URL = 'http://localhost:8080/api'; // Ou apenas '/api' se estiver no mesmo domínio
 
 // --- (DO SEU CÓDIGO) Função para carregar componentes (header/footer) ---
 function loadComponent(url, elementId) {
@@ -32,14 +32,17 @@ function loadComponent(url, elementId) {
 // --- (NOVO) Função Helper de API ---
 // Centraliza todas as chamadas à API e já inclui o token
 async function apiClient(endpoint, method = 'GET', body = null) {
-    // --- CORREÇÃO AQUI ---
     const token = localStorage.getItem('userToken'); // Usa 'userToken'
     
-    const headers = {
-        'Content-Type': 'application/json'
-    };
+    const headers = new Headers(); // Usar Headers object para flexibilidade
+    
+    // Se o corpo não for FormData, definir como JSON
+    if (body && !(body instanceof FormData)) {
+        headers.append('Content-Type', 'application/json');
+    }
+
     if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
+        headers.append('Authorization', `Bearer ${token}`);
     }
 
     const config = {
@@ -48,23 +51,32 @@ async function apiClient(endpoint, method = 'GET', body = null) {
     };
 
     if (body) {
-        config.body = JSON.stringify(body);
+        // Envia como JSON ou como FormData (para uploads)
+        config.body = (body instanceof FormData) ? body : JSON.stringify(body);
     }
 
     try {
         const response = await fetch(`${API_URL}${endpoint}`, config);
         
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.message || `Erro ${response.status}`);
-        }
+        // Se a resposta for 204 (No Content), como em um DELETE, retorne null
         if (response.status === 204) {
             return null;
         }
-        return await response.json();
+
+        // Tenta pegar o JSON. Se não houver, pode dar erro (ex: 500)
+        const data = await response.json();
+
+        if (!response.ok) {
+            // Usa a mensagem de erro do backend (data.message) ou o status
+            throw new Error(data.message || `Erro ${response.status}`);
+        }
+        
+        return data; // Retorna o JSON
+        
     } catch (error) {
         console.error(`Falha na API [${method} ${endpoint}]:`, error);
-        alert(`Erro: ${error.message}`);
+        // Não mostre um 'alert' aqui, apenas lance o erro
+        // A função que chamou (ex: loadDestaques) decidirá o que fazer.
         throw error;
     }
 }
@@ -72,8 +84,7 @@ async function apiClient(endpoint, method = 'GET', body = null) {
 
 // --- (ATUALIZADO) Função para atualizar a UI (Login/Logout) ---
 function atualizarEstadoLogin() {
-    // --- CORREÇÃO AQUI ---
-    const token = localStorage.getItem('userToken'); // Usa 'userToken'
+    const token = localStorage.getItem('userToken'); 
     const role = localStorage.getItem('userRole');
     const userId = localStorage.getItem('userId'); 
 
@@ -106,12 +117,12 @@ function atualizarEstadoLogin() {
             }
         }
         if (role === 'ROLE_ARTISTA' && linkPerfilPublico && userId) {
-            const urlCorreta = `perfil-artesao.html?id=${userId}`;
-            linkPerfilPublico.style.display = 'inline-block'; 
-            linkPerfilPublico.href = urlCorreta; 
-        } else if (linkPerfilPublico) {
-            linkPerfilPublico.style.display = 'none'; 
-        }
+            const urlCorreta = `perfil-artesao.html?id=${userId}`;
+            linkPerfilPublico.style.display = 'inline-block'; 
+            linkPerfilPublico.href = urlCorreta; 
+        } else if (linkPerfilPublico) {
+            linkPerfilPublico.style.display = 'none'; 
+        }
         
         // 2. Controla os botões GLOBAIS ("Comprar", etc.)
         elementosAutenticados.forEach(el => el.style.display = 'block');
@@ -119,6 +130,8 @@ function atualizarEstadoLogin() {
 
         // 3. Adiciona o listener de Logout
         if (btnLogout) {
+            // Evita adicionar múltiplos listeners
+            btnLogout.removeEventListener('click', handleLogout);
             btnLogout.addEventListener('click', handleLogout);
         }
 
@@ -142,13 +155,11 @@ function handleLogout(e) {
     if (e) e.preventDefault();
     if (!confirm('Deseja realmente sair?')) return;
     
-    // --- CORREÇÃO AQUI ---
     // Limpa TODAS as chaves que o 'auth.js' salva
-    localStorage.removeItem('userToken'); // Usa 'userToken'
+    localStorage.removeItem('userToken'); 
     localStorage.removeItem('userRole');
     localStorage.removeItem('userId');
-    // localStorage.removeItem('clienteId'); // Esta chave não é mais necessária
-    localStorage.removeItem('carrinhoId'); // <-- MUITO IMPORTANTE
+    localStorage.removeItem('carrinhoId'); 
     
     alert("Você saiu da sua conta.");
     window.location.href = 'index.html';
@@ -184,6 +195,7 @@ async function handleAdicionarAoCarrinho(evento) {
         
     } catch (error) {
         console.error('Falha ao adicionar item:', error);
+        alert(`Erro ao adicionar: ${error.message}`); // Mostra o erro da API
     } finally {
         botao.disabled = false;
         botao.textContent = 'Comprar Produto';

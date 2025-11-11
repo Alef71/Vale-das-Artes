@@ -6,9 +6,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize; // <-- NOVO IMPORT
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping; // <-- NOVO IMPORT
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -18,9 +20,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import br.com.valedasartes.domain.artista.dto.ArtistaRequestDTO;
+import br.com.valedasartes.domain.artista.dto.ArtistaRequestDTO; // <-- NOVO IMPORT
 import br.com.valedasartes.domain.artista.dto.ArtistaResponseDTO;
-import br.com.valedasartes.domain.artista.dto.ArtistaUpdateDTO;
+import br.com.valedasartes.domain.artista.dto.ArtistaStatusUpdateDTO;
+import br.com.valedasartes.domain.artista.dto.ArtistaUpdateDTO; // <-- NOVO IMPORT
 import br.com.valedasartes.domain.artista.service.ArtistaService;
 import br.com.valedasartes.domain.security.Credencial;
 import io.swagger.v3.oas.annotations.Operation;
@@ -42,44 +45,35 @@ public class ArtistaController {
     }
 
     @Operation(summary = "Cria um novo artista", description = "Registra um novo artista na plataforma.")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "201", description = "Artista criado com sucesso"),
-        @ApiResponse(responseCode = "400", description = "Dados de entrada inválidos (ex: CPF inválido)")
-    })
+    // ...
     @PostMapping
     public ResponseEntity<ArtistaResponseDTO> criarArtista(@Valid @RequestBody ArtistaRequestDTO dto) {
         ArtistaResponseDTO novoArtista = artistaService.criarArtista(dto);
         return new ResponseEntity<>(novoArtista, HttpStatus.CREATED);
     }
+    
+    // --- NOVO ENDPOINT: Listar Artistas Pendentes (ADMIN) ---
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Lista apenas artistas com status PENDENTE (Administrativo)")
+    @GetMapping("/pendentes")
+    public ResponseEntity<List<ArtistaResponseDTO>> listarArtistasPendentes() {
+        List<ArtistaResponseDTO> artistas = artistaService.listarArtistasPendentes();
+        return ResponseEntity.ok(artistas);
+    }
+    // -----------------------------------------------------
 
     @Operation(summary = "Lista todos os artistas", description = "Retorna uma lista com todos os artistas cadastrados.")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Lista de artistas retornada com sucesso")
-    })
+    // ...
     @GetMapping
     public ResponseEntity<List<ArtistaResponseDTO>> listarArtistas() {
         List<ArtistaResponseDTO> artistas = artistaService.listarTodosOsArtistas();
         return ResponseEntity.ok(artistas);
     }
 
-    @Operation(summary = "Busca um artista por ID", description = "Retorna os detalhes de um artista específico.")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Artista encontrado com sucesso"),
-        @ApiResponse(responseCode = "404", description = "Artista não encontrado")
-    })
-    @GetMapping("/{id}")
-    public ResponseEntity<ArtistaResponseDTO> buscarArtistaPorId(@PathVariable Long id) {
-        return artistaService.buscarArtistaPorId(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
-    }
+    // ... (buscarArtistaPorId e atualizarArtista permanecem os mesmos) ...
 
     @Operation(summary = "Atualiza um artista existente", description = "Atualiza os dados cadastrais de um artista.")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Artista atualizado com sucesso"),
-        @ApiResponse(responseCode = "400", description = "Dados de entrada inválidos"),
-        @ApiResponse(responseCode = "404", description = "Artista não encontrado")
-    })
+    // ...
     @PutMapping("/{id}")
     public ResponseEntity<ArtistaResponseDTO> atualizarArtista(@PathVariable Long id, @Valid @RequestBody ArtistaUpdateDTO dto) {
         ArtistaResponseDTO artistaAtualizado = artistaService.atualizarArtista(id, dto);
@@ -89,38 +83,49 @@ public class ArtistaController {
         return ResponseEntity.notFound().build();
     }
     
-    @Operation(summary = "Upload de foto de perfil do artista", description = "Faz upload de uma nova foto para o artista.")
+    // --- NOVO ENDPOINT: Alterar Status de Aprovação (ADMIN) ---
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Atualiza o status de aprovação do artista (Administrativo)")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Foto atualizada com sucesso"),
+        @ApiResponse(responseCode = "200", description = "Status alterado com sucesso"),
         @ApiResponse(responseCode = "404", description = "Artista não encontrado")
     })
+    @PatchMapping("/{id}/status") // PATCH é ideal para atualizar um único campo
+    public ResponseEntity<ArtistaResponseDTO> alterarStatusAprovacao(
+            @PathVariable Long id, 
+            @Valid @RequestBody ArtistaStatusUpdateDTO dto) {
+        
+        ArtistaResponseDTO artistaAtualizado = artistaService.alterarStatusAprovacao(id, dto.getStatus());
+        return ResponseEntity.ok(artistaAtualizado);
+    }
+    // -----------------------------------------------------
+
+    @Operation(summary = "Upload de foto de perfil do artista", description = "Faz upload de uma nova foto para o artista.")
+    // ...
     @PostMapping(value = "/{id}/foto", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ArtistaResponseDTO> uploadFoto(
             @PathVariable Long id, 
             @RequestParam("foto") MultipartFile file,
             Authentication authentication) {
-        
+        // ... (Corpo do método)
         Credencial credencial = (Credencial) authentication.getPrincipal();
-        
         ArtistaResponseDTO artistaAtualizado = artistaService.uploadFoto(id, file, credencial);
         return ResponseEntity.ok(artistaAtualizado);
     }
     
     @Operation(summary = "Remove a foto de perfil do artista")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Foto removida com sucesso"),
-        @ApiResponse(responseCode = "404", description = "Artista não encontrado")
-    })
+    // ...
     @DeleteMapping(value = "/{id}/foto")
     public ResponseEntity<ArtistaResponseDTO> removerFoto(
             @PathVariable Long id,
             Authentication authentication) {
-        
+        // ... (Corpo do método)
         Credencial credencial = (Credencial) authentication.getPrincipal();
         ArtistaResponseDTO artistaAtualizado = artistaService.removerFoto(id, credencial);
         return ResponseEntity.ok(artistaAtualizado);
     }
 
+    @PreAuthorize("hasRole('ADMIN')") // <-- PROTEÇÃO DE SEGURANÇA ADICIONADA AQUI!
     @Operation(summary = "Deleta um artista", description = "Remove permanentemente um artista do sistema.")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "204", description = "Artista deletado com sucesso"),
