@@ -32,7 +32,7 @@ Para rodar o projeto, você precisa de duas partes: o **Banco de Dados (PostgreS
 
 ```bash
 # Clone o projeto para a sua máquina
-git clone [URL_DO_SEU_REPOSITORIO_GIT]
+git clone https://github.com/Alef71/Vale-das-Artes.git
 
 # Entre na pasta do projeto
 cd vale-das-artes
@@ -57,8 +57,9 @@ O banco de dados `valedasartesdb` estará rodando na porta `localhost:5434`.
 ### 3\. ☕ Rodar o Backend (Spring Boot)
 
 1.  Abra a pasta do projeto na sua IDE (IntelliJ, VS Code, etc.).
-2.  Aguarde o Maven baixar todas as dependências do `pom.xml`.
-3.  Encontre e rode a classe principal: `src/main/java/br/com/valedasartes/ValeDasArtesApplication.java`.
+2.  Baixe todas as dependências do projeto rodando o comando `mvn install`.
+3.  Aguarde o Maven baixar todas as dependências do `pom.xml`.
+4.  Encontre e rode a classe principal: `src/main/java/br/com/valedasartes/ValeDasArtesApplication.java`.
 
 Seu servidor backend estará rodando\!
 
