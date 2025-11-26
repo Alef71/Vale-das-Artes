@@ -13,11 +13,35 @@
 body {
     margin: 0; padding: 0;
     font-family: 'Segoe UI', sans-serif;
-    background-color: var(--bg-page); /* Fundo bege */
+    background-color: var(--bg-page);
+    
+    /* CORREÇÃO DE LAYOUT: Coluna Vertical */
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+/* --- ESTRUTURA DA PÁGINA (Novo) --- */
+
+/* O Header e o Footer não encolhem */
+nav.navbar, footer.site-footer {
+    flex-shrink: 0;
+    z-index: 100;
+    position: relative;
+    width: 100%;
+}
+
+/* O Main ocupa o espaço sobrando e centraliza o card */
+main {
+    flex-grow: 1;
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 100vh;
+    padding: 40px 20px;
+    width: 100%;
+    position: relative;
+    z-index: 1;
 }
 
 /* --- CARD PRINCIPAL --- */
@@ -29,11 +53,15 @@ body {
     border-radius: 20px;
     box-shadow: 0 20px 60px rgba(0,0,0,0.3);
     overflow: hidden;
+    
+    /* Garante que o card fique contido */
+    max-width: 100%;
+    position: relative;
 }
 
 /* Lado Esquerdo (IMAGEM) */
 #image-side {
-    width: 75%;
+    width: 50%; /* Ajustado para dividir meio a meio ou conforme preferência */
     position: relative;
     background-image: url('../images/logo-ValeDasArtes.jpg');
     background-size: cover;
@@ -54,10 +82,12 @@ body {
 
 /* Lado Direito (FORMULÁRIOS) */
 #forms-side {
-    width: 55%;
+    width: 50%; /* Ajustado */
     padding: 40px;
     position: relative; /* Importante para as views */
     color: var(--text-white);
+    display: flex;
+    flex-direction: column;
 }
 
 /* --- VIEWS (Telas que alternam) --- */
@@ -91,6 +121,8 @@ body {
 
 /* Inputs */
 .input-group label { display: block; margin-bottom: 5px; font-size: 0.9em; color: #ccc; }
+.input-group { margin-bottom: 15px; }
+
 .input-wrapper {
     position: relative;
     background: var(--input-bg);
@@ -126,6 +158,7 @@ input {
 
 .footer-link { text-align: center; margin-top: auto; padding-top: 20px; font-size: 0.9em; }
 .footer-link a { color: var(--accent); text-decoration: none; font-weight: bold; }
+.divider { text-align: center; margin: 15px 0; color: #666; font-size: 0.8em; }
 
 /* --- CARDS DE SELEÇÃO (Opção 2) --- */
 .selection-container { display: flex; gap: 15px; margin-top: 20px; }
@@ -152,6 +185,24 @@ input {
 /* Mobile */
 @media(max-width: 800px) {
     #image-side { display: none; }
-    #auth-card { width: 95%; height: auto; min-height: 90vh; }
-    #forms-side { width: 100%; }
+    
+    #auth-card { 
+        width: 100%; 
+        height: auto; 
+        min-height: 500px;
+        flex-direction: column;
+    }
+    
+    #forms-side { width: 100%; padding: 30px; }
+    
+    .auth-view {
+        position: relative; /* No mobile, remove absolute para fluir melhor */
+        top: 0; left: 0; right: 0; bottom: 0;
+        opacity: 1; 
+        pointer-events: auto;
+        transform: none;
+        display: none; /* Controlado via JS */
+    }
+    
+    .auth-view.active { display: flex; }
 }
