@@ -1,271 +1,172 @@
-/**
- * js/auth.js
- * (VERSÃO ATUALIZADA)
- * * Corrigido para salvar 'userToken' (em vez de 'authToken')
- * para ser compatível com o 'dashboard-cliente.js'.
- * * Mantém a lógica 'ensureActiveCart' para o carrinho.
- * * Redireciona o cliente para 'dashboard-cliente.html'.
- */
 document.addEventListener("DOMContentLoaded", function() {
 
-    // --- SELETORES DO DOM ---
-    const formLogin = document.getElementById("form-login");
-    const formCadastro = document.getElementById("form-cadastro");
-    const radioCliente = document.getElementById("tipo-cliente");
-    const radioArtesao = document.getElementById("tipo-artesao");
-    const camposArtesao = document.getElementById("campos-artesao");
+    // --- SELETORES ---
+    const viewLogin = document.getElementById("view-login");
+    const viewSelection = document.getElementById("view-selection");
+    const viewCadastro = document.getElementById("view-cadastro");
 
-    // --- FUNÇÃO HELPER: API Fetch ---
-    async function apiFetch(endpoint, method = 'POST', body = null) {
-        // --- CORREÇÃO AQUI ---
-        // Lê 'userToken' em vez de 'authToken'
-        const token = localStorage.getItem('userToken'); 
-        
-        const headers = {
-            'Content-Type': 'application/json'
-        };
+    // Botões de Navegação
+    const btnIrCadastro = document.getElementById("btn-ir-cadastro");
+    const btnVoltarLoginSel = document.getElementById("btn-voltar-login-sel");
+    const btnVoltarSelecao = document.getElementById("btn-voltar-selecao");
 
-        if (token) {
-            headers['Authorization'] = `Bearer ${token}`;
-        }
-    
-        const config = {
-            method: method,
-            headers: headers
-        };
-    
-        if (body) {
-            config.body = JSON.stringify(body);
-        }
-    
-        const response = await fetch(endpoint, config);
-    
-        if (!response.ok) {
-            let errorData;
-            try {
-                errorData = await response.json(); 
-            } catch (e) {
-                errorData = await response.text(); 
-            }
-            console.error(`Erro na API [${method} ${endpoint}]:`, response.status, errorData);
-            throw new Error(errorData.message || errorData || `Erro ${response.status}`);
-        }
-        
-        if (response.status === 204) {
-            return null; // Sem conteúdo
-        }
-        
-        return await response.json(); // Sucesso
+    // Elementos do Cadastro
+    const radioCliente = document.getElementById("radio-cliente");
+    const radioArtesao = document.getElementById("radio-artesao");
+    const extraArtesao = document.getElementById("extra-artesao");
+    const tituloCadastro = document.getElementById("titulo-cadastro");
+
+    // --- FUNÇÃO DE TROCA DE TELA ---
+    function showView(viewId) {
+        // Esconde todos
+        [viewLogin, viewSelection, viewCadastro].forEach(v => {
+            v.classList.remove('active');
+            // Pequeno delay para display:none não quebrar animação
+            setTimeout(() => { if(!v.classList.contains('active')) v.style.display = 'none'; }, 400);
+        });
+
+        // Mostra o alvo
+        const target = document.getElementById(viewId);
+        target.style.display = 'flex'; // Garante que existe
+        setTimeout(() => target.classList.add('active'), 50); // Adiciona classe para opacidade
     }
 
-    // --- LÓGICA DE CADASTRO (Alternar Campos) ---
-    function toggleCamposArtesao() {
-        if (radioArtesao.checked) {
-            camposArtesao.style.display = "block"; 
+    // Inicialização: Mostra Login, esconde outros via style
+    viewSelection.style.display = 'none';
+    viewCadastro.style.display = 'none';
+
+    // --- EVENTOS DE CLIQUE ---
+    
+    // 1. Tela Login -> Tela Seleção
+    if(btnIrCadastro) {
+        btnIrCadastro.addEventListener('click', (e) => {
+            e.preventDefault();
+            showView('view-selection');
+        });
+    }
+
+    // 2. Tela Seleção -> Tela Login
+    if(btnVoltarLoginSel) {
+        btnVoltarLoginSel.addEventListener('click', (e) => {
+            e.preventDefault();
+            showView('view-login');
+        });
+    }
+
+    // 3. Tela Cadastro -> Tela Seleção
+    if(btnVoltarSelecao) {
+        btnVoltarSelecao.addEventListener('click', (e) => {
+            e.preventDefault();
+            showView('view-selection');
+        });
+    }
+
+    // 4. LÓGICA DE SELEÇÃO (Recebe do HTML)
+    document.addEventListener('roleSelected', (e) => {
+        const role = e.detail;
+        
+        if (role === 'cliente') {
+            radioCliente.checked = true;
+            extraArtesao.style.display = 'none';
+            tituloCadastro.innerText = "Cadastro de Cliente";
         } else {
-            camposArtesao.style.display = "none";
+            radioArtesao.checked = true;
+            extraArtesao.style.display = 'block';
+            tituloCadastro.innerText = "Cadastro de Artesão";
         }
+        
+        showView('view-cadastro');
+        // Reseta scroll
+        viewCadastro.scrollTop = 0;
+    });
+
+    // --- API FETCH HELPER ---
+    async function apiFetch(url, method, body) {
+        const token = localStorage.getItem('userToken');
+        const headers = { 'Content-Type': 'application/json' };
+        if(token) headers['Authorization'] = `Bearer ${token}`;
+        
+        const res = await fetch(url, {
+            method: method,
+            headers: headers,
+            body: JSON.stringify(body)
+        });
+        
+        if (!res.ok) {
+            const txt = await res.text();
+            throw new Error(txt || res.statusText);
+        }
+        return res.status === 204 ? null : await res.json();
     }
 
-    if (radioCliente && radioArtesao) {
-        radioCliente.addEventListener('change', toggleCamposArtesao);
-        radioArtesao.addEventListener('change', toggleCamposArtesao);
-    }
-
-    // --- SUBMISSÃO DO FORMULÁRIO DE LOGIN ---
-    if (formLogin) {
-        formLogin.addEventListener("submit", async function(event) {
-            event.preventDefault(); 
-            const loginData = {
-                email: document.getElementById("login-email").value,
-                senha: document.getElementById("login-senha").value
-            };
-            
-            console.log("Enviando dados de Login:", loginData);
+    // --- SUBMIT LOGIN ---
+    const formLogin = document.getElementById("form-login");
+    if(formLogin) {
+        formLogin.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById("login-email").value;
+            const senha = document.getElementById("login-senha").value;
 
             try {
-                // 1. FAZER O LOGIN
-                const data = await apiFetch('/api/auth/login', 'POST', loginData);
-                // data = { token, role, userId }
-                
-                console.log("Login bem-sucedido!", data);
-                
-                // --- INÍCIO DA CORREÇÃO ---
-                // 2. SALVAR DADOS DA SESSÃO (COM AS CHAVES CORRETAS)
-                // Salva 'userToken' como o 'dashboard-cliente.js' espera
-                localStorage.setItem('userToken', data.token); 
+                const data = await apiFetch('/api/auth/login', 'POST', { email, senha });
+                localStorage.setItem('userToken', data.token);
                 localStorage.setItem('userRole', data.role);
                 localStorage.setItem('userId', data.userId);
-                // --- FIM DA CORREÇÃO ---
                 
-                alert("Login realizado com sucesso! Preparando sua sessão...");
-
-                // 3. GARANTIR O CARRINHO
-                if (data.role === 'ROLE_CLIENTE') {
-                    // O 'dashboard-cliente.js' não precisa do 'clienteId',
-                    // mas o 'ensureActiveCart' precisa dele (que é o 'userId').
-                    // Não precisamos salvar 'clienteId' pois já temos 'userId'.
-                    
-                    try {
-                        const carrinho = await ensureActiveCart(data.userId.toString(), data.token);
-                        
-                        if (carrinho && carrinho.id) {
-                            localStorage.setItem('carrinhoId', carrinho.id); // SUCESSO!
-                            console.log("Carrinho ID salvo:", carrinho.id);
-                        } else {
-                            throw new Error('API não retornou um ID de carrinho válido.');
-                        }
-                        
-                        // 4. REDIRECIONAR O CLIENTE (Corrigido)
-                        window.location.href = 'dashboard-cliente.html'; 
-
-                    } catch (cartError) {
-                        console.error("Erro crítico ao criar o carrinho:", cartError);
-                        alert("Login realizado, mas não foi possível carregar seu carrinho. Tente relogar.");
-                        window.location.href = 'index.html'; 
-                    }
-
-                } else {
-                    // 4. REDIRECIONAR (Para não-clientes)
-                    if (data.role === 'ROLE_ARTISTA') {
-                        window.location.href = 'dashboard-artesao.html';
-                    } else if (data.role === 'ROLE_ADMIN') {
-                        window.location.href = 'dashboard-admin.html';
-                    } else {
-                        window.location.href = 'index.html';
-                    }
-                }
-
-            } catch (error) {
-                console.error("Erro de login:", error);
-                alert("Erro no login: " + error.message);
+                alert("Login realizado!");
+                
+                if(data.role === 'ROLE_CLIENTE') window.location.href = 'dashboard-cliente.html';
+                else if(data.role === 'ROLE_ARTISTA') window.location.href = 'dashboard-artesao.html';
+                else window.location.href = 'dashboard-admin.html';
+                
+            } catch (err) {
+                alert("Erro no login: " + err.message);
             }
         });
     }
 
-    // A função ensureActiveCart continua a mesma (está correta)
-    async function ensureActiveCart(clienteId, token) {
-        console.log("Garantindo carrinho para o clienteId:", clienteId);
-        const existingCartId = localStorage.getItem('carrinhoId');
-
-        if (existingCartId) {
-            console.log("Encontrado carrinhoId salvo:", existingCartId);
-            try {
-                const response = await fetch(`/api/carrinhos/${existingCartId}`, {
-                    method: 'GET',
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-
-                if (response.ok) {
-                    const carrinhoDTO = await response.json();
-                    if (carrinhoDTO.clienteId.toString() === clienteId) {
-                        console.log("Carrinho salvo é válido e pertence ao cliente.");
-                        return carrinhoDTO; 
-                    } else {
-                        console.warn("Carrinho salvo pertence a outro cliente. Criando um novo.");
-                    }
-                } else {
-                    console.warn("Carrinho salvo não encontrado (404) ou erro. Criando um novo.");
-                }
-            } catch (error) {
-                console.error("Erro ao validar carrinho salvo:", error);
-            }
-        }
-
-        console.log("Criando novo carrinho para o cliente...");
-        try {
-            const response = await fetch(`/api/carrinhos/cliente/${clienteId}`, {
-                method: 'POST',
-                headers: { 
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                }
-            });
-
-            if (!response.ok) {
-                throw new Error('API falhou ao criar novo carrinho.');
-            }
+    // --- SUBMIT CADASTRO ---
+    const formCadastro = document.getElementById("form-cadastro");
+    if(formCadastro) {
+        formCadastro.addEventListener('submit', async (e) => {
+            e.preventDefault();
             
-            const novoCarrinhoDTO = await response.json();
-            console.log("Novo carrinho criado:", novoCarrinhoDTO.id);
-            return novoCarrinhoDTO;
+            // Coleta dados manualmente para garantir estrutura
+            const tipo = radioCliente.checked ? 'cliente' : 'artesao';
+            const body = {
+                nome: document.getElementById('cad-nome').value,
+                cpf: document.getElementById('cad-cpf').value,
+                telefone: document.getElementById('cad-telefone').value,
+                credencial: {
+                    email: document.getElementById('cad-email').value,
+                    senha: document.getElementById('cad-senha').value
+                },
+                endereco: {
+                    cep: document.getElementById('end-cep').value,
+                    cidade: document.getElementById('end-cidade').value,
+                    logradouro: document.getElementById('end-logradouro').value,
+                    numero: parseInt(document.getElementById('end-numero').value) || 0,
+                    bairro: document.getElementById('end-bairro').value,
+                    estado: document.getElementById('end-estado').value,
+                    telefone: document.getElementById('end-tel-entrega').value
+                }
+            };
 
-        } catch (error) {
-            console.error("Erro crítico ao criar novo carrinho:", error);
-            throw error;
-        }
-    }
-
-
-    // --- SUBMISSÃO DO FORMULÁRIO DE CADASTRO (Lógica original mantida) ---
-    if (formCadastro) {
-        formCadastro.addEventListener("submit", async function(event) {
-            event.preventDefault();
-            const formData = new FormData(formCadastro);
-            const dadosFormulario = Object.fromEntries(formData.entries());
-            
-            const { url, payload } = construirPayloadCadastro(dadosFormulario);
-
-            console.log("Enviando cadastro para:", url);
-            console.log("Payload (JSON) a ser enviado:", payload);
+            let url = '/api/clientes';
+            if (tipo === 'artesao') {
+                url = '/api/artistas';
+                body.nomeEmpresa = document.getElementById('cad-empresa').value;
+                body.cnpj = document.getElementById('cad-cnpj').value;
+            }
 
             try {
-                await apiFetch(url, 'POST', payload);
-
-                alert("Cadastro realizado com sucesso! Você já pode fazer o login.");
-                formCadastro.reset(); 
-                document.getElementById('login-container').scrollIntoView();
-
-            } catch (error) {
-                alert(`Erro no cadastro: ${error.message}`);
+                await apiFetch(url, 'POST', body);
+                alert("Cadastro realizado! Faça login.");
+                formCadastro.reset();
+                showView('view-login');
+            } catch (err) {
+                alert("Erro ao cadastrar: " + err.message);
             }
         });
-    }
-
-    
-    // --- FUNÇÃO HELPER: Construir Payload (Lógica original mantida) ---
-    function construirPayloadCadastro(dados) {
-        const credencial = {
-            email: dados.email,
-            senha: dados.senha
-        };
-        const endereco = {
-            logradouro: dados.logradouro,
-            numero: parseInt(dados.numero) || 0,
-            complemento: dados.complemento || null, 
-            bairro: dados.bairro,
-            cidade: dados.cidade,
-            estado: dados.estado,
-            cep: dados.cep,
-            telefone: dados.telefoneEndereco 
-        };
-
-        let payload;
-        let url;
-        
-        if (dados.tipoConta === 'cliente') {
-            url = '/api/clientes';
-            payload = {
-                nome: dados.nome,
-                cpf: dados.cpf,
-                telefone: dados.telefone, 
-                credencial: credencial,
-                endereco: endereco
-            };
-        } else { // 'artesao'
-            url = '/api/artistas';
-            payload = {
-                nome: dados.nome, 
-                cpf: dados.cpf,   
-                telefone: dados.telefone, 
-                
-                nomeEmpresa: dados.nome_empresa || null,
-                cnpj: dados.cnpj || null, 
-                
-                credencial: credencial,
-                endereco: endereco
-            };
-        }
-        return { url, payload };
     }
 });

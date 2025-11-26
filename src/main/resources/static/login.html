@@ -3,128 +3,233 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vale das Artes - Login e Cadastro</title>
-    <link rel="stylesheet" href="css/style-componente-header.css">
-    <link rel="stylesheet" href="css/style-componente-footer.css">
-    </head>
+    <title>Vale das Artes - Acesso</title>
+    <!-- Ícones Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- CSS Principal -->
+    <link rel="stylesheet" href="css/login.css">
+</head>
 <body>
 
-    <header id="header-placeholder"></header>
+    <!-- CABEÇALHO -->
+    <header class="site-header">
+        <div class="header-content">
+            <div class="logo-area">
+                <i class="fas fa-palette"></i>
+                <span>Vale das Artes</span>
+            </div>
+            <nav>
+                <a href="index.html">Início</a>
+                <a href="#">Sobre</a>
+                <a href="#">Contato</a>
+            </nav>
+        </div>
+    </header>
 
+    <!-- CONTEÚDO PRINCIPAL (Centralizado) -->
     <main>
-        <section id="auth-page">
-            <div id="login-container">
-                <h2>Acessar sua Conta</h2>
-                <form id="form-login">
-                    <div>
-                        <label for="login-email">Email:</label>
-                        <input type="email" id="login-email" name="email" required>
-                    </div>
-                    <div>
-                        <label for="login-senha">Senha:</label>
-                        <input type="password" id="login-senha" name="senha" required>
-                    </div>
-                    <button type="submit">Entrar</button>
-                </form>
+        <section id="auth-card">
+            
+            <!-- Lado Esquerdo: Imagem (Definida no CSS) -->
+            <div id="image-side">
+                <div class="overlay"></div>
+                <div class="brand-text">
+                    <h1>Vale das Artes</h1>
+                    <p>Conectando arte e cultura.</p>
+                </div>
             </div>
 
-            <hr> <div id="cadastro-container">
-                <h2>Criar nova conta</h2>
-                <form id="form-cadastro">
-                    
-                    <div>
-                        <label>Eu sou:</label>
-                        <input type="radio" id="tipo-cliente" name="tipoConta" value="cliente" checked>
-                        <label for="tipo-cliente">Cliente</label>
-                        
-                        <input type="radio" id="tipo-artesao" name="tipoConta" value="artesao">
-                        <label for="tipo-artesao">Artesão</label>
+            <!-- Lado Direito: Telas Interativas -->
+            <div id="forms-side">
+                
+                <!-- TELA 1: LOGIN (Padrão) -->
+                <div id="view-login" class="auth-view active">
+                    <div class="header-box">
+                        <h2>Bem-vindo de volta</h2>
+                        <p>Acesse sua conta para continuar</p>
                     </div>
 
-                    <fieldset id="campos-cliente">
-                        <div>
-                            <label for="cliente-nome">Nome Completo:</label>
-                            <input type="text" id="cliente-nome" name="nome" required>
+                    <form id="form-login">
+                        <div class="input-group">
+                            <label for="login-email">Email</label>
+                            <div class="input-wrapper">
+                                <i class="fas fa-envelope"></i>
+                                <input type="email" id="login-email" name="email" required placeholder="seu@email.com">
+                            </div>
                         </div>
-                        <div>
-                            <label for="cliente-cpf">CPF:</label>
-                            <input type="text" id="cliente-cpf" name="cpf" required>
+                        <div class="input-group">
+                            <label for="login-senha">Senha</label>
+                            <div class="input-wrapper">
+                                <i class="fas fa-lock"></i>
+                                <input type="password" id="login-senha" name="senha" required placeholder="••••••">
+                            </div>
                         </div>
-                        <div>
-                            <label for="cliente-telefone">Telefone:</label>
-                            <input type="text" id="cliente-telefone" name="telefone" required>
-                        </div>
-                    </fieldset>
+                        <button type="submit" class="btn-primary">Entrar</button>
+                    </form>
 
-                    <fieldset id="campos-artesao" style="display: none;">
-                        <div>
-                            <label for="artesao-nome-empresa">Nome do Ateliê/Empresa (Opcional):</label>
-                            <input type="text" id="artesao-nome-empresa" name="nome_empresa">
-                        </div>
-                        <div>
-                            <label for="artesao-cnpj">CNPJ (Opcional):</label>
-                            <input type="text" id="artesao-cnpj" name="cnpj">
-                        </div>
-                    </fieldset>
+                    <div class="divider">OU</div>
 
-                    <fieldset id="campos-credenciais">
-                        <div>
-                            <label for="cadastro-email">Email:</label>
-                            <input type="email" id="cadastro-email" name="email" required>
-                        </div>
-                        <div>
-                            <label for="cadastro-senha">Senha:</label>
-                            <input type="password" id="cadastro-senha" name="senha" required>
-                        </div>
-                    </fieldset>
+                    <div class="footer-link">
+                        <span>Não tem conta?</span>
+                        <a href="#" id="btn-ir-cadastro">Criar nova conta</a>
+                    </div>
+                </div>
 
-                    <fieldset id="campos-endereco">
-                        <legend>Endereço</legend>
-                        <div>
-                            <label for="end-logradouro">Logradouro (Rua/Av.):</label>
-                            <input type="text" id="end-logradouro" name="logradouro" required>
+                <!-- TELA 2: ESCOLHA (Cliente ou Artesão) -->
+                <div id="view-selection" class="auth-view hidden">
+                    <div class="header-box">
+                        <h2>Criar Conta</h2>
+                        <p>Como você deseja usar a plataforma?</p>
+                    </div>
+
+                    <div class="selection-container">
+                        <!-- Opção Cliente -->
+                        <div class="option-card" onclick="selectRole('cliente')">
+                            <i class="fas fa-shopping-bag"></i>
+                            <h3>Sou Cliente</h3>
+                            <p>Quero comprar artes.</p>
                         </div>
-                        <div>
-                            <label for="end-numero">Número:</label>
-                            <input type="text" id="end-numero" name="numero" required>
+
+                        <!-- Opção Artesão -->
+                        <div class="option-card" onclick="selectRole('artesao')">
+                            <i class="fas fa-paint-brush"></i>
+                            <h3>Sou Artesão</h3>
+                            <p>Quero vender minhas criações.</p>
                         </div>
-                        <div>
-                            <label for="end-complemento">Complemento:</label>
-                            <input type="text" id="end-complemento" name="complemento">
+                    </div>
+
+                    <div class="footer-link">
+                        <a href="#" id="btn-voltar-login-sel"><i class="fas fa-arrow-left"></i> Voltar</a>
+                    </div>
+                </div>
+
+                <!-- TELA 3: FORMULÁRIO DE CADASTRO -->
+                <div id="view-cadastro" class="auth-view hidden">
+                    <div class="header-box">
+                        <h2 id="titulo-cadastro">Cadastro</h2>
+                        <p>Preencha seus dados</p>
+                    </div>
+
+                    <form id="form-cadastro">
+                        <!-- Radios ocultos para controle do JS -->
+                        <div style="display:none;">
+                            <input type="radio" id="radio-cliente" name="tipoConta" value="cliente">
+                            <input type="radio" id="radio-artesao" name="tipoConta" value="artesao">
                         </div>
-                        <div>
-                            <label for="end-bairro">Bairro:</label>
-                            <input type="text" id="end-bairro" name="bairro" required>
+
+                        <!-- Campos Pessoais -->
+                        <div class="row">
+                            <div class="col-100">
+                                <label for="cad-nome">Nome Completo</label>
+                                <input type="text" id="cad-nome" name="nome" required>
+                            </div>
                         </div>
-                        <div>
-                            <label for="end-cidade">Cidade:</label>
-                            <input type="text" id="end-cidade" name="cidade" required>
+                        <div class="row">
+                            <div class="col-50">
+                                <label for="cad-cpf">CPF</label>
+                                <input type="text" id="cad-cpf" name="cpf" required>
+                            </div>
+                            <div class="col-50">
+                                <label for="cad-telefone">Telefone</label>
+                                <input type="text" id="cad-telefone" name="telefone" required>
+                            </div>
                         </div>
-                        <div>
-                            <label for="end-estado">Estado (UF):</label>
-                            <input type="text" id="end-estado" name="estado" maxlength="2" required>
+
+                        <!-- Campos Específicos para Artesão (Ocultos por padrão) -->
+                        <div id="extra-artesao" style="display: none; background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px; margin-bottom: 10px;">
+                            <div class="row">
+                                <div class="col-100">
+                                    <label for="cad-empresa">Nome do Ateliê</label>
+                                    <input type="text" id="cad-empresa" name="nome_empresa">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-100">
+                                    <label for="cad-cnpj">CNPJ (Opcional)</label>
+                                    <input type="text" id="cad-cnpj" name="cnpj">
+                                </div>
+                            </div>
                         </div>
-                        <div>
-                            <label for="end-cep">CEP:</label>
-                            <input type="text" id="end-cep" name="cep" required>
+
+                        <!-- Credenciais -->
+                        <div class="row">
+                            <div class="col-100">
+                                <label for="cad-email">Email</label>
+                                <input type="email" id="cad-email" name="email" required>
+                            </div>
                         </div>
-                        <div>
-                            <label for="end-telefone">Telefone (para contato/entrega):</label>
-                            <input type="text" id="end-telefone" name="telefoneEndereco" required>
+                        <div class="row">
+                            <div class="col-100">
+                                <label for="cad-senha">Senha</label>
+                                <input type="password" id="cad-senha" name="senha" required>
+                            </div>
                         </div>
-                    </fieldset>
-                    
-                    <button type="submit">Criar Conta</button>
-                </form>
+
+                        <!-- Endereço -->
+                        <div style="margin-top: 15px; border-top: 1px solid #444; padding-top: 10px;">
+                            <label style="color: #8A2BE2; margin-bottom: 10px; display:block; font-weight: bold;">Endereço</label>
+                            
+                            <div class="row">
+                                <div class="col-40">
+                                    <input type="text" id="end-cep" name="cep" placeholder="CEP" required>
+                                </div>
+                                <div class="col-60">
+                                    <input type="text" id="end-cidade" name="cidade" placeholder="Cidade" required>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-80">
+                                    <input type="text" id="end-logradouro" name="logradouro" placeholder="Rua / Logradouro" required>
+                                </div>
+                                <div class="col-20">
+                                    <input type="text" id="end-numero" name="numero" placeholder="Nº" required>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-50">
+                                    <input type="text" id="end-bairro" name="bairro" placeholder="Bairro" required>
+                                </div>
+                                <div class="col-50">
+                                    <input type="text" id="end-estado" name="estado" placeholder="UF" maxlength="2" required>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-100">
+                                    <input type="text" id="end-tel-entrega" name="telefoneEndereco" placeholder="Telefone para Entrega" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn-primary" style="margin-top: 20px;">Finalizar Cadastro</button>
+                    </form>
+
+                    <div class="footer-link">
+                        <a href="#" id="btn-voltar-selecao"><i class="fas fa-arrow-left"></i> Voltar</a>
+                    </div>
+                </div>
+
             </div>
         </section>
     </main>
 
-    <footer id="footer-placeholder"></footer>
+    <!-- RODAPÉ -->
+    <footer class="site-footer">
+        <p>&copy; 2025 Vale das Artes. Todos os direitos reservados.</p>
+        <div class="social-links">
+            <a href="#"><i class="fab fa-instagram"></i></a>
+            <a href="#"><i class="fab fa-facebook"></i></a>
+            <a href="#"><i class="fab fa-whatsapp"></i></a>
+        </div>
+    </footer>
 
-    <script src="js/main.js"></script>
-    
+    <!-- Scripts -->
     <script src="js/auth.js"></script>
-
+    <script>
+        // Função Global para despachar evento de seleção de perfil
+        function selectRole(role) {
+            const event = new CustomEvent('roleSelected', { detail: role });
+            document.dispatchEvent(event);
+        }
+    </script>
 </body>
 </html>
