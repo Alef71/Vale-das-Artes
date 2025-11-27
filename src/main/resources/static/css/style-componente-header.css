@@ -16,7 +16,7 @@
 /* Barra de navegação */
 .navbar {
     font-family: Arial, Helvetica, sans-serif;
-    background: #402b30;
+    background: #2C241B;
     padding: 2.5rem 0;
     box-shadow: 0 4px 20px rgba(139, 111, 71, 0.3);
     position: sticky;
@@ -89,38 +89,38 @@
 .btn-login {
     background: transparent;
     color: #fff;
-    border: 2px solid #ba6868;
+    border: 2px solid #9c8b75;
 }
 
 .btn-login:hover {
-    background: #ba6868;
+    background: #9c8b75;
 }
 
 /* Cadastre-se */
 .btn-cadastro {
-    background: #ba6868;
+    background: #9c8b75;
     color: #fff;
 }
 
 /* Botões quando logado */
 .btn-painel {
-    background: #ba6868;
+    background: #9c8b75;
     color: #fff;
 }
 
 .btn-perfil {
-    background: #ba6868;
+    background: #9c8b75;
     color: #fff;
 }
 
 .btn-sair {
     background: transparent;
     color: #fff;
-    border: 2px solid #ba6868;
+    border: 2px solid #9c8b75;
 }
 
 .btn-sair:hover {
-    background: #ba6868;
+    background: #9c8b75;
     color: #fff;
 }
 
