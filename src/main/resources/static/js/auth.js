@@ -1,6 +1,16 @@
+/**
+ * js/auth.js
+ * (VERSÃO HÍBRIDA FINAL)
+ * 1. UX: Navegação entre telas (Login -> Seleção -> Cadastro).
+ * 2. Lógica: Gerenciamento robusto de Carrinho (ensureActiveCart) e API.
+ * 3. Dados: Coleta via FormData para cadastro limpo.
+ */
+
 document.addEventListener("DOMContentLoaded", function() {
 
-    // --- SELETORES ---
+    // ============================================================
+    // 1. SELETORES DE NAVEGAÇÃO (UX)
+    // ============================================================
     const viewLogin = document.getElementById("view-login");
     const viewSelection = document.getElementById("view-selection");
     const viewCadastro = document.getElementById("view-cadastro");
@@ -11,162 +21,259 @@ document.addEventListener("DOMContentLoaded", function() {
     const btnVoltarSelecao = document.getElementById("btn-voltar-selecao");
 
     // Elementos do Cadastro
-    const radioCliente = document.getElementById("radio-cliente");
-    const radioArtesao = document.getElementById("radio-artesao");
-    const extraArtesao = document.getElementById("extra-artesao");
+    const formLogin = document.getElementById("form-login");
+    const formCadastro = document.getElementById("form-cadastro");
+    const radioCliente = document.getElementById("radio-cliente"); // Radio oculto ou visível no form
+    const radioArtesao = document.getElementById("radio-artesao"); // Radio oculto ou visível no form
+    const extraArtesao = document.getElementById("extra-artesao"); // Div com campos extras
     const tituloCadastro = document.getElementById("titulo-cadastro");
 
-    // --- FUNÇÃO DE TROCA DE TELA ---
+    // Inicialização: Mostra Login
+    if(viewSelection) viewSelection.style.display = 'none';
+    if(viewCadastro) viewCadastro.style.display = 'none';
+
+    // ============================================================
+    // 2. FUNÇÕES DE UX (Troca de Telas)
+    // ============================================================
     function showView(viewId) {
         // Esconde todos
         [viewLogin, viewSelection, viewCadastro].forEach(v => {
-            v.classList.remove('active');
-            // Pequeno delay para display:none não quebrar animação
-            setTimeout(() => { if(!v.classList.contains('active')) v.style.display = 'none'; }, 400);
+            if(v) {
+                v.classList.remove('active');
+                setTimeout(() => { if(!v.classList.contains('active')) v.style.display = 'none'; }, 400);
+            }
         });
 
         // Mostra o alvo
         const target = document.getElementById(viewId);
-        target.style.display = 'flex'; // Garante que existe
-        setTimeout(() => target.classList.add('active'), 50); // Adiciona classe para opacidade
+        if(target) {
+            target.style.display = 'flex';
+            setTimeout(() => target.classList.add('active'), 50);
+        }
     }
 
-    // Inicialização: Mostra Login, esconde outros via style
-    viewSelection.style.display = 'none';
-    viewCadastro.style.display = 'none';
+    // Eventos de Navegação
+    if(btnIrCadastro) btnIrCadastro.addEventListener('click', (e) => { e.preventDefault(); showView('view-selection'); });
+    if(btnVoltarLoginSel) btnVoltarLoginSel.addEventListener('click', (e) => { e.preventDefault(); showView('view-login'); });
+    if(btnVoltarSelecao) btnVoltarSelecao.addEventListener('click', (e) => { e.preventDefault(); showView('view-selection'); });
 
-    // --- EVENTOS DE CLIQUE ---
-    
-    // 1. Tela Login -> Tela Seleção
-    if(btnIrCadastro) {
-        btnIrCadastro.addEventListener('click', (e) => {
-            e.preventDefault();
-            showView('view-selection');
-        });
-    }
-
-    // 2. Tela Seleção -> Tela Login
-    if(btnVoltarLoginSel) {
-        btnVoltarLoginSel.addEventListener('click', (e) => {
-            e.preventDefault();
-            showView('view-login');
-        });
-    }
-
-    // 3. Tela Cadastro -> Tela Seleção
-    if(btnVoltarSelecao) {
-        btnVoltarSelecao.addEventListener('click', (e) => {
-            e.preventDefault();
-            showView('view-selection');
-        });
-    }
-
-    // 4. LÓGICA DE SELEÇÃO (Recebe do HTML)
+    // Lógica de Seleção de Perfil (Disparada pelo HTML da tela de seleção)
     document.addEventListener('roleSelected', (e) => {
-        const role = e.detail;
+        const role = e.detail; // 'cliente' ou 'artesao'
         
         if (role === 'cliente') {
-            radioCliente.checked = true;
-            extraArtesao.style.display = 'none';
-            tituloCadastro.innerText = "Cadastro de Cliente";
+            if(radioCliente) radioCliente.checked = true;
+            if(extraArtesao) extraArtesao.style.display = 'none';
+            if(tituloCadastro) tituloCadastro.innerText = "Cadastro de Cliente";
         } else {
-            radioArtesao.checked = true;
-            extraArtesao.style.display = 'block';
-            tituloCadastro.innerText = "Cadastro de Artesão";
+            if(radioArtesao) radioArtesao.checked = true;
+            if(extraArtesao) extraArtesao.style.display = 'block';
+            if(tituloCadastro) tituloCadastro.innerText = "Cadastro de Artesão";
         }
         
         showView('view-cadastro');
-        // Reseta scroll
-        viewCadastro.scrollTop = 0;
+        if(viewCadastro) viewCadastro.scrollTop = 0;
     });
 
-    // --- API FETCH HELPER ---
-    async function apiFetch(url, method, body) {
+    // ============================================================
+    // 3. API HELPERS (Fetch e Carrinho)
+    // ============================================================
+    
+    // Helper genérico de Fetch
+    async function apiFetch(endpoint, method = 'POST', body = null) {
         const token = localStorage.getItem('userToken');
+        
         const headers = { 'Content-Type': 'application/json' };
-        if(token) headers['Authorization'] = `Bearer ${token}`;
-        
-        const res = await fetch(url, {
-            method: method,
-            headers: headers,
-            body: JSON.stringify(body)
-        });
-        
-        if (!res.ok) {
-            const txt = await res.text();
-            throw new Error(txt || res.statusText);
+        if (token) headers['Authorization'] = `Bearer ${token}`;
+    
+        const config = { method: method, headers: headers };
+        if (body) config.body = JSON.stringify(body);
+    
+        const response = await fetch(endpoint, config);
+    
+        if (!response.ok) {
+            let errorData;
+            try { errorData = await response.json(); } catch (e) { errorData = await response.text(); }
+            throw new Error(errorData.message || errorData || `Erro ${response.status}`);
         }
-        return res.status === 204 ? null : await res.json();
+        
+        if (response.status === 204) return null;
+        return await response.json();
     }
 
-    // --- SUBMIT LOGIN ---
-    const formLogin = document.getElementById("form-login");
-    if(formLogin) {
-        formLogin.addEventListener('submit', async (e) => {
-            e.preventDefault();
+    // LÓGICA VITAL: Garantir Carrinho Ativo
+    async function ensureActiveCart(clienteId, token) {
+        console.log("Verificando carrinho para cliente:", clienteId);
+        const existingCartId = localStorage.getItem('carrinhoId');
+
+        // 1. Tenta validar carrinho existente
+        if (existingCartId) {
+            try {
+                const response = await fetch(`/api/carrinhos/${existingCartId}`, {
+                    method: 'GET',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (response.ok) {
+                    const carrinhoDTO = await response.json();
+                    if (carrinhoDTO.clienteId.toString() === clienteId) {
+                        return carrinhoDTO; // Carrinho válido
+                    }
+                }
+            } catch (error) {
+                console.warn("Erro ao validar carrinho antigo, criando novo...", error);
+            }
+        }
+
+        // 2. Cria novo carrinho se necessário
+        try {
+            const response = await fetch(`/api/carrinhos/cliente/${clienteId}`, {
+                method: 'POST',
+                headers: { 
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json' 
+                }
+            });
+
+            if (!response.ok) throw new Error('Falha ao criar carrinho');
+            return await response.json();
+        } catch (error) {
+            console.error("Erro crítico no carrinho:", error);
+            throw error;
+        }
+    }
+
+    // ============================================================
+    // 4. LÓGICA DE LOGIN
+    // ============================================================
+    if (formLogin) {
+        formLogin.addEventListener("submit", async function(event) {
+            event.preventDefault(); 
+            
+            // Pega dados baseados nos IDs do seu HTML de Login
             const email = document.getElementById("login-email").value;
             const senha = document.getElementById("login-senha").value;
-
+            
             try {
+                // 1. Login na API
                 const data = await apiFetch('/api/auth/login', 'POST', { email, senha });
-                localStorage.setItem('userToken', data.token);
+                
+                // 2. Salva Tokens
+                localStorage.setItem('userToken', data.token); 
                 localStorage.setItem('userRole', data.role);
                 localStorage.setItem('userId', data.userId);
                 
-                alert("Login realizado!");
-                
-                if(data.role === 'ROLE_CLIENTE') window.location.href = 'dashboard-cliente.html';
-                else if(data.role === 'ROLE_ARTISTA') window.location.href = 'dashboard-artesao.html';
-                else window.location.href = 'dashboard-admin.html';
-                
-            } catch (err) {
-                alert("Erro no login: " + err.message);
+                console.log("Login OK. Role:", data.role);
+                alert("Login realizado com sucesso!");
+
+                // 3. Verifica Role e Redireciona
+                if (data.role === 'ROLE_CLIENTE') {
+                    try {
+                        // Lógica do Carrinho antes de redirecionar
+                        const carrinho = await ensureActiveCart(data.userId.toString(), data.token);
+                        if (carrinho && carrinho.id) {
+                            localStorage.setItem('carrinhoId', carrinho.id);
+                        }
+                        window.location.href = 'dashboard-cliente.html';
+                    } catch (cartError) {
+                        alert("Login feito, mas houve erro no carrinho. Tente recarregar.");
+                        window.location.href = 'dashboard-cliente.html';
+                    }
+                } else if (data.role === 'ROLE_ARTISTA') {
+                    window.location.href = 'dashboard-artesao.html';
+                } else if (data.role === 'ROLE_ADMIN') {
+                    window.location.href = 'dashboard-admin.html';
+                } else {
+                    window.location.href = 'index.html';
+                }
+
+            } catch (error) {
+                console.error("Erro Login:", error);
+                alert("Erro no login: " + error.message);
             }
         });
     }
 
-    // --- SUBMIT CADASTRO ---
-    const formCadastro = document.getElementById("form-cadastro");
-    if(formCadastro) {
-        formCadastro.addEventListener('submit', async (e) => {
-            e.preventDefault();
+    // ============================================================
+    // 5. LÓGICA DE CADASTRO
+    // ============================================================
+    if (formCadastro) {
+        formCadastro.addEventListener("submit", async function(event) {
+            event.preventDefault();
             
-            // Coleta dados manualmente para garantir estrutura
-            const tipo = radioCliente.checked ? 'cliente' : 'artesao';
-            const body = {
-                nome: document.getElementById('cad-nome').value,
-                cpf: document.getElementById('cad-cpf').value,
-                telefone: document.getElementById('cad-telefone').value,
-                credencial: {
-                    email: document.getElementById('cad-email').value,
-                    senha: document.getElementById('cad-senha').value
-                },
-                endereco: {
-                    cep: document.getElementById('end-cep').value,
-                    cidade: document.getElementById('end-cidade').value,
-                    logradouro: document.getElementById('end-logradouro').value,
-                    numero: parseInt(document.getElementById('end-numero').value) || 0,
-                    bairro: document.getElementById('end-bairro').value,
-                    estado: document.getElementById('end-estado').value,
-                    telefone: document.getElementById('end-tel-entrega').value
-                }
-            };
-
-            let url = '/api/clientes';
-            if (tipo === 'artesao') {
-                url = '/api/artistas';
-                body.nomeEmpresa = document.getElementById('cad-empresa').value;
-                body.cnpj = document.getElementById('cad-cnpj').value;
+            // Usa FormData para capturar todos os inputs com name="..."
+            const formData = new FormData(formCadastro);
+            const dadosFormulario = Object.fromEntries(formData.entries());
+            
+            // Detecta tipo de conta (se o radio button não estiver no formData, forçamos a lógica)
+            // Se o seu HTML usa name="tipoConta" nos radios, o 'dadosFormulario' já terá o valor.
+            // Caso contrário, injetamos manualmente baseando-se na UI:
+            if (!dadosFormulario.tipoConta) {
+                dadosFormulario.tipoConta = radioCliente.checked ? 'cliente' : 'artesao';
             }
+
+            const { url, payload } = construirPayloadCadastro(dadosFormulario);
+
+            console.log("Enviando cadastro...", payload);
 
             try {
-                await apiFetch(url, 'POST', body);
+                await apiFetch(url, 'POST', payload);
                 alert("Cadastro realizado! Faça login.");
-                formCadastro.reset();
-                showView('view-login');
-            } catch (err) {
-                alert("Erro ao cadastrar: " + err.message);
+                formCadastro.reset(); 
+                showView('view-login'); // Volta para tela de login (UX)
+
+            } catch (error) {
+                alert(`Erro no cadastro: ${error.message}`);
             }
         });
     }
+
+    // Helper para montar o JSON correto do cadastro
+    function construirPayloadCadastro(dados) {
+        const credencial = {
+            email: dados.email,
+            senha: dados.senha
+        };
+        
+        // Garante numéricos
+        const numeroEndereco = parseInt(dados.numero) || 0;
+
+        const endereco = {
+            logradouro: dados.logradouro,
+            numero: numeroEndereco,
+            complemento: dados.complemento || null, 
+            bairro: dados.bairro,
+            cidade: dados.cidade,
+            estado: dados.estado,
+            cep: dados.cep,
+            telefone: dados.telefoneEndereco || dados.telefone // Fallback
+        };
+
+        let payload;
+        let url;
+        
+        if (dados.tipoConta === 'cliente') {
+            url = '/api/clientes';
+            payload = {
+                nome: dados.nome,
+                cpf: dados.cpf,
+                telefone: dados.telefone, 
+                credencial: credencial,
+                endereco: endereco
+            };
+        } else { // artesao
+            url = '/api/artistas';
+            payload = {
+                nome: dados.nome, 
+                cpf: dados.cpf,   
+                telefone: dados.telefone, 
+                nomeEmpresa: dados.nomeEmpresa || dados.nome_empresa || null, // Aceita ambos os nomes
+                cnpj: dados.cnpj || null, 
+                credencial: credencial,
+                endereco: endereco
+            };
+        }
+        return { url, payload };
+    }
+
 });
