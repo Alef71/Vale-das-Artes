@@ -154,7 +154,7 @@ input {
     font-weight: bold; cursor: pointer;
     margin-top: 15px; transition: 0.3s;
 }
-.btn-primary:hover { background: #7020bd; }
+.btn-primary:hover { background: #f0f0e4; }
 
 .footer-link { text-align: center; margin-top: auto; padding-top: 20px; font-size: 0.9em; }
 .footer-link a { color: var(--accent); text-decoration: none; font-weight: bold; }
