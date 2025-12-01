@@ -1,3 +1,7 @@
+*{
+    margin: 0;
+}
+
 /* Container principal */
 .navbar .container-fluid {
     max-width: 1400px;
@@ -85,38 +89,38 @@
 .btn-login {
     background: transparent;
     color: #fff;
-    border: 2px solid rgb(156, 139, 117);
+    border: 2px solid #9c8b75;
 }
 
 .btn-login:hover {
-    background: rgb(156, 139, 117);
+    background: #9c8b75;
 }
 
 /* Cadastre-se */
 .btn-cadastro {
-    background: rgb(156, 139, 117);
+    background: #9c8b75;
     color: #fff;
 }
 
 /* Botões quando logado */
 .btn-painel {
-    background: rgb(156, 139, 117);
+    background: #9c8b75;
     color: #fff;
 }
 
 .btn-perfil {
-    background: rgb(156, 139, 117);
+    background: #9c8b75;
     color: #fff;
 }
 
 .btn-sair {
     background: transparent;
     color: #fff;
-    border: 2px solid rgb(156, 139, 117);
+    border: 2px solid #9c8b75;
 }
 
 .btn-sair:hover {
-    background: rgb(156, 139, 117);
+    background: #9c8b75;
     color: #fff;
 }
 
