@@ -3,7 +3,6 @@
     background: linear-gradient(135deg, #2C241B 25%, #2C241B 100%);
     color: #e0e0e0;
     padding: 4rem 0 0;
-    margin-top: 25rem;
     font-family: 'Poppins', sans-serif;
 }
 
@@ -53,6 +52,7 @@
 
 /* Links gerais */
 .footer-coluna a {
+    text-decoration: none;
     color: #d4d4d4;
     font-weight: 500;
     transition: all 0.3s ease;
@@ -94,6 +94,17 @@
     font-size: 0.9rem;
     color: #aaa;
     border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.footer-coluna ul li a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.footer-coluna ul li a img {
+    width: 24px;
+    height: 24px;
 }
 
 /* Responsivo */
