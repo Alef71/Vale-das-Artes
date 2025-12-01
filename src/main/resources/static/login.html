@@ -10,48 +10,11 @@
     <link rel="stylesheet" href="css/style-componente-header.css">
     <link rel="stylesheet" href="css/style-componente-footer.css">
     
-    <link rel="stylesheet" href="css/login.css">
+    <link rel="stylesheet" href="css/style-login.css">
 </head>
 <body>
 
-    <nav class="navbar">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="index.html">
-                Vale das Artes
-            </a>
-
-            <ul class="navbar-nav">
-                <li class="nav-item">
-                    <a class="nav-link" href="index.html">Início</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="sobre.html">Sobre o Projeto</a>
-                </li>
-            </ul>
-
-            <div class="navbar-actions">
-                
-                <div id="auth-visitante">
-                    <a href="login.html" class="btn btn-login">Login</a>
-                    <a href="login.html#cadastro" class="btn btn-cadastro">Cadastre-se</a>
-                </div>
-
-                <div id="auth-logado" style="display: none;">
-                    <a href="index.html" id="link-dashboard" class="btn btn-painel">Meu Painel</a>
-                    
-                    <a href="perfil-artesao.html" id="link-perfil-publico" class="btn btn-perfil" style="display: none;">
-                        Perfil Público
-                    </a>
-
-                    <a href="#" id="btn-logout" class="btn btn-sair">Sair</a>
-                </div>
-
-                <a href="carrinho.html" class="btn btn-carrinho">
-                    🛒 Carrinho
-                </a>
-            </div>
-        </div>
-    </nav>
+    <header id="header-placeholder"></header>
 
     <main>
         <section id="auth-card">
@@ -59,7 +22,7 @@
             <div id="image-side">
                 <div class="overlay"></div>
                 <div class="brand-text">
-                    <h1>Vale das Artes</h1>
+                
                     <p>Conectando arte e cultura.</p>
                 </div>
             </div>
@@ -190,6 +153,7 @@
                                     <input type="text" id="end-cidade" name="cidade" placeholder="Cidade" required>
                                 </div>
                             </div>
+
                             <div class="row">
                                 <div class="col-80">
                                     <input type="text" id="end-logradouro" name="logradouro" placeholder="Rua / Logradouro" required>
@@ -198,16 +162,21 @@
                                     <input type="text" id="end-numero" name="numero" placeholder="Nº" required>
                                 </div>
                             </div>
+
                             <div class="row">
+                                <div class="col-50">
+                                    <input type="text" id="end-complemento" name="complemento" placeholder="Complemento (Opcional)">
+                                </div>
                                 <div class="col-50">
                                     <input type="text" id="end-bairro" name="bairro" placeholder="Bairro" required>
                                 </div>
-                                <div class="col-50">
+                            </div>
+
+                            <div class="row">
+                                <div class="col-20">
                                     <input type="text" id="end-estado" name="estado" placeholder="UF" maxlength="2" required>
                                 </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-100">
+                                <div class="col-80">
                                     <input type="text" id="end-tel-entrega" name="telefoneEndereco" placeholder="Telefone para Entrega" required>
                                 </div>
                             </div>
@@ -225,41 +194,9 @@
         </section>
     </main>
 
-    <footer class="site-footer">
-        <div class="container">
-            <div class="footer-coluna">
-                <h4>Sobre o Projeto</h4>
-                <p>
-                    O "Vale das Artes" é um projeto acadêmico que visa conectar
-                    artesãos do Vale do Jequitinhonha a um público mais amplo,
-                    valorizando a cultura e a autonomia local.
-                </p>
-                <a href="sobre.html">Leia mais</a>
-            </div>
-            
-            <div class="footer-coluna">
-                <h4>Links Rápidos</h4>
-                <ul>
-                    <li><a href="index.html">Início</a></li>
-                    <li><a href="sobre.html">Sobre</a></li>
-                    <li><a href="login.html">Login</a></li>
-                </ul>
-            </div>
+    <footer id="footer-placeholder"></footer>
 
-            <div class="footer-coluna">
-                <h4>Redes Sociais</h4>
-                <ul>
-                    <li><a href="#">Instagram</a></li>
-                    <li><a href="#">Facebook</a></li>
-                    <li><a href="#">Pinterest</a></li>
-                </ul>
-            </div>
-        </div>
-        <div class="footer-copyright">
-            <p>&copy; 2025 Vale das Artes. Todos os direitos reservados.</p>
-        </div>
-    </footer>
-
+    <script src="js/main.js"></script>
     <script src="js/auth.js"></script>
     <script>
         // Função Global para despachar evento de seleção de perfil

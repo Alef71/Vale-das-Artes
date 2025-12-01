@@ -81,10 +81,14 @@ public class ArtistaService {
                 .collect(Collectors.toList());
     }
 
-    public Optional<ArtistaResponseDTO> buscarArtistaPorId(Long id) {
+    // --- MUDANÇA PRINCIPAL AQUI ---
+    // Agora retorna o DTO direto e lança exceção se não achar.
+    public ArtistaResponseDTO buscarPorId(Long id) {
         return artistaRepository.findCompletoById(id) 
-                .map(ArtistaResponseDTO::new);
+                .map(ArtistaResponseDTO::new)
+                .orElseThrow(() -> new RuntimeException("Artista não encontrado com ID: " + id));
     }
+    // -----------------------------
 
     @Transactional
     public ArtistaResponseDTO atualizarArtista(Long id, ArtistaUpdateDTO dto) {
@@ -103,21 +107,16 @@ public class ArtistaService {
     
     @Transactional
     public ArtistaResponseDTO alterarStatusAprovacao(Long artistaId, ArtistaStatus novoStatus) {
-        
         return artistaRepository.findById(artistaId)
             .map(artistaExistente -> {
-                
                 artistaExistente.setStatusAprovacao(novoStatus);
-                
                 Artista artistaAtualizado = artistaRepository.save(artistaExistente);
                 return new ArtistaResponseDTO(artistaAtualizado);
-                
             }).orElseThrow(() -> new RuntimeException("Artista com ID " + artistaId + " não encontrado."));
     }
 
     @Transactional
     public ArtistaResponseDTO uploadFoto(Long artistaId, MultipartFile file, Credencial credencialLogada) {
-        
         Artista artista = artistaRepository.findById(artistaId)
                 .orElseThrow(() -> new RuntimeException("Artista não encontrado"));
 
@@ -136,7 +135,6 @@ public class ArtistaService {
 
     @Transactional
     public ArtistaResponseDTO removerFoto(Long artistaId, Credencial credencialLogada) {
-        
         Artista artista = artistaRepository.findById(artistaId)
                 .orElseThrow(() -> new RuntimeException("Artista não encontrado"));
 
@@ -145,25 +143,18 @@ public class ArtistaService {
         }
 
         artista.setFotoUrl(null);
-        
         Artista artistaSalvo = artistaRepository.save(artista);
 
         return new ArtistaResponseDTO(artistaSalvo);
     }
 
-    // --- [ MÉTODO DELETAR ARTISTA CORRIGIDO ] ---
     @Transactional
     public void deletarArtista(Long id) {
-        
-        // 1. Buscamos a entidade primeiro
         Optional<Artista> artistaOptional = artistaRepository.findById(id);
 
         if (artistaOptional.isPresent()) {
-            // 2. Deletamos a ENTIDADE, não o ID
-            // Isso aciona o 'cascade = CascadeType.ALL' no seu Artista.java
             artistaRepository.delete(artistaOptional.get());
         } else {
-            // Se não existir, lançamos a exceção
             throw new RuntimeException("Artista com ID " + id + " não encontrado.");
         }
     }
