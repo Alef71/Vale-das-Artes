@@ -4,9 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vale das Artes - Perfil do Artesão</title>
+    
     <link rel="stylesheet" href="css/style-componente-header.css">
     <link rel="stylesheet" href="css/style-componente-footer.css">
-    </head>
+    
+    <link rel="stylesheet" href="css/style-perfil-artesao.css"> 
+</head>
 <body>
 
     <header id="header-placeholder"></header>
@@ -14,22 +17,17 @@
     <main>
         <section id="perfil-artesao-header">
             <div class="perfil-foto">
-                <img src="https://via.placeholder.com/200" alt="Foto do Artesão" id="img-artesao">
+                <img src="" alt="Foto do Artesão" id="img-artesao" onerror="this.src='https://via.placeholder.com/200?text=Sem+Foto'">
             </div>
             <div class="perfil-info">
-                <h1 id="nome-artesao">[Nome do Artesão]</h1>
-                <h2 id="nome-atelie">[Nome do Ateliê/Empresa]</h2>
-                <p id="biografia-artesao">
-                    [Biografia e história do artesão... O JS vai carregar isso aqui.]
-                </p>
+                <h1 id="nome-artesao">Carregando...</h1>
+                <h2 id="nome-atelie"></h2>
+                <p id="biografia-artesao"></p>
             </div>
         </section>
 
-        <hr>
-
         <section id="produtos-do-artesao">
-            <h2>Produtos de [Nome do Artesão]</h2>
-            
+            <h2>Produtos deste Artesão</h2>
             <div class="grid-produtos">
                 </div>
         </section>
@@ -39,6 +37,5 @@
 
     <script src="js/main.js"></script>
     <script src="js/perfil-artesao.js"></script> 
-    
-    </body>
+</body>
 </html>

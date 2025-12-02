@@ -1,0 +1,290 @@
+/* =========================================
+   Reset e Variáveis (Mesma paleta do Perfil)
+   ========================================= */
+   :root {
+    --cor-primaria: #2c241b; /* Café escuro */
+    --cor-secundaria: #5d4037; /* Marrom médio */
+    --cor-destaque: #d7ccc8; /* Bege */
+    --cor-fundo: #fafafa;
+    --cor-card: #ffffff;
+    --cor-texto: #333333;
+    --cor-preco: #2e7d32; /* Verde */
+    --sombra-suave: 0 4px 12px rgba(0,0,0,0.08);
+    --borda-radius: 8px;
+}
+
+body {
+    background-color: var(--cor-fundo);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: var(--cor-texto);
+    margin: 0;
+    line-height: 1.6;
+}
+
+main {
+    max-width: 1100px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    min-height: 80vh;
+}
+
+/* =========================================
+   Seção Principal: Detalhes do Produto
+   ========================================= */
+#detalhe-produto {
+    background-color: var(--cor-card);
+    border-radius: var(--borda-radius);
+    box-shadow: var(--sombra-suave);
+    padding: 2rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Duas colunas iguais */
+    gap: 3rem;
+    align-items: start;
+}
+
+/* Coluna da Imagem */
+.produto-imagem {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    background-color: #fff;
+    border-radius: var(--borda-radius);
+    overflow: hidden;
+    border: 1px solid #eee;
+}
+
+.produto-imagem img {
+    width: 100%;
+    height: auto;
+    max-height: 500px; /* Limite de altura */
+    object-fit: contain; /* Mostra a imagem inteira */
+    transition: transform 0.3s ease;
+}
+
+.produto-imagem img:hover {
+    transform: scale(1.02); /* Zoom leve ao passar o mouse */
+}
+
+/* Coluna de Informações */
+.produto-info h1 {
+    font-size: 2.5rem;
+    color: var(--cor-primaria);
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+    line-height: 1.2;
+}
+
+.produto-artesao {
+    font-size: 1.1rem;
+    color: #666;
+    margin-bottom: 1.5rem;
+}
+
+.produto-artesao a {
+    color: var(--cor-secundaria);
+    text-decoration: none;
+    font-weight: 600;
+    border-bottom: 1px dotted var(--cor-secundaria);
+}
+
+.produto-artesao a:hover {
+    color: var(--cor-primaria);
+    border-bottom: 1px solid var(--cor-primaria);
+}
+
+.produto-preco {
+    font-size: 2.2rem;
+    color: var(--cor-preco);
+    font-weight: 700;
+    margin: 1.5rem 0;
+}
+
+/* Área de Ação (Input + Botão) */
+.produto-acao {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid #eee;
+}
+
+.produto-acao label {
+    font-weight: 600;
+    color: var(--cor-primaria);
+}
+
+.produto-acao input[type="number"] {
+    width: 60px;
+    padding: 10px;
+    font-size: 1.1rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    text-align: center;
+}
+
+#btn-add-carrinho {
+    flex-grow: 1; /* Ocupa o resto do espaço */
+    background-color: var(--cor-primaria);
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    border-radius: 4px;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: background 0.3s ease, transform 0.1s;
+}
+
+#btn-add-carrinho:hover {
+    background-color: var(--cor-secundaria);
+}
+
+#btn-add-carrinho:active {
+    transform: scale(0.98);
+}
+
+/* Descrição */
+.produto-info h2 {
+    font-size: 1.5rem;
+    color: var(--cor-primaria);
+    margin-bottom: 1rem;
+}
+
+#descricao-produto {
+    color: #555;
+    line-height: 1.8;
+    text-align: justify;
+}
+
+/* Separador */
+hr {
+    border: 0;
+    height: 1px;
+    background: #e0e0e0;
+    margin: 3rem 0;
+}
+
+/* =========================================
+   Seção de Avaliações
+   ========================================= */
+#avaliacoes {
+    background-color: var(--cor-card);
+    border-radius: var(--borda-radius);
+    padding: 2rem;
+    box-shadow: var(--sombra-suave);
+}
+
+#avaliacoes h2 {
+    color: var(--cor-primaria);
+    border-left: 5px solid var(--cor-secundaria);
+    padding-left: 15px;
+    margin-bottom: 2rem;
+}
+
+/* Estilo para cada avaliação (caso o JS gere divs com class 'avaliacao-card') */
+.avaliacao-card {
+    border-bottom: 1px solid #f0f0f0;
+    padding: 1rem 0;
+}
+.avaliacao-card:last-child {
+    border-bottom: none;
+}
+.avaliacao-autor { font-weight: bold; color: var(--cor-primaria); }
+.avaliacao-texto { color: #555; margin-top: 5px; }
+
+/* Formulário de Avaliação */
+#form-nova-avaliacao-container {
+    background-color: #f9f9f9;
+    padding: 2rem;
+    border-radius: var(--borda-radius);
+    margin-top: 2rem;
+    border: 1px solid #eee;
+}
+
+#form-nova-avaliacao-container h3 {
+    margin-top: 0;
+    color: var(--cor-secundaria);
+}
+
+#form-nova-avaliacao {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+#form-nova-avaliacao div {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+#form-nova-avaliacao label {
+    font-weight: 600;
+    color: #444;
+}
+
+#form-nova-avaliacao input,
+#form-nova-avaliacao textarea {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-family: inherit;
+    resize: vertical; /* Permite redimensionar altura do textarea */
+}
+
+#form-nova-avaliacao input:focus,
+#form-nova-avaliacao textarea:focus {
+    border-color: var(--cor-secundaria);
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(93, 64, 55, 0.2);
+}
+
+#form-nova-avaliacao button {
+    align-self: flex-start;
+    background-color: var(--cor-secundaria);
+    color: white;
+    border: none;
+    padding: 10px 25px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background 0.3s;
+}
+
+#form-nova-avaliacao button:hover {
+    background-color: var(--cor-primaria);
+}
+
+/* =========================================
+   Responsividade (Mobile)
+   ========================================= */
+@media (max-width: 768px) {
+    #detalhe-produto {
+        grid-template-columns: 1fr; /* Vira uma coluna só */
+        gap: 2rem;
+        padding: 1.5rem;
+    }
+
+    .produto-imagem img {
+        max-height: 350px;
+    }
+
+    .produto-info h1 {
+        font-size: 2rem;
+    }
+
+    .produto-preco {
+        font-size: 1.8rem;
+    }
+
+    .produto-acao {
+        flex-direction: column; /* Input em cima, botão embaixo */
+        align-items: stretch;
+    }
+
+    .produto-acao input[type="number"] {
+        width: 100%; /* Input ocupa largura total */
+    }
+}

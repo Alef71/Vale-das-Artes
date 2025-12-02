@@ -4,9 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vale das Artes - Detalhe do Produto</title>
+    
     <link rel="stylesheet" href="css/style-componente-header.css">
     <link rel="stylesheet" href="css/style-componente-footer.css">
-    </head>
+    
+    <link rel="stylesheet" href="css/style-produto-detalhe.css">
+</head>
 <body>
 
     <header id="header-placeholder"></header>
@@ -14,17 +17,22 @@
     <main>
         <section id="detalhe-produto">
             <div class="produto-imagem">
-                <img src="https://via.placeholder.com/400" alt="Nome do Produto" id="img-produto">
+                <img 
+                    src="" 
+                    alt="Carregando imagem..." 
+                    id="img-produto"
+                    onerror="this.onerror=null; this.src='https://via.placeholder.com/400?text=Sem+Foto';"
+                >
             </div>
 
             <div class="produto-info">
-                <h1 id="nome-produto">[Nome do Produto]</h1>
+                <h1 id="nome-produto">Carregando produto...</h1>
                 
                 <p class="produto-artesao">
-                    Vendido por: <a href="perfil-artesao.html?id=1" id="link-artesao">[Nome do Artesão]</a>
+                    Vendido por: <a href="#" id="link-artesao">...</a>
                 </p>
                 
-                <p class="produto-preco" id="preco-produto">R$ [Preço]</p>
+                <p class="produto-preco" id="preco-produto">R$ --,--</p>
                 
                 <div class="produto-acao">
                     <label for="quantidade">Quantidade:</label>
@@ -33,7 +41,9 @@
                 </div>
 
                 <h2>Descrição</h2>
-                <p id="descricao-produto">[Descrição detalhada do produto virá aqui...]</p>
+                <p id="descricao-produto">
+                    Aguarde, carregando detalhes do produto...
+                </p>
             </div>
         </section>
 
@@ -43,7 +53,8 @@
             <h2>Avaliações de Clientes</h2>
             
             <div id="lista-avaliacoes">
-                </div>
+                <p style="color: #777; font-style: italic;">Nenhuma avaliação ainda.</p>
+            </div>
 
             <div id="form-nova-avaliacao-container">
                 <h3>Deixe sua avaliação</h3>
@@ -54,7 +65,7 @@
                     </div>
                     <div>
                         <label for="avaliacao-comentario">Comentário (Opcional):</label>
-                        <textarea id="avaliacao-comentario" name="comentario" rows="4"></textarea>
+                        <textarea id="avaliacao-comentario" name="comentario" rows="4" placeholder="O que você achou do produto?"></textarea>
                     </div>
                     <button type="submit">Enviar Avaliação</button>
                 </form>
@@ -65,6 +76,7 @@
     <footer id="footer-placeholder"></footer>
 
     <script src="js/main.js"></script>
+    <script src="js/produto-detalhe.js"></script> 
     
-    </body>
+</body>
 </html>

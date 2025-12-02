@@ -1,11 +1,10 @@
 package br.com.valedasartes.domain.destaque.dto;
 
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
 public class DestaqueRequestDTO {
 
-    @NotBlank(message = "O título do destaque é obrigatório.")
+    //@NotBlank(message = "O título do destaque é obrigatório.")
     @Size(max = 100, message = "O título deve ter no máximo 100 caracteres.")
     private String titulo;
 
