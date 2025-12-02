@@ -7,6 +7,7 @@
     
     <link rel="stylesheet" href="css/style-componente-header.css">
     <link rel="stylesheet" href="css/style-componente-footer.css">
+    <link rel="stylesheet" href="css/style-dashboard-admin.css">
     
     <style>
         /* Estilos Gerais do Dashboard Admin */
@@ -23,6 +24,11 @@
         input[type="text"], input[type="number"], select, textarea {
             width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;
         }
+        /* Estilo para o input file no formulário de criação */
+        input[type="file"] {
+            padding: 5px; background: #fff; border: 1px solid #ccc; width: 100%; border-radius: 4px;
+        }
+
         button {
             padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;
             background-color: #2c241b; color: white; transition: background 0.3s;
@@ -31,88 +37,40 @@
         .btn-danger { background-color: #c0392b; }
         .btn-danger:hover { background-color: #e74c3c; }
 
-        /* --- ESTILOS DO MENU DE FOTO --- */
+        /* --- ESTILOS DO MENU DE FOTO (MODAL DE EDIÇÃO) --- */
         .foto-manager-container { 
-            position: relative; 
-            width: 100%; 
-            max-width: 300px; 
-            margin: 20px auto; 
-            text-align: center;
+            position: relative; width: 100%; max-width: 300px; margin: 20px auto; text-align: center;
         }
 
-        /* Wrapper para garantir que o menu fique posicionado relativo à imagem */
         .foto-wrapper {
-            position: relative;
-            display: inline-block;
-            width: 100%;
-            cursor: pointer;
+            position: relative; display: inline-block; width: 100%; cursor: pointer;
         }
         
-        /* Preview da Imagem */
         .destaque-pic-preview { 
-            width: 100%; 
-            height: 150px; 
-            object-fit: cover; 
-            border-radius: 8px; 
-            border: 2px solid #ddd;
-            transition: filter 0.3s;
-            display: block;
+            width: 100%; height: 150px; object-fit: cover; border-radius: 8px; border: 2px solid #ddd;
+            transition: filter 0.3s; display: block;
         }
 
-        /* Efeito Hover na Imagem */
-        .foto-wrapper:hover .destaque-pic-preview { 
-            filter: brightness(0.6); /* Escurece a foto */
-        }
+        .foto-wrapper:hover .destaque-pic-preview { filter: brightness(0.6); }
 
-        /* Texto "Clique para Editar" */
         .overlay-texto {
-            position: absolute;
-            top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
-            color: white;
-            font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            pointer-events: none; /* O clique passa direto para a imagem */
-            opacity: 0;
-            transition: opacity 0.3s;
-            z-index: 1500;
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            color: white; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;
+            pointer-events: none; opacity: 0; transition: opacity 0.3s; z-index: 1500;
         }
 
-        .foto-wrapper:hover .overlay-texto {
-            opacity: 1; /* Aparece ao passar o mouse */
-        }
+        .foto-wrapper:hover .overlay-texto { opacity: 1; }
 
         /* Menu Flutuante */
         .foto-options-menu { 
-            display: none; /* JS controla isso */
-            position: absolute; 
-            top: 50%; left: 50%; 
-            transform: translate(-50%, -50%); 
-            width: 200px; 
-            background: white; 
-            border-radius: 8px; 
-            box-shadow: 0 10px 40px rgba(0,0,0,0.5); /* Sombra forte */
-            
-            /* Z-INDEX ALTO para ficar acima do Modal (que é 1000) */
-            z-index: 2000; 
-            
-            padding: 10px; 
-            text-align: center; 
-            border: 1px solid #ccc;
+            display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); 
+            width: 200px; background: white; border-radius: 8px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); 
+            z-index: 2000; padding: 10px; text-align: center; border: 1px solid #ccc;
         }
         
         .foto-options-menu .menu-option { 
-            display: block; 
-            width: 100%; 
-            padding: 10px; 
-            margin: 5px 0; 
-            border: none; 
-            border-radius: 4px; 
-            cursor: pointer; 
-            background-color: #f0f0f0; 
-            color: #333;
-            font-size: 0.9rem;
+            display: block; width: 100%; padding: 10px; margin: 5px 0; border: none; border-radius: 4px; 
+            cursor: pointer; background-color: #f0f0f0; color: #333; font-size: 0.9rem;
         }
         .foto-options-menu .menu-option:hover { background-color: #e0e0e0; }
         .foto-options-menu .menu-option.danger { background-color: #fbebee; color: #d9534f; }
@@ -164,10 +122,10 @@
                 <div style="background: #f9f9f9; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
                     <h3>Criar Novo Destaque</h3>
                     <p style="font-size: 0.9rem; color: #666; margin-bottom: 15px;">
-                        Preencha os dados básicos primeiro. Depois, clique em "Editar" na lista abaixo para adicionar a foto.
+                        Preencha os dados e selecione a imagem de capa.
                     </p>
                     
-                    <form id="form-novo-destaque">
+                    <form id="form-novo-destaque" enctype="multipart/form-data">
                         <div>
                             <label for="destaque-titulo">Título:</label>
                             <input type="text" id="destaque-titulo" name="titulo" placeholder="Ex: Promoção de Natal" required>
@@ -176,6 +134,12 @@
                             <label for="destaque-link">Link (Opcional):</label>
                             <input type="text" id="destaque-link" name="link" placeholder="/produto-detalhe.html?id=...">
                         </div>
+                        
+                        <div>
+                            <label for="destaque-foto-input">Imagem do Destaque:</label>
+                            <input type="file" id="destaque-foto-input" name="foto" accept="image/*" required>
+                        </div>
+
                         <button type="submit">Publicar Destaque</button>
                         <p id="novo-destaque-status" style="margin-top: 10px; font-weight: bold;"></p>
                     </form>

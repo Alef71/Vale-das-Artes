@@ -1,6 +1,6 @@
 package br.com.valedasartes.domain.destaque.service;
 
-import java.util.List; // Necessário
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -20,7 +20,7 @@ import br.com.valedasartes.domain.destaque.repository.DestaqueRepository;
 public class DestaqueService {
 
     private final DestaqueRepository destaqueRepository;
-    private final FileStorageService fileStorageService; // Injeção
+    private final FileStorageService fileStorageService;
 
     @Autowired
     public DestaqueService(DestaqueRepository destaqueRepository, FileStorageService fileStorageService) {
@@ -28,14 +28,43 @@ public class DestaqueService {
         this.fileStorageService = fileStorageService;
     }
 
-    // --- C R I A R (C) - Só o texto ---
+    // --- NOVO MÉTODO: CRIAR COM FOTO (Chamado pelo Controller Atualizado) ---
+    @Transactional
+    public DestaqueResponseDTO criarDestaqueComFoto(DestaqueRequestDTO dto, MultipartFile file) {
+        // 1. Cria a entidade e define os dados básicos
+        Destaque novoDestaque = new Destaque();
+        novoDestaque.setTitulo(dto.getTitulo());
+        novoDestaque.setLink(dto.getLink());
+        novoDestaque.setAtivo(true); // Define como ativo por padrão ao criar
+
+        // 2. Salva no banco primeiro para gerar o ID (importante para o nome do arquivo, se usado)
+        Destaque salvo = destaqueRepository.save(novoDestaque);
+
+        // 3. Se houver arquivo, faz o upload e atualiza a referência
+        if (file != null && !file.isEmpty()) {
+            try {
+                String nomeArquivo = fileStorageService.salvarArquivo(file);
+                String fotoUrl = fileStorageService.getUrlCompleta(nomeArquivo);
+
+                salvo.setCaminhoImagem(fotoUrl);
+                salvo = destaqueRepository.save(salvo); // Salva novamente com a URL da imagem
+            } catch (Exception e) {
+                // Se der erro no upload, lança exceção para o @Transactional desfazer a criação do registro
+                throw new RuntimeException("Erro ao salvar a foto do destaque: " + e.getMessage());
+            }
+        }
+
+        return new DestaqueResponseDTO(salvo);
+    }
+
+    // --- C R I A R (C) - Método antigo (mantido por segurança/compatibilidade) ---
     @Transactional
     public DestaqueResponseDTO criarDestaque(DestaqueRequestDTO dto) {
         Destaque novoDestaque = new Destaque();
         novoDestaque.setTitulo(dto.getTitulo());
         novoDestaque.setLink(dto.getLink());
-        // A imagem será adicionada em um POST separado (uploadFoto)
-
+        novoDestaque.setAtivo(true);
+        
         Destaque salvo = destaqueRepository.save(novoDestaque);
         return new DestaqueResponseDTO(salvo);
     }
@@ -51,7 +80,7 @@ public class DestaqueService {
         return destaqueRepository.findById(id).map(DestaqueResponseDTO::new);
     }
     
-    // --- U P L O A D (Adicionando a foto) ---
+    // --- U P L O A D (Adicionando a foto posteriormente) ---
     @Transactional
     public DestaqueResponseDTO uploadFoto(Long destaqueId, MultipartFile file) {
         

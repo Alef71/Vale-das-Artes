@@ -1,13 +1,11 @@
 /*
  * js/dashboard-admin.js
  *
- * VERSÃO 5.1: (Completa e Otimizada)
- * - Correção do Menu de Foto (stopPropagation)
- * - Integração com a classe .foto-wrapper do HTML
- * - Upload via FormData
+ * VERSÃO 6.0: 
+ * - Criação de destaque agora envia foto junto (FormData) igual ao Artesão.
  */
 
-console.log("LOG: dashboard-admin.js (v5.1) CARREGADO!");
+console.log("LOG: dashboard-admin.js (v6.0 - Unified Upload) CARREGADO!");
 
 document.addEventListener("DOMContentLoaded", function() {
 
@@ -17,6 +15,8 @@ document.addEventListener("DOMContentLoaded", function() {
 
     // --- Helpers ---
     function getToken() { return localStorage.getItem('userToken'); }
+    // OBS: Certifique-se que API_URL está definida no main.js, senão use '/api'
+    const API_BASE = (typeof API_URL !== 'undefined') ? API_URL : '/api';
 
     // --- Verificação de Login ---
     async function checkLoginAndLoadData() {
@@ -52,7 +52,7 @@ document.addEventListener("DOMContentLoaded", function() {
     const formEditarDestaque = document.getElementById('form-editar-destaque');
     const closeButtons = document.querySelectorAll('.close-button, #btn-fechar-destaque-modal');
 
-    // Menu de Foto
+    // Menu de Foto (Para o Modal de Edição)
     const destaqueFotoPreview = document.getElementById('destaque-foto-preview-menu');
     const inputFotoDestaque = document.getElementById('input-foto-destaque');
     const destaqueFotoMenu = document.getElementById('foto-options-menu-destaque');
@@ -117,20 +117,45 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     }
 
+    // --- NOVA FUNÇÃO DE CRIAR DESTAQUE (Texto + Foto juntos) ---
     async function handleCriarDestaque(e) {
         e.preventDefault();
-        const titulo = e.target.titulo.value;
-        const link = e.target.link.value;
+        
+        if(novoDestaqueStatus) novoDestaqueStatus.textContent = 'Publicando...';
+        
+        const token = getToken();
+        // Cria o FormData com todos os inputs do formulário (titulo, link E foto)
+        const formData = new FormData(e.target);
 
-        novoDestaqueStatus.textContent = 'Publicando...';
         try {
-            const novoDestaque = await apiClient('/destaques', 'POST', { titulo, link });
-            novoDestaqueStatus.textContent = `Sucesso! ID: ${novoDestaque.id}`;
-            formNovoDestaque.reset();
-            loadDestaques();
+            // Usa fetch nativo para enviar Multipart/Form-Data
+            const response = await fetch(`${API_BASE}/destaques`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                    // Não adicionar Content-Type aqui, o browser adiciona boundary automaticamente
+                },
+                body: formData
+            });
+
+            if (response.ok) {
+                const novoDestaque = await response.json();
+                if(novoDestaqueStatus) {
+                    novoDestaqueStatus.textContent = `Sucesso! Destaque ID ${novoDestaque.id} criado.`;
+                    novoDestaqueStatus.style.color = 'green';
+                }
+                formNovoDestaque.reset();
+                loadDestaques();
+            } else {
+                const err = await response.json().catch(() => ({}));
+                throw new Error(err.message || 'Falha ao criar destaque.');
+            }
         } catch (error) {
             console.error(error);
-            novoDestaqueStatus.textContent = 'Erro ao publicar.';
+            if(novoDestaqueStatus) {
+                novoDestaqueStatus.textContent = 'Erro: ' + error.message;
+                novoDestaqueStatus.style.color = 'red';
+            }
         }
     }
 
@@ -189,9 +214,9 @@ document.addEventListener("DOMContentLoaded", function() {
         document.getElementById('edit-destaque-ativo').checked = destaque.ativo;
         
         // Reseta estados visuais
-        uploadStatusDestaque.textContent = '';
-        inputFotoDestaque.value = null; 
-        fecharMenuDestaque(); // Garante que o menu comece fechado
+        if(uploadStatusDestaque) uploadStatusDestaque.textContent = '';
+        if(inputFotoDestaque) inputFotoDestaque.value = null; 
+        fecharMenuDestaque(); 
         
         // Exibe o modal
         destaqueModal.style.display = 'flex'; 
@@ -205,11 +230,10 @@ document.addEventListener("DOMContentLoaded", function() {
 
 
     // ===================================================================
-    // --- LÓGICA DO MENU DE FOTO (O PULO DO GATO) ---
+    // --- LÓGICA DO MENU DE FOTO (MODAL DE EDIÇÃO) ---
     // ===================================================================
 
     function abrirMenuDestaque(e) {
-        // [IMPORTANTE] Impede que o clique na foto feche o menu ou propague para o fundo
         if (e) {
             e.stopPropagation();
             e.preventDefault();
@@ -217,9 +241,6 @@ document.addEventListener("DOMContentLoaded", function() {
 
         if (!destaqueFotoMenu) return; 
 
-        console.log("Abrindo menu de foto..."); 
-
-        // Alterna quais botões aparecem (Adicionar vs Trocar/Remover)
         if (destaqueAtualTemFoto) {
             btnAdicionarFotoDestaque.style.display = 'none';
             btnAtualizarFotoDestaque.style.display = 'block';
@@ -230,17 +251,16 @@ document.addEventListener("DOMContentLoaded", function() {
             btnRemoverFotoDestaque.style.display = 'none';
         }
         
-        destaqueFotoMenu.style.display = 'flex'; // Exibe o menu
+        destaqueFotoMenu.style.display = 'flex'; 
     }
 
     function fecharMenuDestaque(e) {
-        // Se clicar fora, fecha o menu
         if (e) e.stopPropagation();
         if(destaqueFotoMenu) destaqueFotoMenu.style.display = 'none';
     }
 
     function acionarInputDeArquivoDestaque() {
-        inputFotoDestaque.click(); // Abre a janela de seleção de arquivo
+        inputFotoDestaque.click(); 
         fecharMenuDestaque();
     }
 
@@ -255,8 +275,7 @@ document.addEventListener("DOMContentLoaded", function() {
         formData.append('foto', file);
 
         try {
-            // Usa o API_URL global (do main.js)
-            const response = await fetch(`${API_URL}/destaques/${currentDestaqueId}/foto`, {
+            const response = await fetch(`${API_BASE}/destaques/${currentDestaqueId}/foto`, {
                 method: 'POST',
                 headers: { 'Authorization': `Bearer ${token}` },
                 body: formData
@@ -264,13 +283,10 @@ document.addEventListener("DOMContentLoaded", function() {
 
             if (response.ok) {
                 const destaqueAtualizado = await response.json();
-                
-                // Atualiza tela na hora
                 destaqueFotoPreview.src = destaqueAtualizado.fotoUrl;
                 destaqueAtualTemFoto = true;
-                
                 uploadStatusDestaque.textContent = 'Foto atualizada com sucesso!';
-                loadDestaques(); // Atualiza a lista no fundo
+                loadDestaques(); 
             } else {
                 throw new Error('Falha no upload.');
             }
@@ -327,6 +343,13 @@ document.addEventListener("DOMContentLoaded", function() {
                         <button class="btn btn-warning btn-reprovar-artista" data-id="${a.id}">Reprovar</button>
                     </div>
                 </div>`).join('');
+            
+            // Eventos
+            document.querySelectorAll('.btn-aprovar-artista').forEach(btn => 
+                btn.addEventListener('click', (e) => updateArtistaStatus(e.target.dataset.id, 'APROVADO')));
+            document.querySelectorAll('.btn-reprovar-artista').forEach(btn => 
+                btn.addEventListener('click', (e) => updateArtistaStatus(e.target.dataset.id, 'REPROVADO')));
+
         } catch (e) { listaArtesaosPendentes.innerHTML = '<p>Erro ao carregar.</p>'; }
     }
 
@@ -354,6 +377,9 @@ document.addEventListener("DOMContentLoaded", function() {
                         <button class="btn btn-danger btn-deletar-artista" data-id="${a.id}">Deletar</button>
                     </div>
                 </div>`).join('');
+            
+            document.querySelectorAll('.btn-deletar-artista').forEach(btn => 
+                btn.addEventListener('click', (e) => handleDeletarArtista(e.target.dataset.id)));
         } catch (e) { listaArtesaosTodos.innerHTML = '<p>Erro ao carregar lista.</p>'; }
     }
 
@@ -382,6 +408,9 @@ document.addEventListener("DOMContentLoaded", function() {
                         <button class="btn btn-danger btn-deletar-cliente" data-id="${c.id}">Deletar</button>
                     </div>
                 </div>`).join('');
+            
+            document.querySelectorAll('.btn-deletar-cliente').forEach(btn => 
+                btn.addEventListener('click', (e) => handleDeletarCliente(e.target.dataset.id)));
         } catch (e) { listaClientes.innerHTML = '<p>Erro ao carregar clientes.</p>'; }
     }
 
@@ -408,44 +437,17 @@ document.addEventListener("DOMContentLoaded", function() {
         if (event.target == destaqueModal) closeDestaqueModal();
     }
 
-    // --- EVENTOS DA FOTO (CORRIGIDO) ---
-    // 1. Tenta pegar o wrapper novo (div que envolve a foto e o menu)
-    const fotoWrapper = document.querySelector('.foto-wrapper');
-    if (fotoWrapper) {
-        fotoWrapper.addEventListener('click', abrirMenuDestaque);
-    } 
-    // 2. Fallback: Se não achar o wrapper, tenta a imagem direto
-    else if (destaqueFotoPreview) {
-        destaqueFotoPreview.addEventListener('click', abrirMenuDestaque);
-    }
-
-    // Botões do Menu
-    if(btnCancelarFotoDestaque) btnCancelarFotoDestaque.addEventListener('click', fecharMenuDestaque);
-    if(btnAdicionarFotoDestaque) btnAdicionarFotoDestaque.addEventListener('click', acionarInputDeArquivoDestaque);
-    if(btnAtualizarFotoDestaque) btnAtualizarFotoDestaque.addEventListener('click', acionarInputDeArquivoDestaque);
-    if(btnRemoverFotoDestaque) btnRemoverFotoDestaque.addEventListener('click', handleRemoveDestaqueSubmit);
+    // Foto Menu (Apenas para o Modal de Edição)
+    const wrapper = document.querySelector('.foto-wrapper');
+    if (wrapper) wrapper.addEventListener('click', abrirMenuDestaque);
+    if (btnCancelarFotoDestaque) btnCancelarFotoDestaque.addEventListener('click', fecharMenuDestaque);
     
-    // Upload automático ao selecionar arquivo
-    if(inputFotoDestaque) inputFotoDestaque.addEventListener('change', handleUploadDestaqueSubmit);
+    if (btnAdicionarFotoDestaque) btnAdicionarFotoDestaque.addEventListener('click', acionarInputDeArquivoDestaque);
+    if (btnAtualizarFotoDestaque) btnAtualizarFotoDestaque.addEventListener('click', acionarInputDeArquivoDestaque);
+    
+    if (inputFotoDestaque) inputFotoDestaque.addEventListener('change', handleUploadDestaqueSubmit);
+    if (btnRemoverFotoDestaque) btnRemoverFotoDestaque.addEventListener('click', handleRemoveDestaqueSubmit);
 
-    // Listas (Delegação de Eventos)
-    if(listaArtesaosPendentes) listaArtesaosPendentes.addEventListener('click', e => {
-        const id = e.target.dataset.id;
-        if (!id) return;
-        if (e.target.classList.contains('btn-aprovar-artista')) updateArtistaStatus(id, 'APROVADO');
-        if (e.target.classList.contains('btn-reprovar-artista')) updateArtistaStatus(id, 'REPROVADO');
-    });
-
-    if(listaArtesaosTodos) listaArtesaosTodos.addEventListener('click', e => {
-        const id = e.target.dataset.id;
-        if (id && e.target.classList.contains('btn-deletar-artista')) handleDeletarArtista(id);
-    });
-
-    if(listaClientes) listaClientes.addEventListener('click', e => {
-        const id = e.target.dataset.id;
-        if (id && e.target.classList.contains('btn-deletar-cliente')) handleDeletarCliente(id);
-    });
-
-    // Inicia tudo
+    // Inicialização
     checkLoginAndLoadData();
 });
