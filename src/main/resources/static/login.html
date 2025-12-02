@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vale das Artes - Acesso</title>
+    
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <link rel="stylesheet" href="css/style-componente-header.css">
+    <link rel="stylesheet" href="css/style-componente-footer.css">
+    
+    <link rel="stylesheet" href="css/style-login.css">
+</head>
+<body>
+
+    <header id="header-placeholder"></header>
+
+    <main>
+        <section id="auth-card">
+            
+            <div id="image-side">
+                <div class="overlay"></div>
+                <div class="brand-text">
+                
+                    <p>Conectando arte e cultura.</p>
+                </div>
+            </div>
+
+            <div id="forms-side">
+                
+                <div id="view-login" class="auth-view active">
+                    <div class="header-box">
+                        <h2>Bem-vindo de volta</h2>
+                        <p>Acesse sua conta para continuar</p>
+                    </div>
+
+                    <form id="form-login">
+                        <div class="input-group">
+                            <label for="login-email">Email</label>
+                            <div class="input-wrapper">
+                                <i class="fas fa-envelope"></i>
+                                <input type="email" id="login-email" name="email" required placeholder="seu@email.com">
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label for="login-senha">Senha</label>
+                            <div class="input-wrapper">
+                                <i class="fas fa-lock"></i>
+                                <input type="password" id="login-senha" name="senha" required placeholder="••••••">
+                            </div>
+                        </div>
+                        <button type="submit" class="btn-primary">Entrar</button>
+                    </form>
+
+
+                    <div class="footer-link">
+                        <span>Não tem conta?</span>
+                        <a href="#" id="btn-ir-cadastro">Criar nova conta</a>
+                    </div>
+                </div>
+
+                <div id="view-selection" class="auth-view hidden">
+                    <div class="header-box">
+                        <h2>Criar Conta</h2>
+                        <p>Como você deseja usar a plataforma?</p>
+                    </div>
+
+                    <div class="selection-container">
+                        <div class="option-card" onclick="selectRole('cliente')">
+                            <i class="fas fa-shopping-bag"></i>
+                            <h3>Sou Cliente</h3>
+                            <p>Quero comprar artes.</p>
+                        </div>
+
+                        <div class="option-card" onclick="selectRole('artesao')">
+                            <i class="fas fa-paint-brush"></i>
+                            <h3>Sou Artesão</h3>
+                            <p>Quero vender minhas criações.</p>
+                        </div>
+                    </div>
+
+                    <div class="footer-link">
+                        <a href="#" id="btn-voltar-login-sel"><i class="fas fa-arrow-left"></i> Voltar</a>
+                    </div>
+                </div>
+
+                <div id="view-cadastro" class="auth-view hidden">
+                    <div class="header-box">
+                        <h2 id="titulo-cadastro">Cadastro</h2>
+                        <p>Preencha seus dados</p>
+                    </div>
+
+                    <form id="form-cadastro">
+                        <div style="display:none;">
+                            <input type="radio" id="radio-cliente" name="tipoConta" value="cliente">
+                            <input type="radio" id="radio-artesao" name="tipoConta" value="artesao">
+                        </div>
+
+                        <div class="row">
+                            <div class="col-100">
+                                <label for="cad-nome">Nome Completo</label>
+                                <input type="text" id="cad-nome" name="nome" required>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-50">
+                                <label for="cad-cpf">CPF</label>
+                                <input type="text" id="cad-cpf" name="cpf" required>
+                            </div>
+                            <div class="col-50">
+                                <label for="cad-telefone">Telefone</label>
+                                <input type="text" id="cad-telefone" name="telefone" required>
+                            </div>
+                        </div>
+
+                        <div id="extra-artesao" style="display: none; background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px; margin-bottom: 10px;">
+                            <div class="row">
+                                <div class="col-100">
+                                    <label for="cad-empresa">Nome do Ateliê</label>
+                                    <input type="text" id="cad-empresa" name="nome_empresa">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-100">
+                                    <label for="cad-cnpj">CNPJ (Opcional)</label>
+                                    <input type="text" id="cad-cnpj" name="cnpj">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-100">
+                                <label for="cad-email">Email</label>
+                                <input type="email" id="cad-email" name="email" required>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-100">
+                                <label for="cad-senha">Senha</label>
+                                <input type="password" id="cad-senha" name="senha" required>
+                            </div>
+                        </div>
+
+                        <div style="margin-top: 15px; border-top: 1px solid #444; padding-top: 10px;">
+                            <label style="color: #f0f0e4; margin-bottom: 10px; display:block; font-weight: bold;">Endereço</label>
+                            
+                            <div class="row">
+                                <div class="col-40">
+                                    <input type="text" id="end-cep" name="cep" placeholder="CEP" required>
+                                </div>
+                                <div class="col-60">
+                                    <input type="text" id="end-cidade" name="cidade" placeholder="Cidade" required>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-80">
+                                    <input type="text" id="end-logradouro" name="logradouro" placeholder="Rua / Logradouro" required>
+                                </div>
+                                <div class="col-20">
+                                    <input type="text" id="end-numero" name="numero" placeholder="Nº" required>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-50">
+                                    <input type="text" id="end-complemento" name="complemento" placeholder="Complemento (Opcional)">
+                                </div>
+                                <div class="col-50">
+                                    <input type="text" id="end-bairro" name="bairro" placeholder="Bairro" required>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-20">
+                                    <input type="text" id="end-estado" name="estado" placeholder="UF" maxlength="2" required>
+                                </div>
+                                <div class="col-80">
+                                    <input type="text" id="end-tel-entrega" name="telefoneEndereco" placeholder="Telefone para Entrega" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn-primary" style="margin-top: 20px;">Finalizar Cadastro</button>
+                    </form>
+
+                    <div class="footer-link">
+                        <a href="#" id="btn-voltar-selecao"><i class="fas fa-arrow-left"></i> Voltar</a>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+    </main>
+
+    <footer id="footer-placeholder"></footer>
+
+    <script src="js/main.js"></script>
+    <script src="js/auth.js"></script>
+    <script>
+        // Função Global para despachar evento de seleção de perfil
+        function selectRole(role) {
+            const event = new CustomEvent('roleSelected', { detail: role });
+            document.dispatchEvent(event);
+        }
+    </script>
+</body>
+</html>

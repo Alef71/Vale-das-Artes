@@ -1,0 +1,38 @@
+<nav class="navbar">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="index.html">
+            Vale das Artes
+        </a>
+
+        <ul class="navbar-nav">
+            <li class="nav-item">
+                <a class="nav-link" href="index.html">Início</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="sobre.html">Sobre o Projeto</a>
+            </li>
+        </ul>
+
+        <div class="navbar-actions">
+            
+            <div id="auth-visitante">
+                <a href="login.html" class="btn btn-login">Login</a>
+                <a href="login.html#cadastro" class="btn btn-cadastro">Cadastre-se</a>
+            </div>
+
+            <div id="auth-logado" style="display: none;">
+                <a href="index.html" id="link-dashboard" class="btn btn-painel">Meu Painel</a>
+                
+                <a href="perfil-artesao.html" id="link-perfil-publico" class="btn btn-perfil" style="display: none;">
+                    Perfil Público
+                </a>
+
+                <a href="#" id="btn-logout" class="btn btn-sair">Sair</a>
+            </div>
+
+            <a href="carrinho.html" class="btn btn-carrinho">
+                🛒 Carrinho
+            </a>
+        </div>
+    </div>
+</nav>

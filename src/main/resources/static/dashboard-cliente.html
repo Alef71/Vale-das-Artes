@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vale das Artes - Painel do Cliente</title>
+    <link rel="stylesheet" href="css/style-componente-header.css">
+    <link rel="stylesheet" href="css/style-componente-footer.css">
+    </head>
+<body>
+
+    <header id="header-placeholder"></header>
+
+    <main>
+        <section id="dashboard">
+            
+            <section class="perfil-foto-container">
+                <h3>Minha Foto de Perfil</h3>
+                
+                <img id="foto-preview-cliente" 
+                     src="https://via.placeholder.com/150?text=Carregando..." 
+                     alt="Foto do Perfil" 
+                     class="profile-pic-preview" 
+                     style="border-radius: 50%;">
+            
+                <input type="file" id="input-foto-cliente" accept="image/png, image/jpeg" style="display: none;">
+            
+                <div id="foto-options-menu-cliente" class="profile-pic-menu" style="display: none;">
+                    <p>Alterar foto de perfil</p>
+                    
+                    <button id="btn-adicionar-foto-cliente" class="menu-option">Adicionar foto</button>
+                    <button id="btn-atualizar-foto-cliente" class="menu-option">Atualizar foto</button>
+                    <button id="btn-remover-foto-cliente" class="menu-option danger">Remover foto</button>
+                    
+                    <hr>
+                    <button id="btn-cancelar-foto-cliente" class="menu-option">Cancelar</button>
+                </div>
+                
+                <p id="upload-status-cliente"></p>
+            </section>
+            <h1 id="dashboard-title">Painel do Cliente - Carregando...</h1>
+
+            <a href="chat.html">Ver minhas mensagens (Chat)</a>
+            <hr>
+
+            <section id="meus-pedidos">
+                <h2>Meus Pedidos</h2>
+                <div id="lista-pedidos">
+                    <p>Carregando pedidos...</p>
+                </div>
+            </section>
+
+            <hr>
+
+            <section id="editar-dados-cliente">
+                <h2>Editar Minhas Informações</h2>
+                
+                <form id="form-editar-cliente">
+                    
+                    <input type="hidden" id="cliente-email">
+                    
+                    <fieldset>
+                        <legend>Dados Pessoais (tabela 'cliente')</legend>
+                        <div>
+                            <label for="cliente-nome">Nome Completo:</label>
+                            <input type="text" id="cliente-nome" name="nome">
+                        </div>
+                        <div>
+                            <label for="cliente-cpf">CPF (não pode ser alterado):</label>
+                            <input type="text" id="cliente-cpf" name="cpf" disabled>
+                        </div>
+                        <div>
+                            <label for="cliente-telefone">Telefone (Principal):</label>
+                            <input type="text" id="cliente-telefone" name="telefone">
+                        </div>
+                    </fieldset>
+
+                    <fieldset>
+                        <legend>Endereço de Entrega (tabela 'endereco')</legend>
+                        <div>
+                            <label for="end-logradouro">Logradouro (Rua/Av.):</label>
+                            <input type="text" id="end-logradouro" name="logradouro">
+                        </div>
+                        <div>
+                            <label for="end-numero">Número:</label>
+                            <input type="text" id="end-numero" name="numero">
+                        </div>
+                        <div>
+                            <label for="end-complemento">Complemento:</label>
+                            <input type="text" id="end-complemento" name="complemento">
+                        </div>
+                        <div>
+                            <label for="end-bairro">Bairro:</label>
+                            <input type="text" id="end-bairro" name="bairro">
+                        </div>
+                        <div>
+                            <label for="end-cidade">Cidade:</label>
+                            <input type="text" id="end-cidade" name="cidade">
+                        </div>
+                        <div>
+                            <label for="end-estado">Estado (UF):</label>
+                            <input type="text" id="end-estado" name="estado" maxlength="2">
+                        </div>
+                        <div>
+                            <label for="end-cep">CEP:</label>
+                            <input type="text" id="end-cep" name="cep">
+                        </div>
+                        <div>
+                            <label for="end-telefone">Telefone (do Endereço/Entrega):</label>
+                            <input type="text" id="end-telefone" name="telefoneEndereco">
+                        </div>
+                    </fieldset>
+
+                    <fieldset>
+                        <legend>Alterar Senha (tabela 'credenciais')</legend>
+                        <p>Deixe em branco para não alterar.</p>
+                        <div>
+                            <label for="nova-senha">Nova Senha:</label>
+                            <input type="password" id="nova-senha" name="novaSenha">
+                        </div>
+                        <div>
+                            <label for="confirma-senha">Confirmar Nova Senha:</label>
+                            <input type="password" id="confirma-senha" name="confirmaSenha">
+                        </div>
+                    </fieldset>
+
+                    <button type="submit">Salvar Alterações</button>
+                </form>
+            </section>
+        </section>
+    </main>
+
+    <footer id="footer-placeholder"></footer>
+
+    <script src="js/main.js"></script>
+    
+    <script src="js/dashboard-cliente.js"></script>
+
+</body>
+</html>

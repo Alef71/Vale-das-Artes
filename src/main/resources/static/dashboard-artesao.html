@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vale das Artes - Painel do Artesão</title>
+    <link rel="stylesheet" href="css/style-componente-header.css">
+    <link rel="stylesheet" href="css/style-componente-footer.css">
+    <style>
+        /* Cole os estilos (placeholder) da minha resposta anterior aqui, se quiser */
+        /* ... */
+        .perfil-foto-container { position: relative; width: 200px; }
+        .profile-pic-preview { width: 200px; height: 200px; border-radius: 50%; object-fit: cover; cursor: pointer; }
+        .profile-pic-menu { display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 220px; background: white; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 10; padding: 10px; text-align: center; }
+        .profile-pic-menu .menu-option { display: block; width: 100%; padding: 12px; margin: 5px 0; border: none; border-radius: 6px; cursor: pointer; background-color: #f0f0f0; }
+        .profile-pic-menu .menu-option.danger { background-color: #fbebee; color: #d9534f; }
+        /* (Estilos do modal, formulário, etc. que você já tinha) */
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4); }
+        .modal-content { background-color: #fefefe; margin: 10% auto; padding: 20px; border: 1px solid #888; width: 80%; max-width: 600px; position: relative; }
+        .close-button { color: #aaa; position: absolute; top: 10px; right: 20px; font-size: 28px; font-weight: bold; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+    <header id="header-placeholder"></header>
+
+    <main>
+        <section id="dashboard">
+            <h1 id="dashboard-title">Painel do Artesão - Carregando...</h1>
+            <a href="perfil-artesao.html" id="link-perfil-publico">Ver meu perfil público</a>
+            <hr>
+
+            <section id="editar-perfil-artesao">
+                <h2>Editar Meu Perfil</h2>
+
+                <section class="perfil-foto-container">
+                    <h3>Minha Foto de Perfil</h3>
+                    <img id="foto-preview-artista" 
+                         src="https://via.placeholder.com/200?text=Carregando..." 
+                         alt="Foto do Perfil" 
+                         class="profile-pic-preview">
+                    
+                    <input type="file" id="input-foto-artista" accept="image/png, image/jpeg" style="display: none;">
+                    
+                    <div id="foto-options-menu" class="profile-pic-menu" style="display: none;">
+                        <p>Alterar foto de perfil</p>
+                        <button id="btn-adicionar-foto" class="menu-option">Adicionar foto</button>
+                        <button id="btn-atualizar-foto" class="menu-option">Atualizar foto</button>
+                        <button id="btn-remover-foto" class="menu-option danger">Remover foto</button>
+                        <hr>
+                        <button id="btn-cancelar-foto" class="menu-option">Cancelar</button>
+                    </div>
+                    <p id="upload-status-artista"></p>
+                </section>
+                <form id="form-editar-artesao">
+                    <div>
+                        <label for="artesao-nome">Nome:</label>
+                        <input type="text" id="artesao-nome" name="nome" required>
+                    </div>
+                    <div>
+                        <label for="artesao-nome-empresa">Nome da Empresa:</label>
+                        <input type="text" id="artesao-nome-empresa" name="nomeEmpresa">
+                    </div>
+                    <div>
+                        <label for="artesao-biografia">Biografia (Máx. 500 caracteres):</label>
+                        <textarea id="artesao-biografia" name="biografia" rows="5" maxlength="500" placeholder="..."></textarea>
+                    </div>
+                    <button type="submit">Salvar Alterações do Perfil</button>
+                </form>
+            </section>
+            
+            <hr>
+
+            <section id="novo-produto">
+                <h2>Cadastrar Novo Produto</h2>
+                <form id="form-novo-produto" enctype="multipart/form-data">
+                    <div>
+                        <label for="produto-nome">Nome do Produto:</label>
+                        <input type="text" id="produto-nome" name="nome" required>
+                    </div>
+                    <div>
+                        <label for="produto-descricao">Descrição:</label>
+                        <textarea id="produto-descricao" name="descricao" rows="3" required></textarea>
+                    </div>
+                    <div>
+                        <label for="produto-preco">Preço (R$):</label>
+                        <input type="number" id="produto-preco" name="preco" step="0.01" min="0.01" required>
+                    </div>
+                    <div>
+                        <label for="produto-categoria">Categoria:</label>
+                        <select id="produto-categoria" name="categoria" required>
+                            <option value="">Selecione</option>
+                            <option value="CERAMICA">Cerâmica</option>
+                            <option value="MADEIRA">Madeira</option>
+                            <option value="TECIDO">Tecido/Tricô</option>
+                            <option value="JOALHERIA">Joalheria Artesanal</option>
+                            <option value="PINTURA">Pintura/Quadros</option>
+                            <option value="OUTROS">Outros</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="produto-foto">Foto do Produto:</label>
+                        <input type="file" id="produto-foto" name="foto" accept="image/*" required>
+                    </div>
+                    <button type="submit">Cadastrar Produto</button>
+                </form>
+            </section>
+
+            <hr>
+
+            <section id="meus-produtos-lista">
+                <h2>Meus Produtos Cadastrados</h2>
+                <div id="lista-meus-produtos">
+                    <p>Carregando produtos...</p>
+                </div>
+            </section>
+        </section>
+    </main>
+
+    <div id="editProductModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h2>Editar Produto</h2>
+            <form id="form-editar-produto">
+                <input type="hidden" id="edit-produto-id" name="id">
+                <div>
+                    <label for="edit-produto-nome">Nome:</label>
+                    <input type="text" id="edit-produto-nome" name="nome" required>
+                </div>
+                <div>
+                    <label for="edit-produto-descricao">Descrição:</label>
+                    <textarea id="edit-produto-descricao" name="descricao" rows="3" required></textarea>
+                </div>
+                <div>
+                    <label for="edit-produto-preco">Preço (R$):</label>
+                    <input type="number" id="edit-produto-preco" name="preco" step="0.01" min="0.01" required>
+                </div>
+                <div>
+                    <label for="edit-produto-categoria">Categoria:</label>
+                    <select id="edit-produto-categoria" name="categoria" required>
+                        <option value="">Selecione</option>
+                        <option value="CERAMICA">Cerâmica</option>
+                        <option value="MADEIRA">Madeira</option>
+                        <option value="TECIDO">Tecido/Tricô</option>
+                        <option value="JOALHERIA">Joalheria Artesanal</option>
+                        <option value="PINTURA">Pintura/Quadros</option>
+                        <option value="OUTROS">Outros</option>
+                    </select>
+                </div>
+                <button type="submit">Salvar Edição</button>
+            </form>
+        </div>
+    </div>
+    
+    <footer id="footer-placeholder"></footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const userId = localStorage.getItem('userId');
+            const linkPerfilPublico = document.getElementById('link-perfil-publico');
+            if (userId && linkPerfilPublico) {
+                linkPerfilPublico.href = `perfil-artesao.html?id=${userId}`;
+            }
+        });
+    </script>
+    
+    <script src="/js/main.js"></script> 
+    <script src="/js/dashboard-artesao.js"></script>
+
+</body>
+</html>
