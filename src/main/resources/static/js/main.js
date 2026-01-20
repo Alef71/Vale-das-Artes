@@ -1,224 +1,159 @@
-/*
- * js/main.js (VERSÃO CORRIGIDA)
- *
- * Este arquivo contém a função 'apiClient' e NÃO tem o SyntaxError na linha 109.
- * Este é o "par" correto para o dashboard-admin.js (v3.1).
+/**
+ * js/main.js
+ * Gerencia o Header, Footer e carrega a FOTO DO PERFIL
  */
 
-const API_URL = 'http://localhost:8080/api'; // Ou apenas '/api' se estiver no mesmo domínio
+const API_URL = 'http://localhost:8080/api'; 
 
-// --- (DO SEU CÓDIGO) Função para carregar componentes (header/footer) ---
+// --- Carrega HTML externo (Header/Footer) ---
 function loadComponent(url, elementId) {
     return fetch(url)
         .then(response => {
-            if (!response.ok) {
-                throw new Error('Erro ao carregar componente: ' + response.statusText);
-            }
+            if (!response.ok) throw new Error('Erro ao carregar ' + url);
             return response.text();
         })
         .then(html => {
             const element = document.getElementById(elementId);
-            if (element) {
-                element.innerHTML = html;
-            } else {
-                console.error('Elemento placeholder não encontrado:', elementId);
-            }
+            if (element) element.innerHTML = html;
         })
-        .catch(error => {
-            console.error('Erro no fetch do componente:', error);
-        });
+        .catch(err => console.error(err));
 }
 
-// --- (NOVO) Função Helper de API ---
-// Centraliza todas as chamadas à API e já inclui o token
+// --- Cliente HTTP Genérico ---
 async function apiClient(endpoint, method = 'GET', body = null) {
-    const token = localStorage.getItem('userToken'); // Usa 'userToken'
+    const token = localStorage.getItem('userToken');
+    const headers = new Headers();
     
-    const headers = new Headers(); // Usar Headers object para flexibilidade
-    
-    // Se o corpo não for FormData, definir como JSON
     if (body && !(body instanceof FormData)) {
         headers.append('Content-Type', 'application/json');
     }
+    if (token) headers.append('Authorization', `Bearer ${token}`);
 
-    if (token) {
-        headers.append('Authorization', `Bearer ${token}`);
-    }
-
-    const config = {
-        method: method,
-        headers: headers
-    };
-
-    if (body) {
-        // Envia como JSON ou como FormData (para uploads)
-        config.body = (body instanceof FormData) ? body : JSON.stringify(body);
-    }
+    const config = { method, headers };
+    if (body) config.body = (body instanceof FormData) ? body : JSON.stringify(body);
 
     try {
         const response = await fetch(`${API_URL}${endpoint}`, config);
-        
-        // Se a resposta for 204 (No Content), como em um DELETE, retorne null
-        if (response.status === 204) {
-            return null;
-        }
-
-        // Tenta pegar o JSON. Se não houver, pode dar erro (ex: 500)
+        if (response.status === 204) return null;
         const data = await response.json();
-
-        if (!response.ok) {
-            // Usa a mensagem de erro do backend (data.message) ou o status
-            throw new Error(data.message || `Erro ${response.status}`);
-        }
-        
-        return data; // Retorna o JSON
-        
+        if (!response.ok) throw new Error(data.message || `Erro ${response.status}`);
+        return data;
     } catch (error) {
-        console.error(`Falha na API [${method} ${endpoint}]:`, error);
-        // Não mostre um 'alert' aqui, apenas lance o erro
-        // A função que chamou (ex: loadDestaques) decidirá o que fazer.
+        console.error("API Client Error:", error);
         throw error;
     }
 }
 
-
-// --- (ATUALIZADO) Função para atualizar a UI (Login/Logout) ---
+// --- ATUALIZA HEADER COM FOTO E LOGIN ---
 function atualizarEstadoLogin() {
     const token = localStorage.getItem('userToken'); 
     const role = localStorage.getItem('userRole');
-    const userId = localStorage.getItem('userId'); 
+    
+    // Recupera o que o auth.js salvou
+    const storedName = localStorage.getItem('userName');
+    const storedPhoto = localStorage.getItem('userPhoto');
 
-    // Seletores do SEU header (componente-header.html)
+    // Elementos do Header
     const divVisitante = document.getElementById('auth-visitante');
     const divLogado = document.getElementById('auth-logado');
-    const linkDashboard = document.getElementById('link-dashboard');
+    const imgAvatar = document.getElementById('nav-user-avatar'); // O IMG da bolinha
+    const linkAvatar = document.getElementById('user-avatar-link');
     const btnLogout = document.getElementById('btn-logout');
-    const linkPerfilPublico = document.getElementById('link-perfil-publico'); 
-
-    // Seletores GLOBAIS (para os botões "Comprar", etc.)
-    const elementosAutenticados = document.querySelectorAll('.auth-required');
-    const elementosNaoAutenticados = document.querySelectorAll('.auth-hidden');
-
+    
+    // Se está logado
     if (token && role) {
-        // --- SE ESTIVER LOGADO ---
+        if (divVisitante) divVisitante.style.display = 'none';
+        if (divLogado) divLogado.style.display = 'flex'; // Mostra área do usuário
 
-        // 1. Controla o SEU header
-        if (divVisitante && divLogado) {
-            divVisitante.style.display = 'none';
-            divLogado.style.display = 'block';
-        }
-        if (linkDashboard) {
-            if (role === 'ROLE_CLIENTE') {
-                linkDashboard.href = 'dashboard-cliente.html';
-            } else if (role === 'ROLE_ARTISTA') {
-                linkDashboard.href = 'dashboard-artesao.html';
-            } else if (role === 'ROLE_ADMIN') {
-                linkDashboard.href = 'dashboard-admin.html';
+        // 1. ATUALIZA A FOTO
+        if (imgAvatar) {
+            if (storedPhoto && storedPhoto !== "null" && storedPhoto.trim() !== "") {
+                // Tem foto no banco? Usa ela.
+                imgAvatar.src = storedPhoto;
+            } else {
+                // Não tem? Gera avatar com iniciais
+                const nameToUse = storedName || "User";
+                imgAvatar.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(nameToUse)}&background=9c8b75&color=fff&size=150`;
             }
         }
-        if (role === 'ROLE_ARTISTA' && linkPerfilPublico && userId) {
-            const urlCorreta = `perfil-artesao.html?id=${userId}`;
-            linkPerfilPublico.style.display = 'inline-block'; 
-            linkPerfilPublico.href = urlCorreta; 
-        } else if (linkPerfilPublico) {
-            linkPerfilPublico.style.display = 'none'; 
-        }
-        
-        // 2. Controla os botões GLOBAIS ("Comprar", etc.)
-        elementosAutenticados.forEach(el => el.style.display = 'block');
-        elementosNaoAutenticados.forEach(el => el.style.display = 'none');
 
-        // 3. Adiciona o listener de Logout
+        // 2. Define link do dashboard
+        if (linkAvatar) {
+            if (role === 'ROLE_CLIENTE') linkAvatar.href = 'dashboard-cliente.html';
+            else if (role === 'ROLE_ARTISTA') linkAvatar.href = 'dashboard-artesao.html';
+            else linkAvatar.href = 'dashboard-admin.html';
+        }
+
+        // 3. Configura Logout
         if (btnLogout) {
-            // Evita adicionar múltiplos listeners
-            btnLogout.removeEventListener('click', handleLogout);
-            btnLogout.addEventListener('click', handleLogout);
+            // Remove listener anterior para não duplicar
+            btnLogout.replaceWith(btnLogout.cloneNode(true));
+            document.getElementById('btn-logout').addEventListener('click', (e) => {
+                e.preventDefault();
+                if(confirm("Deseja sair?")) {
+                    localStorage.clear(); // Limpa tudo (Token, Foto, Nome)
+                    window.location.href = 'index.html';
+                }
+            });
         }
 
     } else {
-        // --- SE ESTIVER DESLOGADO ---
-
-        // 1. Controla o SEU header
-        if (divVisitante && divLogado) {
-            divVisitante.style.display = 'block';
-            divLogado.style.display = 'none';
-        }
-        
-        // 2. Controla os botões GLOBAIS ("Comprar", etc.)
-        elementosAutenticados.forEach(el => el.style.display = 'none');
-        elementosNaoAutenticados.forEach(el => el.style.display = 'block');
+        // Se NÃO está logado
+        if (divVisitante) divVisitante.style.display = 'block';
+        if (divLogado) divLogado.style.display = 'none';
     }
 }
 
-// --- (NOVO) Lógica de Logout ---
-function handleLogout(e) {
-    if (e) e.preventDefault();
-    if (!confirm('Deseja realmente sair?')) return;
-    
-    // Limpa TODAS as chaves que o 'auth.js' salva
-    localStorage.removeItem('userToken'); 
-    localStorage.removeItem('userRole');
-    localStorage.removeItem('userId');
-    localStorage.removeItem('carrinhoId'); 
-    
-    alert("Você saiu da sua conta.");
-    window.location.href = 'index.html';
-}
+// --- ADICIONAR AO CARRINHO ---
+async function handleAdicionarAoCarrinho(e) {
+    const btn = e.target;
+    const produtoId = btn.dataset.produtoId;
+    const carrinhoId = localStorage.getItem('carrinhoId');
 
-// --- (NOVO) Lógica de Adicionar ao Carrinho ---
-async function handleAdicionarAoCarrinho(evento) {
-    const botao = evento.target;
-    const produtoId = botao.dataset.produtoId;
-    
-    const carrinhoId = localStorage.getItem('carrinhoId'); 
-    
+    if (!localStorage.getItem('userToken')) {
+        alert("Faça login para comprar!");
+        window.location.href = 'login.html';
+        return;
+    }
+
     if (!carrinhoId) {
-        console.error('ERRO: carrinhoId não encontrado no localStorage.');
-        alert('Seu carrinho não foi encontrado. Por favor, faça o login novamente.');
-        handleLogout(); 
+        alert("Erro: Carrinho não encontrado. Tente fazer login novamente.");
         return;
     }
 
     try {
-        botao.disabled = true;
-        botao.textContent = 'Adicionando...';
-
-        const dto = { 
-            produtoId: parseInt(produtoId), 
-            quantidade: 1 
-        };
+        btn.textContent = "...";
+        btn.disabled = true;
         
-        const carrinhoAtualizado = await apiClient(`/carrinhos/${carrinhoId}/itens`, 'POST', dto);
+        await apiClient(`/carrinhos/${carrinhoId}/itens`, 'POST', {
+            produtoId: parseInt(produtoId),
+            quantidade: 1
+        });
         
-        console.log("Item adicionado!", carrinhoAtualizado);
-        alert('Produto adicionado ao carrinho!');
-        
-    } catch (error) {
-        console.error('Falha ao adicionar item:', error);
-        alert(`Erro ao adicionar: ${error.message}`); // Mostra o erro da API
+        alert("Produto na sacola!");
+    } catch (err) {
+        alert("Erro ao adicionar: " + err.message);
     } finally {
-        botao.disabled = false;
-        botao.textContent = 'Comprar Produto';
+        btn.textContent = "Comprar";
+        btn.disabled = false;
     }
 }
 
-
-// --- INICIALIZAÇÃO (DOMContentLoaded) ---
+// --- INICIALIZAÇÃO GERAL ---
 document.addEventListener("DOMContentLoaded", function() {
     
-    // Carrega o footer
+    // 1. Carrega Footer
     loadComponent('componente-footer.html', 'footer-placeholder');
 
-    // Carrega o header e, DEPOIS, atualiza o estado de login
+    // 2. Carrega Header E DEPOIS atualiza a foto
     loadComponent('componente-header.html', 'header-placeholder')
         .then(() => {
-            // Esta função agora controla TUDO (o header e os botões de comprar)
+            // O HTML do header já existe agora, então podemos buscar os IDs e atualizar
             atualizarEstadoLogin();
         });
 
-    // --- (NOVO) DELEGAÇÃO DE EVENTOS ---
+    // 3. Escuta cliques em botões de compra (Delegate event)
     document.addEventListener('click', function(e) {
-        // Se o elemento clicado tem a classe 'btn-adicionar-carrinho'
         if (e.target && e.target.classList.contains('btn-adicionar-carrinho')) {
             handleAdicionarAoCarrinho(e);
         }

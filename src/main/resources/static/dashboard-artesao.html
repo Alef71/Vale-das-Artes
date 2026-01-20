@@ -3,118 +3,223 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vale das Artes - Painel do Artesão</title>
+    <title>Painel do Artesão | Vale das Artes</title>
+    
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
     <link rel="stylesheet" href="css/style-componente-header.css">
     <link rel="stylesheet" href="css/style-componente-footer.css">
-    <style>
-        /* Cole os estilos (placeholder) da minha resposta anterior aqui, se quiser */
-        /* ... */
-        .perfil-foto-container { position: relative; width: 200px; }
-        .profile-pic-preview { width: 200px; height: 200px; border-radius: 50%; object-fit: cover; cursor: pointer; }
-        .profile-pic-menu { display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 220px; background: white; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 10; padding: 10px; text-align: center; }
-        .profile-pic-menu .menu-option { display: block; width: 100%; padding: 12px; margin: 5px 0; border: none; border-radius: 6px; cursor: pointer; background-color: #f0f0f0; }
-        .profile-pic-menu .menu-option.danger { background-color: #fbebee; color: #d9534f; }
-        /* (Estilos do modal, formulário, etc. que você já tinha) */
-        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4); }
-        .modal-content { background-color: #fefefe; margin: 10% auto; padding: 20px; border: 1px solid #888; width: 80%; max-width: 600px; position: relative; }
-        .close-button { color: #aaa; position: absolute; top: 10px; right: 20px; font-size: 28px; font-weight: bold; cursor: pointer; }
-    </style>
+    <link rel="stylesheet" href="css/style-perfil-artesao.css"> 
 </head>
 <body>
 
     <header id="header-placeholder"></header>
 
-    <main>
-        <section id="dashboard">
-            <h1 id="dashboard-title">Painel do Artesão - Carregando...</h1>
-            <a href="perfil-artesao.html" id="link-perfil-publico">Ver meu perfil público</a>
-            <hr>
-
-            <section id="editar-perfil-artesao">
-                <h2>Editar Meu Perfil</h2>
-
-                <section class="perfil-foto-container">
-                    <h3>Minha Foto de Perfil</h3>
-                    <img id="foto-preview-artista" 
-                         src="https://via.placeholder.com/200?text=Carregando..." 
-                         alt="Foto do Perfil" 
-                         class="profile-pic-preview">
-                    
-                    <input type="file" id="input-foto-artista" accept="image/png, image/jpeg" style="display: none;">
-                    
-                    <div id="foto-options-menu" class="profile-pic-menu" style="display: none;">
-                        <p>Alterar foto de perfil</p>
-                        <button id="btn-adicionar-foto" class="menu-option">Adicionar foto</button>
-                        <button id="btn-atualizar-foto" class="menu-option">Atualizar foto</button>
-                        <button id="btn-remover-foto" class="menu-option danger">Remover foto</button>
-                        <hr>
-                        <button id="btn-cancelar-foto" class="menu-option">Cancelar</button>
-                    </div>
-                    <p id="upload-status-artista"></p>
-                </section>
-                <form id="form-editar-artesao">
-                    <div>
-                        <label for="artesao-nome">Nome:</label>
-                        <input type="text" id="artesao-nome" name="nome" required>
-                    </div>
-                    <div>
-                        <label for="artesao-nome-empresa">Nome da Empresa:</label>
-                        <input type="text" id="artesao-nome-empresa" name="nomeEmpresa">
-                    </div>
-                    <div>
-                        <label for="artesao-biografia">Biografia (Máx. 500 caracteres):</label>
-                        <textarea id="artesao-biografia" name="biografia" rows="5" maxlength="500" placeholder="..."></textarea>
-                    </div>
-                    <button type="submit">Salvar Alterações do Perfil</button>
-                </form>
-            </section>
-            
-            <hr>
-
-            <section id="novo-produto">
-                <h2>Cadastrar Novo Produto</h2>
-                <form id="form-novo-produto" enctype="multipart/form-data">
-                    <div>
-                        <label for="produto-nome">Nome do Produto:</label>
-                        <input type="text" id="produto-nome" name="nome" required>
-                    </div>
-                    <div>
-                        <label for="produto-descricao">Descrição:</label>
-                        <textarea id="produto-descricao" name="descricao" rows="3" required></textarea>
-                    </div>
-                    <div>
-                        <label for="produto-preco">Preço (R$):</label>
-                        <input type="number" id="produto-preco" name="preco" step="0.01" min="0.01" required>
-                    </div>
-                    <div>
-                        <label for="produto-categoria">Categoria:</label>
-                        <select id="produto-categoria" name="categoria" required>
-                            <option value="">Selecione</option>
-                            <option value="CERAMICA">Cerâmica</option>
-                            <option value="MADEIRA">Madeira</option>
-                            <option value="TECIDO">Tecido/Tricô</option>
-                            <option value="JOALHERIA">Joalheria Artesanal</option>
-                            <option value="PINTURA">Pintura/Quadros</option>
-                            <option value="OUTROS">Outros</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label for="produto-foto">Foto do Produto:</label>
-                        <input type="file" id="produto-foto" name="foto" accept="image/*" required>
-                    </div>
-                    <button type="submit">Cadastrar Produto</button>
-                </form>
-            </section>
-
-            <hr>
-
-            <section id="meus-produtos-lista">
-                <h2>Meus Produtos Cadastrados</h2>
-                <div id="lista-meus-produtos">
-                    <p>Carregando produtos...</p>
-                </div>
-            </section>
+    <main class="container-dashboard">
+        
+        <section class="dashboard-header-top">
+            <div>
+                <h1 id="dashboard-title">Painel do Artesão</h1>
+                <p class="subtitle">Gerencie seu ateliê e suas criações</p>
+            </div>
+            <a href="javascript:void(0)" id="btn-perfil-publico" class="link-perfil-publico" target="_blank">
+                <i class="fas fa-external-link-alt"></i> Ver Perfil Público
+            </a>
         </section>
+
+        <div class="dashboard-grid">
+            
+            <aside class="dashboard-sidebar">
+                <div class="card-sidebar">
+                    <div class="foto-container">
+                        <div class="avatar-wrapper">
+                            <img id="foto-preview-artista" 
+                                 src="https://via.placeholder.com/150?text=Foto" 
+                                 alt="Foto do Perfil">
+                            
+                            <button type="button" id="btn-camera-upload" title="Alterar foto">
+                                <i class="fas fa-camera"></i>
+                            </button>
+                        </div>
+                        <input type="file" id="input-foto-artista" accept="image/png, image/jpeg" style="display: none;">
+                        <p id="upload-status-artista" class="status-msg"></p>
+                    </div>
+
+                    <h3 id="artesao-nome-display">Carregando...</h3>
+                    <p class="sidebar-role">Artesão Verificado</p>
+
+                    <hr class="divider">
+
+                    <nav class="sidebar-menu">
+                        <a href="#secao-produtos" class="menu-item active">
+                            <i class="fas fa-box-open"></i> Meus Produtos
+                        </a>
+                        <a href="#secao-novo-produto" class="menu-item">
+                            <i class="fas fa-plus-circle"></i> Adicionar Produto
+                        </a>
+                        <a href="#secao-dados" class="menu-item">
+                            <i class="fas fa-user-edit"></i> Dados Pessoais
+                        </a>
+                        <a href="#secao-endereco" class="menu-item">
+                            <i class="fas fa-map-marker-alt"></i> Endereço do Ateliê
+                        </a>
+                    </nav>
+                </div>
+            </aside>
+
+            <section class="dashboard-content">
+
+                <div id="secao-produtos" class="content-card mb-30">
+                    <div class="header-card">
+                        <h2><i class="fas fa-th-list"></i> Vitrine de Produtos</h2>
+                        <p>Gerencie os produtos que estão visíveis para os clientes.</p>
+                    </div>
+                    <div id="lista-meus-produtos" class="grid-produtos">
+                        <p class="loading-text">Carregando seus produtos...</p>
+                    </div>
+                </div>
+
+                <div id="secao-novo-produto" class="content-card mb-30 highlight-card">
+                    <div class="header-card">
+                        <h2><i class="fas fa-plus"></i> Cadastrar Novo Produto</h2>
+                    </div>
+                    <form id="form-novo-produto" enctype="multipart/form-data" class="form-grid">
+                        <div class="form-col-img">
+                            <label class="upload-box">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <span>Escolher Foto</span>
+                                <input type="file" id="produto-foto" name="foto" accept="image/*" required>
+                            </label>
+                        </div>
+                        <div class="form-col-data">
+                            <div class="form-group">
+                                <label>Nome da Peça</label>
+                                <input type="text" id="produto-nome" name="nome" placeholder="Ex: Vaso de Cerâmica Azul" required>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group half">
+                                    <label>Preço (R$)</label>
+                                    <input type="number" id="produto-preco" name="preco" step="0.01" placeholder="0,00" required>
+                                </div>
+                                <div class="form-group half">
+                                    <label>Categoria</label>
+                                    <select id="produto-categoria" name="categoria" required>
+                                        <option value="">Selecione...</option>
+                                        <option value="CERAMICA">Cerâmica</option>
+                                        <option value="MADEIRA">Madeira</option>
+                                        <option value="TECIDO">Tecido/Tricô</option>
+                                        <option value="JOALHERIA">Joalheria</option>
+                                        <option value="PINTURA">Pintura</option>
+                                        <option value="OUTROS">Outros</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Descrição Detalhada</label>
+                                <textarea id="produto-descricao" name="descricao" rows="2" placeholder="Descreva os materiais e dimensões..." required></textarea>
+                            </div>
+                            <button type="submit" class="btn-full btn-success">Publicar Produto</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div id="secao-dados" class="content-card mb-30">
+                    <div class="header-card">
+                        <h2><i class="fas fa-user-cog"></i> Perfil do Artesão</h2>
+                        <p>Estas informações aparecem no seu perfil público.</p>
+                    </div>
+                    
+                    <div class="split-view">
+                        <div class="edit-area">
+                            <form id="form-editar-artesao">
+                                <div class="form-group">
+                                    <label>Nome Completo</label>
+                                    <input type="text" id="artesao-nome" name="nome" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Nome do Ateliê (Marca)</label>
+                                    <input type="text" id="artesao-nome-empresa" name="nomeEmpresa">
+                                </div>
+                                <div class="form-group">
+                                    <label>Biografia (Conte sua história)</label>
+                                    <textarea id="artesao-biografia" name="biografia" rows="6" onkeyup="atualizarPreview(this.value)"></textarea>
+                                </div>
+                                <button type="submit" class="btn-full">Salvar Alterações</button>
+                            </form>
+                        </div>
+
+                        <div class="preview-area">
+                            <label class="preview-label"><i class="fas fa-eye"></i> Pré-visualização</label>
+                            <div class="preview-card">
+                                <div class="preview-header">
+                                    <div class="dot red"></div>
+                                    <div class="dot yellow"></div>
+                                    <div class="dot green"></div>
+                                </div>
+                                <div class="preview-content">
+                                    <h4 id="preview-nome">Nome do Artesão</h4>
+                                    <small id="preview-atelie">Ateliê</small>
+                                    <hr>
+                                    <p id="preview-bio">Sua biografia aparecerá aqui enquanto você digita...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="secao-endereco" class="content-card mt-30">
+                    <div class="header-card">
+                        <h2><i class="fas fa-map-marked-alt"></i> Endereço do Ateliê</h2>
+                        <p>Local de onde seus produtos são enviados.</p>
+                    </div>
+
+                    <form id="form-endereco">
+                        <div class="form-row">
+                            <div class="form-group" style="flex: 0 0 150px;">
+                                <label>CEP</label>
+                                <div style="position: relative;">
+                                    <input type="text" id="endereco-cep" name="cep" placeholder="00000-000" maxlength="9" required>
+                                    <i class="fas fa-search" style="position: absolute; right: 10px; top: 12px; color: #999;"></i>
+                                </div>
+                            </div>
+                            <div class="form-group" style="flex: 1;">
+                                <label>Rua / Logradouro</label>
+                                <input type="text" id="endereco-logradouro" name="logradouro" readonly required style="background-color: #eee;">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group" style="flex: 0 0 100px;">
+                                <label>Número</label>
+                                <input type="text" id="endereco-numero" name="numero" required>
+                            </div>
+                            <div class="form-group" style="flex: 1;">
+                                <label>Complemento</label>
+                                <input type="text" id="endereco-complemento" name="complemento">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group half">
+                                <label>Bairro</label>
+                                <input type="text" id="endereco-bairro" name="bairro" readonly required style="background-color: #eee;">
+                            </div>
+                            <div class="form-group half">
+                                <label>Cidade</label>
+                                <input type="text" id="endereco-cidade" name="cidade" readonly required style="background-color: #eee;">
+                            </div>
+                            <div class="form-group" style="flex: 0 0 80px;">
+                                <label>UF</label>
+                                <input type="text" id="endereco-uf" name="uf" readonly required style="background-color: #eee;">
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn-full">Salvar Endereço</button>
+                    </form>
+                </div>
+
+            </section>
+        </div>
     </main>
 
     <div id="editProductModal" class="modal">
@@ -123,49 +228,69 @@
             <h2>Editar Produto</h2>
             <form id="form-editar-produto">
                 <input type="hidden" id="edit-produto-id" name="id">
-                <div>
-                    <label for="edit-produto-nome">Nome:</label>
+                <div class="form-group">
+                    <label>Nome</label>
                     <input type="text" id="edit-produto-nome" name="nome" required>
                 </div>
-                <div>
-                    <label for="edit-produto-descricao">Descrição:</label>
-                    <textarea id="edit-produto-descricao" name="descricao" rows="3" required></textarea>
+                <div class="form-group">
+                    <label>Descrição</label>
+                    <textarea id="edit-produto-descricao" name="descricao" rows="4" required></textarea>
                 </div>
-                <div>
-                    <label for="edit-produto-preco">Preço (R$):</label>
-                    <input type="number" id="edit-produto-preco" name="preco" step="0.01" min="0.01" required>
+                <div class="row-inputs">
+                    <div class="form-group half">
+                        <label>Preço</label>
+                        <input type="number" id="edit-produto-preco" name="preco" step="0.01" required>
+                    </div>
+                    <div class="form-group half">
+                        <label>Categoria</label>
+                        <select id="edit-produto-categoria" name="categoria" required>
+                            <option value="CERAMICA">Cerâmica</option>
+                            <option value="MADEIRA">Madeira</option>
+                            <option value="TECIDO">Tecido/Tricô</option>
+                            <option value="JOALHERIA">Joalheria</option>
+                            <option value="PINTURA">Pintura</option>
+                            <option value="OUTROS">Outros</option>
+                        </select>
+                    </div>
                 </div>
-                <div>
-                    <label for="edit-produto-categoria">Categoria:</label>
-                    <select id="edit-produto-categoria" name="categoria" required>
-                        <option value="">Selecione</option>
-                        <option value="CERAMICA">Cerâmica</option>
-                        <option value="MADEIRA">Madeira</option>
-                        <option value="TECIDO">Tecido/Tricô</option>
-                        <option value="JOALHERIA">Joalheria Artesanal</option>
-                        <option value="PINTURA">Pintura/Quadros</option>
-                        <option value="OUTROS">Outros</option>
-                    </select>
-                </div>
-                <button type="submit">Salvar Edição</button>
+                <button type="submit" class="btn-full">Salvar Alterações</button>
             </form>
         </div>
     </div>
-    
+
     <footer id="footer-placeholder"></footer>
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const userId = localStorage.getItem('userId');
-            const linkPerfilPublico = document.getElementById('link-perfil-publico');
-            if (userId && linkPerfilPublico) {
-                linkPerfilPublico.href = `perfil-artesao.html?id=${userId}`;
+        function atualizarPreview(texto) {
+            const bioPreview = document.getElementById('preview-bio');
+            if(bioPreview) {
+                bioPreview.textContent = texto || 'Sua biografia aparecerá aqui...';
             }
+        }
+        
+        // Listener simples para atualizar nome/atelie no preview quando carregar
+        document.addEventListener("DOMContentLoaded", function() {
+            setTimeout(() => {
+                const nomeInput = document.getElementById('artesao-nome');
+                const atelieInput = document.getElementById('artesao-nome-empresa');
+                const bioInput = document.getElementById('artesao-biografia');
+                
+                if(nomeInput) {
+                    document.getElementById('preview-nome').textContent = nomeInput.value || 'Nome';
+                    nomeInput.addEventListener('keyup', (e) => document.getElementById('preview-nome').textContent = e.target.value);
+                }
+                if(atelieInput) {
+                    document.getElementById('preview-atelie').textContent = atelieInput.value || 'Ateliê';
+                    atelieInput.addEventListener('keyup', (e) => document.getElementById('preview-atelie').textContent = e.target.value);
+                }
+                if(bioInput) {
+                    document.getElementById('preview-bio').textContent = bioInput.value || 'Biografia...';
+                }
+            }, 1000); // Pequeno delay para esperar o JS principal carregar os dados
         });
     </script>
-    
-    <script src="/js/main.js"></script> 
-    <script src="/js/dashboard-artesao.js"></script>
 
+    <script src="js/main.js"></script>
+    <script src="js/dashboard-artesao.js"></script>
 </body>
 </html>

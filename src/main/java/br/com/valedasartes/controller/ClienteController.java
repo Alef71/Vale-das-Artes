@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -30,6 +31,7 @@ import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/clientes")
+@CrossOrigin(origins = "*") // Libera acesso para o Front-End
 @Tag(name = "Clientes", description = "Endpoints para gerenciamento de clientes")
 public class ClienteController {
 
@@ -81,7 +83,9 @@ public class ClienteController {
     })
     @PutMapping("/{id}")
     public ResponseEntity<ClienteResponseDTO> atualizarCliente(@PathVariable Long id, @Valid @RequestBody ClienteRequestDTO dto) {
+        // Usa o Service que espera um DTO, garantindo compatibilidade com o Front
         ClienteResponseDTO clienteAtualizado = clienteService.atualizarCliente(id, dto);
+        
         if (clienteAtualizado != null) {
             return ResponseEntity.ok(clienteAtualizado);
         }

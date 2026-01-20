@@ -1,251 +1,219 @@
 document.addEventListener("DOMContentLoaded", function() {
     
+    // --- ELEMENTOS DO DOM ---
     const formEditar = document.getElementById('form-editar-cliente');
-    
-    // --- 1. SELETORES DA FOTO DE PERFIL ADICIONADOS ---
     const previewFoto = document.getElementById('foto-preview-cliente');
     const inputFoto = document.getElementById('input-foto-cliente');
-    const menu = document.getElementById('foto-options-menu-cliente');
+    const btnCamera = document.getElementById('btn-camera-upload'); 
     const uploadStatus = document.getElementById('upload-status-cliente');
-    const btnAdicionar = document.getElementById('btn-adicionar-foto-cliente');
-    const btnAtualizar = document.getElementById('btn-atualizar-foto-cliente');
-    const btnRemover = document.getElementById('btn-remover-foto-cliente');
-    const btnCancelar = document.getElementById('btn-cancelar-foto-cliente');
-
-    let token = null;       // Movido para escopo global do script
-    let userId = null;      // Movido para escopo global do script
-    let clientePossuiFoto = false; // Controla o estado da foto
-
     
-    async function checkLoginAndLoadData() {
-        token = localStorage.getItem('userToken'); // Atribui ao escopo global
-        const role = localStorage.getItem('userRole');
-        userId = localStorage.getItem('userId'); // Atribui ao escopo global
+    const nomeInput = document.getElementById('cliente-nome');
+    const sidebarNome = document.getElementById('sidebar-nome-display');
 
-        
-        if (!token || !userId || role !== 'ROLE_CLIENTE') {
+    let token = localStorage.getItem('userToken');
+    let userId = localStorage.getItem('userId');
+
+    // --- 0. LÓGICA DO ACORDEÃO (ABRIR/FECHAR ABAS) ---
+    const accordions = document.querySelectorAll('.accordion-header');
+    
+    accordions.forEach(header => {
+        header.addEventListener('click', () => {
+            // Alterna a classe 'active' no cabeçalho (para girar a seta)
+            header.classList.toggle('active');
             
+            // Pega o próximo elemento (o conteúdo oculto)
+            const content = header.nextElementSibling;
+            if (content) {
+                // Alterna a classe 'open' para mostrar/esconder
+                content.classList.toggle('open');
+            }
+        });
+    });
+
+    // --- 1. INICIALIZAÇÃO ---
+    async function checkLoginAndLoadData() {
+        const role = localStorage.getItem('userRole');
+
+        if (!token || !userId || role !== 'ROLE_CLIENTE') {
             alert("Acesso negado. Por favor, faça o login.");
             localStorage.clear(); 
             window.location.href = 'login.html';
             return; 
         }
 
-        
         try {
-            // Usa a função apiClient global do main.js
             const cliente = await apiClient(`/clientes/${userId}`, 'GET');
             populatePage(cliente); 
-
         } catch (error) {
-            console.error("Erro ao buscar dados do cliente:", error);
-            
-            if (error.message.includes('403')) {
-                alert("Sua sessão expirou. Por favor, faça login novamente.");
-                localStorage.clear();
+            console.error("Erro ao buscar dados:", error);
+            if (error.message && error.message.includes('403')) {
+                alert("Sessão expirada.");
                 window.location.href = 'login.html';
-            } else {
-                alert("Erro ao conectar ao servidor para buscar seus dados.");
             }
         }
-
-        
-        if (formEditar) {
-            formEditar.addEventListener('submit', handleUpdateSubmit);
-        }
-        
-        // --- 2. LISTENERS DA FOTO DE PERFIL ADICIONADOS ---
-        if (previewFoto) previewFoto.addEventListener('click', abrirMenuFoto);
-        if (btnCancelar) btnCancelar.addEventListener('click', fecharMenuFoto);
-        if (btnAdicionar) btnAdicionar.addEventListener('click', acionarInputDeArquivo);
-        if (btnAtualizar) btnAtualizar.addEventListener('click', acionarInputDeArquivo);
-        if (btnRemover) btnRemover.addEventListener('click', handleRemoveFoto);
-        if (inputFoto) inputFoto.addEventListener('change', handleUploadFoto);
     }
 
-    
+    // --- 2. PREENCHER DADOS NA TELA ---
     function populatePage(cliente) {
-        
-        document.getElementById('dashboard-title').textContent = `Painel do Cliente - Bem-vindo, ${cliente.nome}!`;
+        const titleElement = document.getElementById('dashboard-title');
+        if(titleElement) titleElement.textContent = `Painel do Cliente - Bem-vindo, ${cliente.nome}!`;
 
-        // --- 3. ATUALIZAÇÃO DA FOTO NA PÁGINA ---
-        if (previewFoto) {
-            if (cliente.fotoUrl) {
-                previewFoto.src = cliente.fotoUrl;
-                clientePossuiFoto = true;
-            } else {
-                previewFoto.src = 'https://via.placeholder.com/150?text=Sem+Foto';
-                clientePossuiFoto = false;
-            }
-        }
-        // --- FIM DA ATUALIZAÇÃO DA FOTO ---
-
-        
-        document.getElementById('cliente-nome').value = cliente.nome || '';
-        document.getElementById('cliente-cpf').value = cliente.cpf || '';
-        document.getElementById('cliente-telefone').value = cliente.telefone || '';
-        
-        
-        if (cliente.credencial && cliente.credencial.email) {
-            document.getElementById('cliente-email').value = cliente.credencial.email;
-        }
-
-        
-        if (cliente.endereco) {
-            document.getElementById('end-logradouro').value = cliente.endereco.logradouro || '';
-            document.getElementById('end-numero').value = cliente.endereco.numero || '';
-            document.getElementById('end-complemento').value = cliente.endereco.complemento || '';
-            document.getElementById('end-bairro').value = cliente.endereco.bairro || '';
-            document.getElementById('end-cidade').value = cliente.endereco.cidade || '';
-            document.getElementById('end-estado').value = cliente.endereco.estado || '';
-            document.getElementById('end-cep').value = cliente.endereco.cep || '';
-            document.getElementById('end-telefone').value = cliente.endereco.telefone || ''; 
-        }
-        document.getElementById('lista-pedidos').innerHTML = "<p>Nenhum pedido encontrado (função ainda não implementada).</p>";
-    }
-
-    
-    async function handleUpdateSubmit(event) {
-        event.preventDefault(); 
-        console.log("Iniciando atualização de cadastro...");
-        
-        // (token e userId já são globais)
-
-        const payload = {
-            nome: document.getElementById('cliente-nome').value,
-            cpf: document.getElementById('cliente-cpf').value,
-            telefone: document.getElementById('cliente-telefone').value,
-            
-            credencial: {
-                email: document.getElementById('cliente-email').value, 
-                senha: null 
-            },
-            
-            endereco: {
-                logradouro: document.getElementById('end-logradouro').value,
-                numero: parseInt(document.getElementById('end-numero').value) || 0,
-                complemento: document.getElementById('end-complemento').value,
-                bairro: document.getElementById('end-bairro').value,
-                cidade: document.getElementById('end-cidade').value,
-                estado: document.getElementById('end-estado').value,
-                cep: document.getElementById('end-cep').value,
-                telefone: document.getElementById('end-telefone').value
-            }
-        };
-
-       
-        const novaSenha = document.getElementById('nova-senha').value;
-        const confirmaSenha = document.getElementById('confirma-senha').value;
-
-        if (novaSenha) {
-            if (novaSenha !== confirmaSenha) {
-                alert('As novas senhas não coincidem! Tente novamente.');
-                return; 
-            }
-            
-            payload.credencial.senha = novaSenha; 
-        }
-
-        console.log("Enviando atualização para /api/clientes/", userId, payload);
-
-        try {
-            // Usa a função apiClient global do main.js
-            const clienteAtualizado = await apiClient(`/clientes/${userId}`, 'PUT', payload);
-            
-            alert('Dados atualizados com sucesso!');
-            populatePage(clienteAtualizado); 
-            
-            document.getElementById('nova-senha').value = '';
-            document.getElementById('confirma-senha').value = '';
-
-        } catch (error) {
-            console.error("Erro ao atualizar:", error);
-            alert(`Erro ao atualizar: ${error.message || 'Verifique os dados.'}`);
-        }
-    }
-
-    
-    // --- 4. TODAS AS NOVAS FUNÇÕES DA FOTO DE PERFIL ---
-
-    function abrirMenuFoto() {
-        if (clientePossuiFoto) {
-            btnAdicionar.style.display = 'none';
-            btnAtualizar.style.display = 'block';
-            btnRemover.style.display = 'block';
+        // FOTO
+        if (cliente.fotoUrl) {
+            previewFoto.src = `${cliente.fotoUrl}?t=${new Date().getTime()}`;
         } else {
-            btnAdicionar.style.display = 'block';
-            btnAtualizar.style.display = 'none';
-            btnRemover.style.display = 'none';
+            previewFoto.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(cliente.nome)}&background=9c8b75&color=fff&size=150`;
         }
-        menu.style.display = 'block';
-    }
 
-    function fecharMenuFoto() {
-        menu.style.display = 'none';
-    }
-
-    function acionarInputDeArquivo() {
-        inputFoto.click();
-        fecharMenuFoto();
-    }
-
-    async function handleUploadFoto() {
-        const file = inputFoto.files[0];
-        if (!file) return; 
-
-        uploadStatus.textContent = 'Enviando...';
+        // DADOS PESSOAIS
+        if(nomeInput) nomeInput.value = cliente.nome || '';
+        if(document.getElementById('cliente-cpf')) document.getElementById('cliente-cpf').value = cliente.cpf || '';
+        if(document.getElementById('cliente-telefone')) document.getElementById('cliente-telefone').value = cliente.telefone || '';
         
-        const formData = new FormData();
-        formData.append('foto', file); // Nome "foto", como no backend
+        // EMAIL
+        if (cliente.credencial) {
+            const emailInput = document.getElementById('cliente-email');
+            const emailVisual = document.getElementById('cliente-email-visual');
+            if(emailInput) emailInput.value = cliente.credencial.email || '';
+            if(emailVisual) emailVisual.value = cliente.credencial.email || ''; 
+        }
 
-        try {
-            // Usamos fetch direto para FormData
-            const response = await fetch(`/api/clientes/${userId}/foto`, {
-                method: 'POST',
-                headers: { 'Authorization': `Bearer ${token}` },
-                body: formData
-            });
+        // SIDEBAR
+        if(sidebarNome) sidebarNome.textContent = cliente.nome || 'Cliente';
 
-            if (response.ok) {
-                const clienteAtualizado = await response.json();
-                previewFoto.src = clienteAtualizado.fotoUrl;
-                clientePossuiFoto = true; 
-                uploadStatus.textContent = 'Foto atualizada!';
-                inputFoto.value = null; 
-            } else {
-                const error = await response.json();
-                throw new Error(error.message || 'Falha no upload.');
+        // ENDEREÇO
+        if (cliente.endereco) {
+            const fields = {
+                'end-logradouro': cliente.endereco.logradouro,
+                'end-numero': cliente.endereco.numero,
+                'end-complemento': cliente.endereco.complemento,
+                'end-bairro': cliente.endereco.bairro,
+                'end-cidade': cliente.endereco.cidade,
+                'end-estado': cliente.endereco.estado,
+                'end-cep': cliente.endereco.cep,
+                'end-telefone': cliente.endereco.telefone
+            };
+
+            for (const [id, value] of Object.entries(fields)) {
+                const el = document.getElementById(id);
+                if (el) el.value = value || '';
             }
-        } catch (error) {
-            console.error('Erro no upload:', error);
-            uploadStatus.textContent = 'Erro ao enviar foto.';
+        }
+    }
+
+    // Sincroniza nome sidebar enquanto digita
+    if(nomeInput && sidebarNome) {
+        nomeInput.addEventListener('input', (e) => {
+            sidebarNome.textContent = e.target.value || 'Cliente';
+        });
+    }
+
+    // --- 3. UPLOAD DE FOTO ---
+    if(btnCamera) {
+        btnCamera.addEventListener('click', () => {
+            if(inputFoto) inputFoto.click();
+        });
+    }
+
+    if(inputFoto) {
+        inputFoto.addEventListener('change', async () => {
+            const file = inputFoto.files[0];
+            if (!file) return;
+
+            if (file.size > 5 * 1024 * 1024) { 
+                alert("A imagem é muito grande. Máximo 5MB.");
+                return;
+            }
+
+            uploadStatus.textContent = 'Enviando...';
+            uploadStatus.style.color = 'var(--accent)';
+
+            const formData = new FormData();
+            formData.append('foto', file);
+
+            try {
+                const urlUpload = `http://localhost:8080/api/clientes/${userId}/foto`;
+                
+                const response = await fetch(urlUpload, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` },
+                    body: formData
+                });
+
+                if (response.ok) {
+                    const clienteAtualizado = await response.json();
+                    previewFoto.src = clienteAtualizado.fotoUrl + `?t=${new Date().getTime()}`;
+                    uploadStatus.textContent = 'Sucesso!';
+                    uploadStatus.style.color = 'green';
+                    setTimeout(() => { uploadStatus.textContent = ''; }, 3000);
+                } else {
+                    throw new Error(`Falha: ${response.status}`);
+                }
+            } catch (error) {
+                console.error('Erro upload:', error);
+                uploadStatus.textContent = 'Erro ao enviar.';
+                uploadStatus.style.color = 'red';
+            }
             inputFoto.value = null;
-        }
+        });
     }
 
-    async function handleRemoveFoto() {
-        if (!confirm('Tem certeza que deseja remover sua foto de perfil?')) {
-            fecharMenuFoto();
-            return;
-        }
-        
-        fecharMenuFoto();
-        uploadStatus.textContent = 'Removendo...';
-
-        try {
-            // Usa a função apiClient global do main.js
-            const clienteAtualizado = await apiClient(`/clientes/${userId}/foto`, 'DELETE');
+    // --- 4. ATUALIZAR DADOS (LOGICA CORRIGIDA) ---
+    if (formEditar) {
+        formEditar.addEventListener('submit', async (event) => {
+            event.preventDefault();
             
-            previewFoto.src = 'https://via.placeholder.com/150?text=Sem+Foto';
-            clientePossuiFoto = false; 
-            uploadStatus.textContent = 'Foto removida.';
-        } catch (error) {
-            console.error('Erro ao remover foto:', error);
-            uploadStatus.textContent = 'Erro ao remover foto.';
-        }
-    }
+            // 1. Monta o objeto BÁSICO (Sem a senha ainda)
+            const payload = {
+                nome: document.getElementById('cliente-nome').value,
+                cpf: document.getElementById('cliente-cpf').value,
+                telefone: document.getElementById('cliente-telefone').value,
+                credencial: {
+                    email: document.getElementById('cliente-email').value
+                    // NOTA: 'senha' NÃO é adicionada aqui, para ir como nula se estiver vazia
+                },
+                endereco: {
+                    logradouro: document.getElementById('end-logradouro').value,
+                    numero: parseInt(document.getElementById('end-numero').value) || 0,
+                    complemento: document.getElementById('end-complemento').value,
+                    bairro: document.getElementById('end-bairro').value,
+                    cidade: document.getElementById('end-cidade').value,
+                    estado: document.getElementById('end-estado').value,
+                    cep: document.getElementById('end-cep').value,
+                    telefone: document.getElementById('end-telefone').value
+                }
+            };
 
-    // --- FIM DAS NOVAS FUNÇÕES ---
+            // 2. Verifica se o usuário digitou algo na "Nova Senha"
+            const novaSenha = document.getElementById('nova-senha').value;
+            const confirmaSenha = document.getElementById('confirma-senha').value;
+
+            // Só adiciona a senha ao envio SE o campo não estiver vazio
+            if (novaSenha && novaSenha.trim() !== "") {
+                if (novaSenha !== confirmaSenha) {
+                    alert('As senhas digitadas não conferem!');
+                    return; // Para o envio se as senhas forem diferentes
+                }
+                // Se passou na validação, adiciona ao payload para o Java processar
+                payload.credencial.senha = novaSenha;
+            } 
+            // Se estiver vazio, o payload segue sem o campo 'senha'.
+            // O Java receberá null/vazio e manterá a senha antiga.
+
+            try {
+                const clienteAtualizado = await apiClient(`/clientes/${userId}`, 'PUT', payload);
+                alert('Dados atualizados com sucesso!');
+                populatePage(clienteAtualizado);
+                
+                // Limpa os campos de senha por segurança visual
+                document.getElementById('nova-senha').value = '';
+                document.getElementById('confirma-senha').value = '';
+            } catch (error) {
+                alert('Erro ao atualizar dados. Verifique as informações.');
+                console.error(error);
+            }
+        });
+    }
 
     checkLoginAndLoadData();
 });

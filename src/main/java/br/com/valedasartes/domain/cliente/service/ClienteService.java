@@ -79,9 +79,11 @@ public class ClienteService {
         return clienteRepository.findById(id)
             .map(clienteExistente -> {
                 
+                // 1. Atualiza dados básicos
                 clienteExistente.setNome(dto.getNome());
                 clienteExistente.setTelefone(dto.getTelefone());
 
+                // 2. Atualiza Endereço
                 if (clienteExistente.getEndereco() != null && dto.getEndereco() != null) {
                     Endereco enderecoExistente = clienteExistente.getEndereco();
                     enderecoExistente.setLogradouro(dto.getEndereco().getLogradouro());
@@ -94,16 +96,27 @@ public class ClienteService {
                     enderecoExistente.setTelefone(dto.getEndereco().getTelefone());
                 }
                 
-                String novaSenha = dto.getCredencial().getSenha();
-                if (novaSenha != null && !novaSenha.isBlank()) {
-                    String senhaCriptografada = passwordEncoder.encode(novaSenha);
-                    clienteExistente.getCredencial().setSenha(senhaCriptografada);
+                // 3. Atualiza Credencial (Senha e Email)
+                if (dto.getCredencial() != null) {
+                    
+                    // Atualiza o Email se tiver mudado
+                    if (dto.getCredencial().getEmail() != null) {
+                        clienteExistente.getCredencial().setEmail(dto.getCredencial().getEmail());
+                    }
+
+                    // LÓGICA DA SENHA: Só altera se vier preenchida e não estiver em branco
+                    String novaSenha = dto.getCredencial().getSenha();
+                    if (novaSenha != null && !novaSenha.isBlank()) {
+                        String senhaCriptografada = passwordEncoder.encode(novaSenha);
+                        clienteExistente.getCredencial().setSenha(senhaCriptografada);
+                    }
+                    // Se novaSenha for null ou "", a senha antiga é mantida (não fazemos nada aqui)
                 }
 
                 Cliente clienteAtualizado = clienteRepository.save(clienteExistente);
                 return new ClienteResponseDTO(clienteAtualizado);
                 
-            }).orElse(null);
+            }).orElseThrow(() -> new RuntimeException("Cliente não encontrado com ID: " + id));
     }
 
     @Transactional

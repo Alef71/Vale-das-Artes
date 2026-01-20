@@ -4,138 +4,165 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vale das Artes - Painel do Cliente</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
     <link rel="stylesheet" href="css/style-componente-header.css">
     <link rel="stylesheet" href="css/style-componente-footer.css">
-    <link rel="stylesheet" href="css/style-dasboard-cliente.css">
-    </head>
+    <link rel="stylesheet" href="css/style-perfil-cliente.css">
+</head>
 <body>
 
     <header id="header-placeholder"></header>
 
-    <main>
-        <section id="dashboard">
-            
-            <section class="perfil-foto-container">
-                <h3>Minha Foto de Perfil</h3>
+    <div class="dashboard-wrapper">
+        
+        <aside class="sidebar">
+            <div class="avatar-container">
+                <img id="foto-preview-cliente" src="https://via.placeholder.com/150" alt="Foto de Perfil">
                 
-                <img id="foto-preview-cliente" 
-                     src="https://via.placeholder.com/150?text=Carregando..." 
-                     alt="Foto do Perfil" 
-                     class="profile-pic-preview" 
-                     style="border-radius: 50%;">
+                <button id="btn-camera-upload" class="edit-avatar-btn" title="Alterar foto">
+                    <i class="fa-solid fa-camera"></i>
+                </button>
+                <input type="file" id="input-foto-cliente" accept="image/*" style="display: none;">
+            </div>
             
-                <input type="file" id="input-foto-cliente" accept="image/png, image/jpeg" style="display: none;">
+            <h3 id="sidebar-nome-display">Carregando...</h3>
+            <p id="upload-status-cliente" style="font-size: 0.8rem; height: 20px;"></p>
+
+            <nav class="sidebar-menu">
+                <a href="#" class="active"><i class="fa-solid fa-user"></i> Meus Dados</a>
+                <a href="#meus-pedidos"><i class="fa-solid fa-bag-shopping"></i> Meus Pedidos</a>
+                <a href="chat.html"><i class="fa-solid fa-envelope"></i> Mensagens</a>
+                </nav>
+        </aside>
+
+        <main class="main-content">
             
-                <div id="foto-options-menu-cliente" class="profile-pic-menu" style="display: none;">
-                    <p>Alterar foto de perfil</p>
-                    
-                    <button id="btn-adicionar-foto-cliente" class="menu-option">Adicionar foto</button>
-                    <button id="btn-atualizar-foto-cliente" class="menu-option">Atualizar foto</button>
-                    <button id="btn-remover-foto-cliente" class="menu-option danger">Remover foto</button>
-                    
-                    <hr>
-                    <button id="btn-cancelar-foto-cliente" class="menu-option">Cancelar</button>
+            <div class="welcome-banner">
+                <div>
+                    <h1 id="dashboard-title">Painel do Cliente</h1>
+                    <p>Clique nas seções abaixo para visualizar ou editar seus dados.</p>
                 </div>
-                
-                <p id="upload-status-cliente"></p>
-            </section>
-            <h1 id="dashboard-title">Painel do Cliente - Carregando...</h1>
+                <i class="fa-solid fa-user-shield" style="font-size: 2.5rem; opacity: 0.3;"></i>
+            </div>
 
-            <a href="chat.html">Ver minhas mensagens (Chat)</a>
-            <hr>
-
-            <section id="meus-pedidos">
-                <h2>Meus Pedidos</h2>
-                <div id="lista-pedidos">
-                    <p>Carregando pedidos...</p>
+            <div class="info-card">
+                <div class="card-header-flex">
+                    <h2 style="font-size: 1.2rem; color: #f0f0f0;">Minhas Informações</h2>
+                    <span style="font-size: 0.8rem; color: #9c8b75; font-weight: bold;"><i class="fa-solid fa-pen"></i> Modo Edição Ativo</span>
                 </div>
-            </section>
 
-            <hr>
-
-            <section id="editar-dados-cliente">
-                <h2>Editar Minhas Informações</h2>
-                
                 <form id="form-editar-cliente">
-                    
                     <input type="hidden" id="cliente-email">
-                    
-                    <fieldset>
-                        <legend>Dados Pessoais (tabela 'cliente')</legend>
-                        <div>
-                            <label for="cliente-nome">Nome Completo:</label>
-                            <input type="text" id="cliente-nome" name="nome">
-                        </div>
-                        <div>
-                            <label for="cliente-cpf">CPF (não pode ser alterado):</label>
-                            <input type="text" id="cliente-cpf" name="cpf" disabled>
-                        </div>
-                        <div>
-                            <label for="cliente-telefone">Telefone (Principal):</label>
-                            <input type="text" id="cliente-telefone" name="telefone">
-                        </div>
-                    </fieldset>
 
-                    <fieldset>
-                        <legend>Endereço de Entrega (tabela 'endereco')</legend>
-                        <div>
-                            <label for="end-logradouro">Logradouro (Rua/Av.):</label>
-                            <input type="text" id="end-logradouro" name="logradouro">
+                    <div class="accordion-group">
+                        <div class="accordion-header">
+                            <span><i class="fa-solid fa-address-card"></i> Dados Pessoais</span>
+                            <i class="fa-solid fa-chevron-down arrow-icon"></i>
                         </div>
-                        <div>
-                            <label for="end-numero">Número:</label>
-                            <input type="text" id="end-numero" name="numero">
+                        <div class="accordion-content">
+                            <div class="form-grid">
+                                <div class="input-group">
+                                    <label>Nome Completo</label>
+                                    <input type="text" id="cliente-nome" name="nome">
+                                </div>
+                                <div class="input-group">
+                                    <label>CPF</label>
+                                    <input type="text" id="cliente-cpf" name="cpf" disabled title="CPF não pode ser alterado">
+                                </div>
+                                <div class="input-group">
+                                    <label>Email</label>
+                                    <input type="email" id="cliente-email-visual" placeholder="Carregando..." disabled>
+                                </div>
+                                <div class="input-group">
+                                    <label>Telefone</label>
+                                    <input type="text" id="cliente-telefone" name="telefone">
+                                </div>
+                            </div>
                         </div>
-                        <div>
-                            <label for="end-complemento">Complemento:</label>
-                            <input type="text" id="end-complemento" name="complemento">
-                        </div>
-                        <div>
-                            <label for="end-bairro">Bairro:</label>
-                            <input type="text" id="end-bairro" name="bairro">
-                        </div>
-                        <div>
-                            <label for="end-cidade">Cidade:</label>
-                            <input type="text" id="end-cidade" name="cidade">
-                        </div>
-                        <div>
-                            <label for="end-estado">Estado (UF):</label>
-                            <input type="text" id="end-estado" name="estado" maxlength="2">
-                        </div>
-                        <div>
-                            <label for="end-cep">CEP:</label>
-                            <input type="text" id="end-cep" name="cep">
-                        </div>
-                        <div>
-                            <label for="end-telefone">Telefone (do Endereço/Entrega):</label>
-                            <input type="text" id="end-telefone" name="telefoneEndereco">
-                        </div>
-                    </fieldset>
+                    </div>
 
-                    <fieldset>
-                        <legend>Alterar Senha (tabela 'credenciais')</legend>
-                        <p>Deixe em branco para não alterar.</p>
-                        <div>
-                            <label for="nova-senha">Nova Senha:</label>
-                            <input type="password" id="nova-senha" name="novaSenha">
+                    <div class="accordion-group">
+                        <div class="accordion-header">
+                            <span><i class="fa-solid fa-map-location-dot"></i> Endereço de Entrega</span>
+                            <i class="fa-solid fa-chevron-down arrow-icon"></i>
                         </div>
-                        <div>
-                            <label for="confirma-senha">Confirmar Nova Senha:</label>
-                            <input type="password" id="confirma-senha" name="confirmaSenha">
+                        <div class="accordion-content">
+                            <div class="form-grid">
+                                <div class="input-group">
+                                    <label>CEP</label>
+                                    <input type="text" id="end-cep" name="cep">
+                                </div>
+                                <div class="input-group span-2">
+                                    <label>Logradouro</label>
+                                    <input type="text" id="end-logradouro" name="logradouro">
+                                </div>
+                                <div class="input-group">
+                                    <label>Número</label>
+                                    <input type="text" id="end-numero" name="numero">
+                                </div>
+                                <div class="input-group">
+                                    <label>Complemento</label>
+                                    <input type="text" id="end-complemento" name="complemento">
+                                </div>
+                                <div class="input-group">
+                                    <label>Bairro</label>
+                                    <input type="text" id="end-bairro" name="bairro">
+                                </div>
+                                <div class="input-group">
+                                    <label>Cidade</label>
+                                    <input type="text" id="end-cidade" name="cidade">
+                                </div>
+                                <div class="input-group">
+                                    <label>UF</label>
+                                    <input type="text" id="end-estado" name="estado">
+                                </div>
+                                <div class="input-group">
+                                    <label>Telefone para Entrega</label>
+                                    <input type="text" id="end-telefone" name="telefoneEndereco">
+                                </div>
+                            </div>
                         </div>
-                    </fieldset>
+                    </div>
 
-                    <button type="submit">Salvar Alterações</button>
+                    <div class="accordion-group">
+                        <div class="accordion-header">
+                            <span><i class="fa-solid fa-lock"></i> Segurança e Senha</span>
+                            <i class="fa-solid fa-chevron-down arrow-icon"></i>
+                        </div>
+                        <div class="accordion-content">
+                            <div class="form-grid">
+                                <div class="input-group">
+                                    <label>Nova Senha</label>
+                                    <input type="password" id="nova-senha" name="novaSenha" placeholder="Em branco para manter a atual">
+                                </div>
+                                <div class="input-group">
+                                    <label>Confirmar Senha</label>
+                                    <input type="password" id="confirma-senha" name="confirmaSenha">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-salvar-main">Salvar Todas as Alterações</button>
                 </form>
-            </section>
-        </section>
-    </main>
+            </div>
+
+            <div id="meus-pedidos" class="pedidos-section">
+                <h3>Meus Pedidos Recentes</h3>
+                <div id="lista-pedidos" class="empty-state">
+                    <i class="fa-solid fa-box-open" style="font-size: 2rem; margin-bottom: 10px; display: block;"></i>
+                    <p>Nenhum pedido encontrado no histórico.</p>
+                </div>
+            </div>
+
+        </main>
+    </div>
 
     <footer id="footer-placeholder"></footer>
 
     <script src="js/main.js"></script>
-    
     <script src="js/dashboard-cliente.js"></script>
-
+    
 </body>
 </html>
