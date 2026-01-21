@@ -1,6 +1,6 @@
 package br.com.valedasartes.domain.auth.service;
 
-import java.time.LocalDateTime; // NOVO IMPORT
+import java.time.LocalDateTime; 
 import java.util.Optional;
 import java.util.UUID;
 
@@ -32,7 +32,6 @@ public class AuthService {
         String tipo = null;
         String nomeUsuario = "";
 
-        // 1. Tenta achar Cliente com CPF E Telefone
         Optional<Cliente> clienteOpt = clienteRepository.findByCpfAndTelefone(cpf, telefone);
         
         if (clienteOpt.isPresent()) {
@@ -40,7 +39,7 @@ public class AuthService {
             tipo = "CLIENTE";
             nomeUsuario = clienteOpt.get().getNome();
         } else {
-            // 2. Se não achou cliente, tenta Artista
+            
             Optional<Artista> artistaOpt = artistaRepository.findByCpfAndTelefone(cpf, telefone);
             if (artistaOpt.isPresent()) {
                 usuarioId = artistaOpt.get().getId();
@@ -49,16 +48,15 @@ public class AuthService {
             }
         }
 
-        // 3. Se achou (Dados conferem)
         if (usuarioId != null) {
             String tokenUuid = UUID.randomUUID().toString();
             
-            // ✅ CORREÇÃO: Adicionado o 4º parâmetro (dataExpiracao) conforme o construtor da Entidade
+            
             TokenRecuperacao novoToken = new TokenRecuperacao(
                 tokenUuid, 
                 usuarioId, 
                 tipo, 
-                LocalDateTime.now().plusMinutes(30) // Token expira em 30 minutos
+                LocalDateTime.now().plusMinutes(30) 
             );
             
             tokenRepository.save(novoToken);

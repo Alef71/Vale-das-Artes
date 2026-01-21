@@ -1,6 +1,6 @@
-package br.com.valedasartes.config; // <-- 1. PACOTE CORRETO
+package br.com.valedasartes.config; 
 
-import java.io.IOException; // <-- 2. IMPORT CORRETO
+import java.io.IOException; 
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -23,19 +23,17 @@ public class FileStorageService {
 
         try {
             Files.createDirectories(this.fileStorageLocation);
-        } catch (IOException ex) { // <-- 3. CATCH CORRETO
+        } catch (IOException ex) {
             throw new RuntimeException("Não foi possível criar o diretório para salvar os arquivos.", ex);
         }
     }
 
-    /**
-     * Salva o arquivo no disco
-     */
+
     public String salvarArquivo(MultipartFile file) {
         String originalFileName = file.getOriginalFilename();
         String extensao = "";
         
-        // Garante que existe um ponto para pegar a extensão
+        
         if (originalFileName != null && originalFileName.contains(".")) {
              extensao = originalFileName.substring(originalFileName.lastIndexOf("."));
         }
@@ -55,9 +53,7 @@ public class FileStorageService {
         }
     }
 
-    /**
-     * Gera a URL completa para acessar o arquivo
-     */
+    
     public String getUrlCompleta(String nomeArquivo) {
         if (nomeArquivo == null || nomeArquivo.isBlank()) {
             return null;
@@ -65,7 +61,7 @@ public class FileStorageService {
         
         return ServletUriComponentsBuilder
                 .fromCurrentContextPath() 
-                .path("/uploads/") // Nome da pasta (pode ser configurável também)
+                .path("/uploads/") 
                 .path(nomeArquivo)
                 .toUriString();
     }

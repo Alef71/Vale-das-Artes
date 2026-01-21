@@ -8,7 +8,7 @@ public class ArtistaStatusUpdateDTO {
     @NotNull(message = "O novo status é obrigatório.")
     private ArtistaStatus status;
 
-    // Getters e Setters
+
     public ArtistaStatus getStatus() { return status; }
     public void setStatus(ArtistaStatus status) { this.status = status; }
 }

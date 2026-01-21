@@ -146,7 +146,6 @@ public class ClienteService {
         return new ClienteResponseDTO(clienteSalvo);
     }
 
-    // ✅ MÉTODO ATUALIZADO COM @TRANSACTIONAL E NOMES CORRETOS
     @Transactional
     public void deletarCliente(Long id) {
         if (!clienteRepository.existsById(id)) {

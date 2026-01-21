@@ -24,7 +24,7 @@ public class Destaque {
     @Column(name = "link_url", length = 255)
     private String link; 
 
-    // O caminho completo/URL da imagem salva
+    
     @Column(name = "caminho_imagem", length = 255) 
     private String caminhoImagem; 
 
@@ -34,10 +34,9 @@ public class Destaque {
     @Column(name = "ativo", nullable = false)
     private boolean ativo = true; 
 
-    // Construtores
+    
     public Destaque() { }
 
-    // Getters e Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     public String getTitulo() { return titulo; }

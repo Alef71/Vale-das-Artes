@@ -1,45 +1,33 @@
-/**
- * js/auth.js
- * Gerencia Login, Cadastro e Recuperação (Fluxo Simulado)
- */
-
 document.addEventListener("DOMContentLoaded", function() {
 
     const API_BASE_URL = "http://localhost:8080"; 
 
-    // --- SELETORES UX ---
     const viewLogin = document.getElementById("view-login");
     const viewSelection = document.getElementById("view-selection");
     const viewCadastro = document.getElementById("view-cadastro");
     const viewRecuperar = document.getElementById("view-recuperar");
     
-    // Botões de navegação
     const btnIrCadastro = document.getElementById("btn-ir-cadastro");
     const btnVoltarLoginSel = document.getElementById("btn-voltar-login-sel");
     const btnVoltarSelecao = document.getElementById("btn-voltar-selecao");
     const btnEsqueciSenha = document.getElementById("btn-esqueci-senha");
     const btnVoltarLoginRec = document.getElementById("btn-voltar-login-rec");
     
-    // Formulários
     const formLogin = document.getElementById("form-login");
     const formCadastro = document.getElementById("form-cadastro");
     const formRecuperar = document.getElementById("form-recuperar");
     
-    // Elementos do Cadastro
     const radioCliente = document.getElementById("radio-cliente"); 
     const radioArtesao = document.getElementById("radio-artesao"); 
     const extraArtesao = document.getElementById("extra-artesao"); 
     const tituloCadastro = document.getElementById("titulo-cadastro");
 
-    // Variável para guardar o token temporário de recuperação
     let tokenRecuperacaoTemp = null;
 
-    // Inicializa Views
     if(viewSelection) viewSelection.style.display = 'none';
     if(viewCadastro) viewCadastro.style.display = 'none';
     if(viewRecuperar) viewRecuperar.style.display = 'none';
 
-    // --- FUNÇÕES DE NAVEGAÇÃO ---
     function showView(viewId) {
         [viewLogin, viewSelection, viewCadastro, viewRecuperar].forEach(v => {
             if(v) {
@@ -53,28 +41,18 @@ document.addEventListener("DOMContentLoaded", function() {
             setTimeout(() => target.classList.add('active'), 10);
         }
         
-        // Resetar estado de recuperação ao sair da tela
         if (viewId !== 'view-recuperar') {
             resetRecuperacaoForm();
         }
     }
 
-    // Restaura o formulário de recuperação para o estado original
     function resetRecuperacaoForm() {
         if (!formRecuperar) return;
         tokenRecuperacaoTemp = null;
         formRecuperar.reset();
         
-        // Recria o HTML original (inputs de verificação)
-        const container = formRecuperar.querySelector('.inputs-container') || formRecuperar;
-        // Se você tiver uma div específica para inputs, use ela. Senão, recriamos grosseiramente:
-        // Nota: O ideal é ter divs separadas no HTML, mas vamos manipular via JS para não quebrar seu layout
-        
-        // Verifica se estamos no modo "Nova Senha" para voltar ao "Verificar"
         const senhaInput = document.getElementById("nova-senha-recuperacao");
         if (senhaInput) {
-             // Recarrega a página para limpar o DOM modificado ou inverte a lógica visual
-             // Para simplificar, vou recarregar a div inputs
              formRecuperar.innerHTML = `
                 <h2>Recuperar Senha</h2>
                 <p>Informe CPF e WhatsApp para confirmar sua identidade.</p>
@@ -112,11 +90,9 @@ document.addEventListener("DOMContentLoaded", function() {
         showView('view-cadastro');
     });
 
-    // --- HELPER FETCH ---
     async function apiFetch(endpoint, method = 'POST', body = null) {
         const token = localStorage.getItem('userToken');
         const headers = { 'Content-Type': 'application/json' };
-        // if (token) headers['Authorization'] = `Bearer ${token}`; // Login/Recuperacao nao usam token auth
     
         const config = { method: method, headers: headers };
         if (body) config.body = JSON.stringify(body);
@@ -138,7 +114,6 @@ document.addEventListener("DOMContentLoaded", function() {
         return text ? JSON.parse(text) : {};
     }
 
-    // --- LOGIN ---
     if (formLogin) {
         formLogin.addEventListener("submit", async function(event) {
             event.preventDefault(); 
@@ -179,7 +154,6 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 
-    // --- CADASTRO ---
     if (formCadastro) {
         formCadastro.addEventListener("submit", async function(event) {
             event.preventDefault();
@@ -232,13 +206,11 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 
-    // --- RECUPERAÇÃO DE SENHA (Lógica Nova: 2 Etapas) ---
     if (formRecuperar) {
         formRecuperar.addEventListener("submit", async function(event) {
             event.preventDefault();
             const btn = formRecuperar.querySelector("button");
             
-            // ETAPA 2: SALVAR NOVA SENHA (Se já temos o token)
             if (tokenRecuperacaoTemp) {
                 const novaSenha = document.getElementById("nova-senha-recuperacao").value;
                 
@@ -269,11 +241,10 @@ document.addEventListener("DOMContentLoaded", function() {
                 return;
             }
 
-            // ETAPA 1: VERIFICAR DADOS
             const cpfInput = document.getElementById("recuperar-cpf");
             const telInput = document.getElementById("recuperar-telefone");
             
-            if (!cpfInput || !telInput) return; // Segurança
+            if (!cpfInput || !telInput) return;
 
             const cpf = cpfInput.value;
             const telefone = telInput.value;
@@ -287,18 +258,15 @@ document.addEventListener("DOMContentLoaded", function() {
                 btn.disabled = true;
                 btn.innerText = "Verificando...";
 
-                // Chama o backend para validar
                 const data = await apiFetch('/api/auth/esqueci-senha', 'POST', { 
                     cpf: cpf, 
                     telefone: telefone 
                 });
 
-                // Se chegou aqui, deu certo e temos o token
                 tokenRecuperacaoTemp = data.token;
                 
                 alert(data.mensagem || "Dados confirmados! Defina a nova senha.");
 
-                // --- TROCA O FORMULÁRIO PARA "NOVA SENHA" ---
                 formRecuperar.innerHTML = `
                     <h2>Definir Nova Senha</h2>
                     <p>Identidade confirmada. Digite sua nova senha abaixo.</p>

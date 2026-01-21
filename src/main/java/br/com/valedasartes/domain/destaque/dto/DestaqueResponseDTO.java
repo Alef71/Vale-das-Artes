@@ -17,12 +17,12 @@ public class DestaqueResponseDTO {
         this.id = destaque.getId();
         this.titulo = destaque.getTitulo();
         this.link = destaque.getLink();
-        this.caminhoImagem = destaque.getCaminhoImagem(); // Será a URL completa
+        this.caminhoImagem = destaque.getCaminhoImagem(); 
         this.dataPublicacao = destaque.getDataPublicacao();
         this.ativo = destaque.isAtivo();
     }
 
-    // Getters
+    
     public Long getId() { return id; }
     public String getTitulo() { return titulo; }
     public String getLink() { return link; }

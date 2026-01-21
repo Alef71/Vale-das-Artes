@@ -1,29 +1,21 @@
-/*
- * js/dashboard-artesao.js
- * (VERSÃO ATUALIZADA - COM ENDEREÇO E CEP)
- */
-
 const API_BASE_URL = 'http://localhost:8080/api';
 
 console.log("LOG: dashboard-artesao.js CARREGADO! API:", API_BASE_URL);
 
 document.addEventListener("DOMContentLoaded", function() {
     
-    // --- Seletores do DOM ---
     const formNovoProduto = document.getElementById('form-novo-produto');
     const formEditarPerfil = document.getElementById('form-editar-artesao');
     const formEditarProduto = document.getElementById('form-editar-produto');
-    const formEndereco = document.getElementById('form-endereco'); // NOVO
+    const formEndereco = document.getElementById('form-endereco');
     const listaMeusProdutos = document.getElementById('lista-meus-produtos');
     const sidebarNome = document.getElementById('artesao-nome-display');
 
-    // Foto
     const previewFoto = document.getElementById('foto-preview-artista');
     const inputFoto = document.getElementById('input-foto-artista');
     const btnCamera = document.getElementById('btn-camera-upload'); 
     const uploadStatus = document.getElementById('upload-status-artista');
 
-    // Inputs Endereço (NOVO)
     const cepInput = document.getElementById('endereco-cep');
     const logradouroInput = document.getElementById('endereco-logradouro');
     const numeroInput = document.getElementById('endereco-numero');
@@ -32,22 +24,18 @@ document.addEventListener("DOMContentLoaded", function() {
     const cidadeInput = document.getElementById('endereco-cidade');
     const ufInput = document.getElementById('endereco-uf');
 
-    // Modal Editar Produto
     const editModal = document.getElementById('editProductModal');
     const closeModalButton = editModal ? editModal.querySelector('.close-button') : null;
     
-    // Inputs Edição Produto
     const editProductIdInput = document.getElementById('edit-produto-id');
     const editProductNameInput = document.getElementById('edit-produto-nome');
     const editProductDescInput = document.getElementById('edit-produto-descricao');
     const editProductPriceInput = document.getElementById('edit-produto-preco');
     const editProductCategoryInput = document.getElementById('edit-produto-categoria');
 
-    // --- Helpers ---
     function getToken() { return localStorage.getItem('userToken'); }
     function getUserId() { return localStorage.getItem('userId'); }
 
-    // Helper API Cliente
     async function apiClient(endpoint, method, body = null) {
         const token = getToken();
         const headers = { 'Authorization': `Bearer ${token}` };
@@ -76,9 +64,6 @@ document.addEventListener("DOMContentLoaded", function() {
         return await response.json();
     }
 
-    /**
-     * INICIALIZAÇÃO
-     */
     async function checkLoginAndLoadData() {
         const token = getToken();
         const role = localStorage.getItem('userRole');
@@ -108,27 +93,20 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     }
 
-    /**
-     * PREENCHER PÁGINA
-     */
     function populatePage(artista, produtos) {
-        // Título e Sidebar
         const title = document.getElementById('dashboard-title');
         if(title) title.textContent = `Painel do Artesão - Bem-vindo, ${artista.nome || 'Artesão'}!`;
         if (sidebarNome) sidebarNome.textContent = artista.nome || 'Artesão';
 
-        // Link Perfil Público
         const linkPerfilPublico = document.getElementById('btn-perfil-publico');
         if (linkPerfilPublico && artista.id) {
             linkPerfilPublico.href = `perfil-artesao.html?id=${artista.id}`;
         }
 
-        // Preencher Form Perfil
         document.getElementById('artesao-nome').value = artista.nome || '';
         document.getElementById('artesao-nome-empresa').value = artista.nomeEmpresa || '';
         document.getElementById('artesao-biografia').value = artista.biografia || '';
 
-        // Foto
         if (previewFoto) {
             const timestamp = new Date().getTime();
             if (artista.fotoUrl) {
@@ -138,7 +116,6 @@ document.addEventListener("DOMContentLoaded", function() {
             }
         }
 
-        // --- NOVO: Preencher Endereço ---
         if (artista.endereco) {
             if(cepInput) cepInput.value = artista.endereco.cep || '';
             if(logradouroInput) logradouroInput.value = artista.endereco.logradouro || '';
@@ -151,12 +128,10 @@ document.addEventListener("DOMContentLoaded", function() {
 
         renderProdutos(produtos);
         
-        // Dispara evento visual para o preview (se existir)
         const event = new Event('keyup');
         if(document.getElementById('artesao-biografia')) document.getElementById('artesao-biografia').dispatchEvent(event);
     }
 
-    // --- NOVO: BUSCA DE CEP (ViaCEP) ---
     if (cepInput) {
         cepInput.addEventListener('blur', async () => {
             const cep = cepInput.value.replace(/\D/g, '');
@@ -180,7 +155,6 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 
-    // --- UPLOAD DE FOTO ---
     if(btnCamera) btnCamera.addEventListener('click', () => inputFoto.click());
     if(inputFoto) {
         inputFoto.addEventListener('change', async () => {
@@ -212,7 +186,6 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 
-    // --- RENDERIZAR PRODUTOS ---
     function renderProdutos(produtos) {
         if (!listaMeusProdutos) return;
         listaMeusProdutos.innerHTML = '';
@@ -244,9 +217,6 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 
-    // --- SUBMITS ---
-    
-    // Perfil
     if (formEditarPerfil) {
         formEditarPerfil.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -263,7 +233,6 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 
-    // --- NOVO: Submit Endereço ---
     if (formEndereco) {
         formEndereco.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -277,17 +246,8 @@ document.addEventListener("DOMContentLoaded", function() {
                 uf: ufInput.value
             };
 
-            // NOTA: Dependendo do backend, pode ser '/endereco' ou parte do PUT do artista.
-            // Aqui assumimos uma rota específica para manter organizado, ou ajustamos.
-            // Se o backend espera tudo junto, teríamos que mesclar com o update de perfil.
-            // Vamos tentar uma rota dedicada primeiro, se falhar, você me avisa.
             try {
-                // Opção A: Rota específica (Recomendado)
                 await apiClient(`/artistas/${getUserId()}/endereco`, 'PUT', dadosEndereco);
-                
-                // Opção B (Alternativa se não existir rota específica):
-                // await apiClient(`/artistas/${getUserId()}`, 'PUT', { endereco: dadosEndereco });
-                
                 alert('Endereço atualizado com sucesso!');
             } catch (err) {
                 alert('Erro ao salvar endereço: ' + err.message);
@@ -295,7 +255,6 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 
-    // Novo Produto
     if (formNovoProduto) {
         formNovoProduto.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -316,7 +275,6 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 
-    // Ações na Lista (Delegação de Eventos)
     if (listaMeusProdutos) {
         listaMeusProdutos.addEventListener('click', async (e) => {
             const target = e.target;
@@ -337,7 +295,6 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 
-    // --- MODAL DE EDIÇÃO ---
     async function openEditModal(id) {
         try {
             const produto = await apiClient(`/produtos/${id}`, 'GET');
@@ -373,6 +330,5 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 
-    // Start
     checkLoginAndLoadData();
 });

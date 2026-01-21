@@ -51,7 +51,6 @@ public class ArtistaController {
         return new ResponseEntity<>(novoArtista, HttpStatus.CREATED);
     }
     
-    // --- Listar Artistas Pendentes (ADMIN) ---
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Lista apenas artistas com status PENDENTE (Administrativo)")
     @GetMapping("/pendentes")
@@ -67,9 +66,6 @@ public class ArtistaController {
         return ResponseEntity.ok(artistas);
     }
 
-    // ==================================================================================
-    // [CORREÇÃO APLICADA] O MÉTODO QUE FALTAVA PARA O DASHBOARD FUNCIONAR
-    // ==================================================================================
     @Operation(summary = "Busca um artista por ID", description = "Retorna os detalhes de um único artista.")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Artista encontrado"),
@@ -80,7 +76,7 @@ public class ArtistaController {
         ArtistaResponseDTO artista = artistaService.buscarPorId(id);
         return ResponseEntity.ok(artista);
     }
-    // ==================================================================================
+    
 
     @Operation(summary = "Atualiza um artista existente", description = "Atualiza os dados cadastrais de um artista.")
     @PutMapping("/{id}")
@@ -92,7 +88,7 @@ public class ArtistaController {
         return ResponseEntity.notFound().build();
     }
     
-    // --- Alterar Status de Aprovação (ADMIN) ---
+
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Atualiza o status de aprovação do artista (Administrativo)")
     @ApiResponses(value = {

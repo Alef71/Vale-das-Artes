@@ -52,23 +52,14 @@ public class ProdutoController {
         return new ResponseEntity<>(novoProduto, HttpStatus.CREATED);
     }
     
-    // --- 1. ENDPOINT PÚBLICO ADICIONADO ---
-    /**
-     * Rota pública para listar todos os produtos ATIVOS.
-     * (Usado pela index.html)
-     */
     @Operation(summary = "Lista todos os produtos ativos (público)")
-    @GetMapping // Mapeia para GET /api/produtos
+    @GetMapping 
     public ResponseEntity<List<ProdutoResponseDTO>> listarProdutosPublico() {
-        // Chama o novo método no service
+        
         List<ProdutoResponseDTO> produtos = produtoService.listarTodosOsProdutosAtivos();
         return ResponseEntity.ok(produtos);
     }
 
-    /**
-     * Rota PRIVADA do artesão para ver TODOS os seus produtos (ativos e inativos)
-     * (Usado pelo dashboard-artesao.js)
-     */
     @Operation(summary = "Lista os produtos do artista logado (privado)")
     @GetMapping("/meus-produtos")
     public ResponseEntity<List<ProdutoResponseDTO>> listarMeusProdutos(Authentication authentication) {
@@ -118,7 +109,6 @@ public class ProdutoController {
     @Operation(summary = "Deleta um produto (privado, Artista)")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletarProduto(@PathVariable Long id) {
-        // (Futuramente, adicionar verificação de segurança aqui também)
         produtoService.deletarProduto(id);
         return ResponseEntity.noContent().build();
     }

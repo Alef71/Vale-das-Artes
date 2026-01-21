@@ -34,7 +34,7 @@ public class EnderecoRequestDTO {
     @Pattern(regexp = "\\d{5}-?\\d{3}", message = "O CEP informado é inválido.") 
     private String cep;
 
-    // Getters e Setters
+
     public String getLogradouro() { return logradouro; }
     public void setLogradouro(String logradouro) { this.logradouro = logradouro; }
     public String getComplemento() { return complemento; }

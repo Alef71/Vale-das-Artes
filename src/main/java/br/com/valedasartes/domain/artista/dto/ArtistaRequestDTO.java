@@ -5,13 +5,12 @@ import org.hibernate.validator.constraints.br.CPF;
 
 import br.com.valedasartes.domain.endereco.dto.EnderecoRequestDTO;
 import br.com.valedasartes.domain.security.dto.CredencialRequestDTO;
-import jakarta.validation.Valid; // <-- 2. IMPORTAR @Valid
+import jakarta.validation.Valid; 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
 public class ArtistaRequestDTO {
 
-    // 3. RENOMEEI OS CAMPOS PARA BATER COM O JSON DO auth.js
     @NotBlank(message = "O nome é obrigatório.")
     @Size(min = 3, max = 100, message = "O nome deve ter entre 3 e 100 caracteres.")
     private String nome;
@@ -27,18 +26,13 @@ public class ArtistaRequestDTO {
     private String telefone;
 
     private String nomeEmpresa; 
-
-    // --- 4. CAMPOS ANINHADOS ADICIONADOS ---
-    // (Exatamente como o ClienteRequestDTO deve ser)
     
-    @Valid // Diz ao Spring para validar os campos dentro deste objeto
+    @Valid 
     private CredencialRequestDTO credencial;
     
-    @Valid // Diz ao Spring para validar os campos dentro deste objeto
+    @Valid 
     private EnderecoRequestDTO endereco;
     
-
-    // --- 5. GETTERS E SETTERS ATUALIZADOS ---
     
     public String getNome() { return nome; }
     public void setNome(String nome) { this.nome = nome; }
@@ -54,8 +48,6 @@ public class ArtistaRequestDTO {
     
     public String getNomeEmpresa() { return nomeEmpresa; }
     public void setNomeEmpresa(String nomeEmpresa) { this.nomeEmpresa = nomeEmpresa; }
-
-    // --- 6. GETTERS E SETTERS NOVOS ---
     
     public CredencialRequestDTO getCredencial() { return credencial; }
     public void setCredencial(CredencialRequestDTO credencial) { this.credencial = credencial; }

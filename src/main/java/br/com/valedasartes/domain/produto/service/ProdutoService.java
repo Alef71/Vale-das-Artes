@@ -35,7 +35,7 @@ public class ProdutoService {
 
     @Transactional
     public ProdutoResponseDTO criarProduto(ProdutoRequestDTO dto, MultipartFile foto, Long artistaId) {
-        // ... (código existente, tudo igual) ...
+        
         Artista artista = artistaRepository.findById(artistaId)
                 .orElseThrow(() -> new RuntimeException("Artista não encontrado!"));
         
@@ -55,10 +55,7 @@ public class ProdutoService {
         return new ProdutoResponseDTO(produtoSalvo);
     }
 
-    /**
-     * Lista TODOS os produtos (ativos e inativos) de UM artista.
-     * (Usado no /dashboard-artesao)
-     */
+    
     public List<ProdutoResponseDTO> listarProdutosPorArtistaId(Long artistaId) {
         return produtoRepository.findAll()
                 .stream()
@@ -74,7 +71,7 @@ public class ProdutoService {
 
     @Transactional
     public ProdutoResponseDTO atualizarProduto(Long id, ProdutoRequestDTO dto, Long artistaId) {
-        // ... (código existente, tudo igual) ...
+        
         return produtoRepository.findById(id)
             .map(produtoExistente -> {
                 if (!produtoExistente.getArtista().getId().equals(artistaId)) {
@@ -91,12 +88,12 @@ public class ProdutoService {
     }
 
     public void deletarProduto(Long id) {
-        // ... (código existente, tudo igual) ...
+        
     }
 
     @Transactional
     public ProdutoResponseDTO toggleProdutoAtivo(Long id, Long artistaId) {
-        // ... (código existente, tudo igual) ...
+        
         return produtoRepository.findById(id)
             .map(produtoExistente -> {
                 if (!produtoExistente.getArtista().getId().equals(artistaId)) {
@@ -109,15 +106,11 @@ public class ProdutoService {
             }).orElseThrow(() -> new RuntimeException("Produto não encontrado!"));
     }
     
-    // --- 1. MÉTODO NOVO ADICIONADO AQUI ---
-    /**
-     * Lista TODOS os produtos ATIVOS de TODOS os artistas.
-     * (Usado na /index.html)
-     */
+    
     public List<ProdutoResponseDTO> listarTodosOsProdutosAtivos() {
         return produtoRepository.findAll()
                 .stream()
-                .filter(Produto::isAtivo) // <-- A MÁGICA ACONTECE AQUI
+                .filter(Produto::isAtivo) 
                 .map(ProdutoResponseDTO::new)
                 .collect(Collectors.toList());
     }

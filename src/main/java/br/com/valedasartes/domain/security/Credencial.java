@@ -36,7 +36,7 @@ public class Credencial implements UserDetails {
     @Column(name = "senha_credencial", nullable = false)
     private String senha;
     
-    // Relações inversas (já estava correto)
+    
     @OneToOne(mappedBy = "credencial", fetch = FetchType.LAZY)
     private Cliente cliente;
     
@@ -47,7 +47,7 @@ public class Credencial implements UserDetails {
     private Administrador administrador;
     
     
-    // Getters e setters para id, email, senha (já estava correto)
+    
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     public String getEmail() { return email; }
@@ -56,14 +56,13 @@ public class Credencial implements UserDetails {
     public void setSenha(String senha) { this.senha = senha; }
     
 
-    // --- 1. GETTERS ADICIONADOS AQUI ---
-    // (O AuthenticationService precisa disso para pegar o ID correto)
+    
     public Cliente getCliente() { return cliente; }
     public Artista getArtista() { return artista; }
     public Administrador getAdministrador() { return administrador; }
 
 
-    // Lógica de Roles (já estava correto)
+    
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         if (this.administrador != null) {
@@ -78,7 +77,7 @@ public class Credencial implements UserDetails {
         return Collections.emptyList();
     }
 
-    // Métodos do UserDetails (já estava correto)
+    
     @Override
     public String getPassword() {
         return this.senha;
@@ -95,7 +94,6 @@ public class Credencial implements UserDetails {
     @Override public boolean isEnabled() { return true; }
     
     
-    // Equals e hashCode (já estava correto)
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

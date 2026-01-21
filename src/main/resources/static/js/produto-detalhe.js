@@ -1,5 +1,4 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // URL DO BACKEND
     const API_BASE_URL = 'http://localhost:8080/api';
     
     const params = new URLSearchParams(window.location.search);
@@ -15,7 +14,6 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
 
-    // Inicialização
     carregarProduto();
     carregarAvaliacoes();
 
@@ -24,17 +22,12 @@ document.addEventListener('DOMContentLoaded', () => {
         formAvaliacao.addEventListener('submit', enviarAvaliacao);
     }
 
-    // ==========================================
-    // 1. CARREGAR PRODUTO
-    // ==========================================
     async function carregarProduto() {
         try {
             const response = await fetch(`${API_BASE_URL}/produtos/${produtoId}`);
             if (!response.ok) throw new Error('Erro ao buscar produto');
             
             const produto = await response.json();
-
-            // --- LÓGICA DO TELEFONE ---
             let telefoneResgatado = null;
 
             if (produto.telefone) telefoneResgatado = produto.telefone;
@@ -52,9 +45,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             produto.telefone_final = telefoneResgatado;
-            // --------------------------
-
-            // Preencher HTML
+            
             const elNome = document.getElementById('nome-produto');
             const elDesc = document.getElementById('descricao-produto');
             const elPreco = document.getElementById('preco-produto');
@@ -73,7 +64,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 elImg.src = produto.fotoUrl || 'https://via.placeholder.com/400?text=Sem+Foto';
             }
 
-            // Link do Artesão
+            
             const linkArtesao = document.getElementById('link-artesao');
             if (linkArtesao) {
                 let nomeArtesao = 'Artesão Parceiro';
@@ -88,8 +79,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 linkArtesao.textContent = nomeArtesao;
                 if (idArtesao) linkArtesao.href = `perfil-artesao.html?id=${idArtesao}`;
             }
-
-            // Configurar botão Adicionar
             const btnAdd = document.getElementById('btn-add-carrinho');
             if (btnAdd) {
                 const novoBtn = btnAdd.cloneNode(true);
@@ -103,9 +92,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // ==========================================
-    // 2. ADICIONAR AO CARRINHO
-    // ==========================================
     function adicionarAoCarrinho(produto) {
         const qtdInput = document.getElementById('quantidade');
         const quantidade = parseInt(qtdInput ? qtdInput.value : 1) || 1;
@@ -143,21 +129,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         localStorage.setItem('carrinho_vale_artes', JSON.stringify(carrinho));
         
-        // CHAMA O MODAL ATUALIZADO
         exibirModalDecisao();
     }
 
-    // ==========================================
-    // 3. MODAL DE DECISÃO (COM AS CORES NOVAS)
-    // ==========================================
     function exibirModalDecisao() {
         const modalExistente = document.getElementById('modal-carrinho-decisao');
         if (modalExistente) modalExistente.remove();
-
-        // CORES DO TEMA:
-        // Fundo Card: #2C241B
-        // Texto: #E8DCCA
-        // Fundo Input/Detalhe: #3b3026
 
         const modalHTML = `
             <div id="modal-carrinho-decisao" style="
@@ -205,11 +182,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         document.body.insertAdjacentHTML('beforeend', modalHTML);
 
-        // Ações dos botões
         const btnCarrinho = document.getElementById('btn-modal-carrinho');
         const btnContinuar = document.getElementById('btn-modal-continuar');
 
-        // Efeito Hover simples via JS
         btnContinuar.onmouseover = () => { 
             btnContinuar.style.background = '#3b3026'; 
         };
@@ -220,17 +195,12 @@ document.addEventListener('DOMContentLoaded', () => {
         btnCarrinho.onclick = () => window.location.href = 'carrinho.html';
         btnContinuar.onclick = () => window.location.href = 'index.html';
 
-        // Fechar ao clicar fora
         document.getElementById('modal-carrinho-decisao').onclick = (e) => {
             if (e.target.id === 'modal-carrinho-decisao') {
                 window.location.href = 'index.html';
             }
         };
     }
-
-    // ==========================================
-    // 4. AVALIAÇÕES
-    // ==========================================
     async function carregarAvaliacoes() {
         const lista = document.getElementById('lista-avaliacoes');
         if(!lista) return;

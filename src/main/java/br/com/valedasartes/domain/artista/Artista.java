@@ -60,17 +60,16 @@ public class Artista {
     @ColumnDefault("'PENDENTE'")
     private ArtistaStatus statusAprovacao = ArtistaStatus.PENDENTE;
 
-    // ✅ CASCADE ALL: Se apagar o Artista, apaga todos os Produtos dele
+    
     @JsonManagedReference
     @OneToMany(mappedBy = "artista", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Produto> produtos = new ArrayList<>();
 
-    // ✅ CASCADE ALL: Se apagar o Artista, apaga a Credencial de acesso dele
+    
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     @JoinColumn(name = "id_credencial", referencedColumnName = "id_credencial", unique = true)
     private Credencial credencial;
 
-    // ✅ CASCADE ALL: Se apagar o Artista, apaga o Endereço dele
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     @JoinColumn(name = "id_endereco", referencedColumnName = "id_endereco", unique = true)
     private Endereco endereco;
@@ -87,7 +86,7 @@ public class Artista {
         this.nomeEmpresa = nomeEmpresa;
     }
 
-    // --- GETTERS E SETTERS ---
+   
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     public String getCpf() { return cpf; }

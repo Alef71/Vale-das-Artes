@@ -28,28 +28,28 @@ public class DestaqueService {
         this.fileStorageService = fileStorageService;
     }
 
-    // --- NOVO MÉTODO: CRIAR COM FOTO (Chamado pelo Controller Atualizado) ---
+    
     @Transactional
     public DestaqueResponseDTO criarDestaqueComFoto(DestaqueRequestDTO dto, MultipartFile file) {
-        // 1. Cria a entidade e define os dados básicos
+        
         Destaque novoDestaque = new Destaque();
         novoDestaque.setTitulo(dto.getTitulo());
         novoDestaque.setLink(dto.getLink());
-        novoDestaque.setAtivo(true); // Define como ativo por padrão ao criar
+        novoDestaque.setAtivo(true); 
 
-        // 2. Salva no banco primeiro para gerar o ID (importante para o nome do arquivo, se usado)
+        
         Destaque salvo = destaqueRepository.save(novoDestaque);
 
-        // 3. Se houver arquivo, faz o upload e atualiza a referência
+        
         if (file != null && !file.isEmpty()) {
             try {
                 String nomeArquivo = fileStorageService.salvarArquivo(file);
                 String fotoUrl = fileStorageService.getUrlCompleta(nomeArquivo);
 
                 salvo.setCaminhoImagem(fotoUrl);
-                salvo = destaqueRepository.save(salvo); // Salva novamente com a URL da imagem
+                salvo = destaqueRepository.save(salvo); 
             } catch (Exception e) {
-                // Se der erro no upload, lança exceção para o @Transactional desfazer a criação do registro
+                
                 throw new RuntimeException("Erro ao salvar a foto do destaque: " + e.getMessage());
             }
         }
@@ -57,7 +57,7 @@ public class DestaqueService {
         return new DestaqueResponseDTO(salvo);
     }
 
-    // --- C R I A R (C) - Método antigo (mantido por segurança/compatibilidade) ---
+    
     @Transactional
     public DestaqueResponseDTO criarDestaque(DestaqueRequestDTO dto) {
         Destaque novoDestaque = new Destaque();
@@ -69,7 +69,7 @@ public class DestaqueService {
         return new DestaqueResponseDTO(salvo);
     }
     
-    // --- L E R (R) ---
+    
     public List<DestaqueResponseDTO> listarTodos() {
         return destaqueRepository.findAll().stream()
                 .map(DestaqueResponseDTO::new)
@@ -80,7 +80,7 @@ public class DestaqueService {
         return destaqueRepository.findById(id).map(DestaqueResponseDTO::new);
     }
     
-    // --- U P L O A D (Adicionando a foto posteriormente) ---
+
     @Transactional
     public DestaqueResponseDTO uploadFoto(Long destaqueId, MultipartFile file) {
         
@@ -96,7 +96,6 @@ public class DestaqueService {
         return new DestaqueResponseDTO(destaqueSalvo);
     }
 
-    // --- R E M O V E R F O T O ---
     @Transactional
     public DestaqueResponseDTO removerFoto(Long destaqueId) {
         Destaque destaque = destaqueRepository.findById(destaqueId)
@@ -108,7 +107,6 @@ public class DestaqueService {
         return new DestaqueResponseDTO(destaqueSalvo);
     }
 
-    // --- A T U A L I Z A R (U) ---
     @Transactional
     public DestaqueResponseDTO atualizarDestaque(Long id, DestaqueUpdateRequestDTO dto) {
         return destaqueRepository.findById(id)
@@ -121,8 +119,6 @@ public class DestaqueService {
                 return new DestaqueResponseDTO(atualizado);
             }).orElse(null);
     }
-
-    // --- D E L E T A R (D) ---
     public void deletarDestaque(Long id) {
         if (!destaqueRepository.existsById(id)) {
             throw new RuntimeException("Destaque com ID " + id + " não encontrado.");

@@ -8,7 +8,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
-// Se o seu Spring for antigo (versão 2.x), mude 'jakarta.persistence' para 'javax.persistence'
 
 @Entity
 @Table(name = "tokens_recuperacao")
@@ -22,15 +21,14 @@ public class TokenRecuperacao {
 
     private Long usuarioId;
 
-    private String tipoUsuario; // "CLIENTE" ou "ARTISTA"
+    private String tipoUsuario; 
 
     private LocalDateTime dataExpiracao;
 
-    // --- CONSTRUTOR PADRÃO (Obrigatório para o JPA) ---
+    
     public TokenRecuperacao() {
     }
 
-    // --- CONSTRUTOR COM ARGUMENTOS (Opcional, mas útil) ---
     public TokenRecuperacao(String token, Long usuarioId, String tipoUsuario, LocalDateTime dataExpiracao) {
         this.token = token;
         this.usuarioId = usuarioId;
@@ -38,7 +36,7 @@ public class TokenRecuperacao {
         this.dataExpiracao = dataExpiracao;
     }
 
-    // --- GETTERS E SETTERS (Essenciais para resolver seu erro) ---
+    
 
     public Long getId() {
         return id;
@@ -52,7 +50,7 @@ public class TokenRecuperacao {
         return token;
     }
 
-    public void setToken(String token) { // ✅ O erro sumirá por causa deste método
+    public void setToken(String token) { 
         this.token = token;
     }
 

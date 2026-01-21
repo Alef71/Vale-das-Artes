@@ -1,21 +1,15 @@
-/* js/dashboard-admin.js */
-
 console.log("LOG: dashboard-admin.js INICIADO");
 
 document.addEventListener("DOMContentLoaded", function() {
 
-    // --- Helpers Básicos ---
     function getToken() { 
         return localStorage.getItem('userToken'); 
     }
     
-    // Tenta pegar a URL global, senão usa padrão
     const API_BASE = (typeof API_URL !== 'undefined') ? API_URL : 'http://localhost:8080';
 
-    // --- 1. Verificação de Segurança (Login) ---
     async function checkLoginAndLoadData() {
         const token = getToken();
-        // Verifica se é Admin (ajuste a role conforme seu backend: 'ROLE_ADMIN' ou 'ADMIN')
         const role = localStorage.getItem('userRole'); 
 
         if (!token || !role || !role.includes('ADMIN')) {
@@ -27,7 +21,6 @@ document.addEventListener("DOMContentLoaded", function() {
         
         console.log("Login verificado. Carregando dados...");
         
-        // Carrega todas as listas
         loadDestaques();
         loadAvaliacoes();
         loadUsuarios();
@@ -39,7 +32,6 @@ document.addEventListener("DOMContentLoaded", function() {
         loadClientes();
     }
 
-    // --- 2. Requisições Genéricas (Fetch Wrapper) ---
     async function apiClient(endpoint, method = 'GET', body = null) {
         const token = getToken();
         const headers = { 'Authorization': `Bearer ${token}` };
@@ -60,7 +52,6 @@ document.addEventListener("DOMContentLoaded", function() {
             const response = await fetch(`${API_BASE}${endpoint}`, config);
             if (!response.ok) throw new Error(`Erro na API: ${response.status}`);
             
-            // Se for DELETE ou PUT sem retorno, não tenta fazer json()
             if (response.status === 204) return null;
             
             return await response.json();
@@ -70,9 +61,6 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     }
 
-    // =================================================================
-    // GESTÃO DE AVALIAÇÕES (MODERAÇÃO)
-    // =================================================================
     const listaAvaliacoes = document.getElementById('lista-avaliacoes-todas');
 
     async function loadAvaliacoes() {
@@ -80,7 +68,6 @@ document.addEventListener("DOMContentLoaded", function() {
         listaAvaliacoes.innerHTML = '<p>Buscando avaliações...</p>';
 
         try {
-            // Ajuste a rota conforme seu backend. Pode ser /avaliacoes ou /produtos/avaliacoes/todas
             const data = await apiClient('/avaliacoes', 'GET'); 
             
             if (!data || data.length === 0) {
@@ -101,7 +88,6 @@ document.addEventListener("DOMContentLoaded", function() {
                 </div>
             `).join('');
 
-            // Listeners
             document.querySelectorAll('.btn-del-avaliacao').forEach(btn => {
                 btn.addEventListener('click', (e) => deletarAvaliacao(e.target.dataset.id));
             });
@@ -116,24 +102,18 @@ document.addEventListener("DOMContentLoaded", function() {
         try {
             await apiClient(`/avaliacoes/${id}`, 'DELETE');
             alert("Avaliação removida!");
-            loadAvaliacoes(); // Cascata: Recarrega a lista
+            loadAvaliacoes();
         } catch (e) {
             alert("Erro ao excluir avaliação.");
         }
     }
 
-
-    // =================================================================
-    // GESTÃO DE USUÁRIOS (ARTESÃOS E CLIENTES)
-    // =================================================================
-    
-    // --- Artesãos Pendentes ---
     async function loadArtistasPendentes() {
         const div = document.getElementById('lista-artesaos-pendentes');
         if(!div) return;
         
         try {
-            const users = await apiClient('/artistas/pendentes'); // Rota hipotética
+            const users = await apiClient('/artistas/pendentes');
             if(users.length === 0) { div.innerHTML = '<p>Nenhum pendente.</p>'; return; }
 
             div.innerHTML = users.map(u => `
@@ -148,7 +128,6 @@ document.addEventListener("DOMContentLoaded", function() {
                 </div>
             `).join('');
 
-            // Binds
             document.querySelectorAll('.btn-aprovar').forEach(b => 
                 b.addEventListener('click', () => alterarStatusArtista(b.dataset.id, 'APROVADO')));
             
@@ -160,14 +139,12 @@ document.addEventListener("DOMContentLoaded", function() {
 
     async function alterarStatusArtista(id, novoStatus) {
         try {
-            // Ajuste para PUT ou PATCH conforme seu backend
             await apiClient(`/artistas/${id}/status`, 'PATCH', { status: novoStatus });
             loadArtistasPendentes();
             loadTodosArtistas();
         } catch(e) { alert('Erro ao atualizar status'); }
     }
 
-    // --- Todos os Artesãos (Deletar em Cascata) ---
     async function loadTodosArtistas() {
         const div = document.getElementById('lista-artesaos-todos');
         if(!div) return;
@@ -190,7 +167,6 @@ document.addEventListener("DOMContentLoaded", function() {
         } catch(e) { console.log(e); }
     }
 
-    // --- Clientes (Deletar em Cascata) ---
     async function loadClientes() {
         const div = document.getElementById('lista-clientes');
         if(!div) return;
@@ -213,25 +189,18 @@ document.addEventListener("DOMContentLoaded", function() {
         } catch(e) { console.log(e); }
     }
 
-    // Função genérica de delete (Cascata)
     async function deletarUsuario(id, tipo) {
-        // tipo = 'clientes' ou 'artistas'
         if(!confirm(`ATENÇÃO: Deletar este usuário apagará também seus dados (pedidos/produtos)?`)) return;
 
         try {
             await apiClient(`/${tipo}/${id}`, 'DELETE');
             alert("Usuário deletado com sucesso.");
-            // Recarrega tudo para garantir que dados antigos sumiram
             loadUsuarios(); 
         } catch (e) {
             alert("Erro ao deletar usuário.");
         }
     }
 
-
-    // =================================================================
-    // GESTÃO DE DESTAQUES
-    // =================================================================
     const listaDestaques = document.getElementById('lista-destaques-ativos');
     const formNovoDestaque = document.getElementById('form-novo-destaque');
 
@@ -282,6 +251,5 @@ document.addEventListener("DOMContentLoaded", function() {
         } catch(e) { alert('Erro ao deletar'); }
     }
 
-    // Inicializa
     checkLoginAndLoadData();
 });

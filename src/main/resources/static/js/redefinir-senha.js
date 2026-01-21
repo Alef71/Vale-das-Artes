@@ -3,12 +3,9 @@ document.addEventListener("DOMContentLoaded", function() {
     const API_BASE_URL = "http://localhost:8080";
     const form = document.getElementById("form-nova-senha");
     const statusMsg = document.getElementById("status-msg");
-
-    // 1. Captura o TOKEN da URL (ex: ?token=abc-123)
     const urlParams = new URLSearchParams(window.location.search);
     const token = urlParams.get('token');
 
-    // Se não tiver token, nem deixa tentar
     if (!token) {
         statusMsg.style.color = "red";
         statusMsg.innerText = "Erro: Link inválido ou expirado. Solicite novamente.";
@@ -23,7 +20,6 @@ document.addEventListener("DOMContentLoaded", function() {
         const confirmaSenha = document.getElementById("confirma-senha").value;
         const btn = form.querySelector("button");
 
-        // Validação básica
         if (novaSenha.length < 6) {
             alert("A senha deve ter pelo menos 6 caracteres.");
             return;
@@ -39,7 +35,6 @@ document.addEventListener("DOMContentLoaded", function() {
         statusMsg.innerText = "";
 
         try {
-            // Envia para o Backend: O Token (quem é) e a Senha (o que mudar)
             const response = await fetch(`${API_BASE_URL}/api/auth/salvar-nova-senha`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -54,8 +49,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 throw new Error(text || "Erro ao salvar senha");
             }
 
-            // Sucesso
-            statusMsg.style.color = "#4CAF50"; // Verde
+            statusMsg.style.color = "#4CAF50"; 
             statusMsg.innerText = "Senha alterada com sucesso! Redirecionando...";
             
             setTimeout(() => {

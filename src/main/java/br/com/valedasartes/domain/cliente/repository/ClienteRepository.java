@@ -14,6 +14,6 @@ public interface ClienteRepository extends JpaRepository<Cliente, Long> {
 
     Optional<Cliente> findByTelefone(String telefone);
 
-    // ✅ MÉTODO QUE ESTAVA FALTANDO
+
     Optional<Cliente> findByCpf(String cpf);
 }

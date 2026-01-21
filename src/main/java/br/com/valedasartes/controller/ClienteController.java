@@ -114,16 +114,13 @@ public class ClienteController {
         return ResponseEntity.ok(clienteAtualizado);
     }
 
-    /**
-     * Deleta um cliente - Apenas Administradores podem realizar esta ação.
-     */
     @Operation(summary = "Deleta um cliente (Acesso ADMIN)")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "204", description = "Cliente deletado com sucesso"),
         @ApiResponse(responseCode = "403", description = "Acesso negado"),
         @ApiResponse(responseCode = "404", description = "Cliente não encontrado")
     })
-    @PreAuthorize("hasRole('ADMIN')") // Garante o poder do Admin
+    @PreAuthorize("hasRole('ADMIN')") 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletarCliente(@PathVariable Long id) {
         clienteService.deletarCliente(id);

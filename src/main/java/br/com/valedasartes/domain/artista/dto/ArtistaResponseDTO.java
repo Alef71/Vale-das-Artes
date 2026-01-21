@@ -21,9 +21,7 @@ public class ArtistaResponseDTO {
     private final CredencialDTO credencial;
     private final List<ProdutoResponseDTO> produtos;
 
-    // --- 1. MUDANÇA ADICIONADA ---
     private final String fotoUrl;
-    // --- FIM DA MUDANÇA ---
 
     public ArtistaResponseDTO(Artista artista) {
         this.id = artista.getId();
@@ -34,9 +32,9 @@ public class ArtistaResponseDTO {
         this.nomeEmpresa = artista.getNomeEmpresa();
         this.biografia = artista.getBiografia();
 
-        // --- 2. MUDANÇA ADICIONADA ---
-        this.fotoUrl = artista.getFotoUrl(); // Pega a URL da entidade
-        // --- FIM DA MUDANÇA ---
+
+        this.fotoUrl = artista.getFotoUrl(); 
+       
 
         if (artista.getEndereco() != null) {
             this.endereco = new EnderecoDTO(artista.getEndereco());
@@ -60,7 +58,6 @@ public class ArtistaResponseDTO {
         }
     }
 
-    // (Sub-classes CredencialDTO e EnderecoDTO continuam iguais)
     public static class CredencialDTO {
         private final String email;
         public CredencialDTO(String email) { this.email = email; }
@@ -89,7 +86,6 @@ public class ArtistaResponseDTO {
         public String getCep() { return cep; }
     }
 
-    // (Getters existentes)
     public Long getId() { return id; }
     public String getNome() { return nome; }
     public String getCpf() { return cpf; }
@@ -101,7 +97,7 @@ public class ArtistaResponseDTO {
     public CredencialDTO getCredencial() { return credencial; }
     public List<ProdutoResponseDTO> getProdutos() { return produtos; }
 
-    // --- 3. MUDANÇA ADICIONADA ---
+    
     public String getFotoUrl() { return fotoUrl; }
-    // --- FIM DA MUDANÇA ---
+    
 }

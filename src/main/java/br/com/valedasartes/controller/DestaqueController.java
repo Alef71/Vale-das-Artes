@@ -38,29 +38,25 @@ public class DestaqueController {
         this.destaqueService = destaqueService;
     }
 
-    // --- C R I A R (POST) - AGORA COM FOTO E DADOS JUNTOS (Multipart) ---
+    
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Cria um novo destaque já com a imagem (Multipart Form)")
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE) // <-- Isso corrige o erro 415
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE) 
     public ResponseEntity<DestaqueResponseDTO> criarDestaque(
             @RequestParam("titulo") String titulo,
             @RequestParam(value = "link", required = false) String link,
             @RequestParam(value = "foto", required = true) MultipartFile foto
     ) {
-        // 1. Convertemos os parâmetros recebidos para o seu DTO
-        // (Assumindo que sua classe DestaqueRequestDTO tenha setters ou construtor padrão)
         DestaqueRequestDTO dto = new DestaqueRequestDTO();
         dto.setTitulo(titulo);
         dto.setLink(link);
-        // Se o DTO tiver campo 'ativo', defina aqui (ex: dto.setAtivo(true));
-
-        // 2. Chamamos um método novo no Service que aceita DTO + Arquivo
+        
         DestaqueResponseDTO novoDestaque = destaqueService.criarDestaqueComFoto(dto, foto);
         
         return new ResponseEntity<>(novoDestaque, HttpStatus.CREATED);
     }
 
-    // --- L I S T A R (GET) ---
+    
     @Operation(summary = "Lista todos os destaques")
     @GetMapping
     public ResponseEntity<List<DestaqueResponseDTO>> listarDestaques() {
@@ -68,7 +64,7 @@ public class DestaqueController {
         return ResponseEntity.ok(destaques);
     }
     
-    // --- U P L O A D F O T O (POST) - Mantido para atualizações futuras ---
+    
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Atualizar apenas a imagem do destaque")
     @PostMapping(value = "/{id}/foto", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -80,7 +76,7 @@ public class DestaqueController {
         return ResponseEntity.ok(destaqueAtualizado);
     }
     
-    // --- R E M O V E R F O T O (DELETE) ---
+    
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Remove a imagem do destaque")
     @DeleteMapping(value = "/{id}/foto")
@@ -89,7 +85,6 @@ public class DestaqueController {
         return ResponseEntity.ok(destaqueAtualizado);
     }
 
-    // --- A T U A L I Z A R (PUT) ---
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Atualiza título, link e status do destaque")
     @PutMapping("/{id}")
@@ -101,7 +96,6 @@ public class DestaqueController {
         return ResponseEntity.notFound().build();
     }
 
-    // --- D E L E T A R (DELETE) ---
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Deleta o registro de destaque")
     @DeleteMapping("/{id}")

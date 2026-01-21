@@ -1,6 +1,5 @@
 document.addEventListener("DOMContentLoaded", function() {
     
-    // --- ELEMENTOS DO DOM ---
     const formEditar = document.getElementById('form-editar-cliente');
     const previewFoto = document.getElementById('foto-preview-cliente');
     const inputFoto = document.getElementById('input-foto-cliente');
@@ -12,25 +11,22 @@ document.addEventListener("DOMContentLoaded", function() {
 
     let token = localStorage.getItem('userToken');
     let userId = localStorage.getItem('userId');
-
-    // --- 0. LÓGICA DO ACORDEÃO (ABRIR/FECHAR ABAS) ---
     const accordions = document.querySelectorAll('.accordion-header');
     
     accordions.forEach(header => {
         header.addEventListener('click', () => {
-            // Alterna a classe 'active' no cabeçalho (para girar a seta)
+            
             header.classList.toggle('active');
             
-            // Pega o próximo elemento (o conteúdo oculto)
+            
             const content = header.nextElementSibling;
             if (content) {
-                // Alterna a classe 'open' para mostrar/esconder
+                
                 content.classList.toggle('open');
             }
         });
     });
 
-    // --- 1. INICIALIZAÇÃO ---
     async function checkLoginAndLoadData() {
         const role = localStorage.getItem('userRole');
 
@@ -52,25 +48,23 @@ document.addEventListener("DOMContentLoaded", function() {
             }
         }
     }
-
-    // --- 2. PREENCHER DADOS NA TELA ---
     function populatePage(cliente) {
         const titleElement = document.getElementById('dashboard-title');
         if(titleElement) titleElement.textContent = `Painel do Cliente - Bem-vindo, ${cliente.nome}!`;
 
-        // FOTO
+        
         if (cliente.fotoUrl) {
             previewFoto.src = `${cliente.fotoUrl}?t=${new Date().getTime()}`;
         } else {
             previewFoto.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(cliente.nome)}&background=9c8b75&color=fff&size=150`;
         }
 
-        // DADOS PESSOAIS
+        
         if(nomeInput) nomeInput.value = cliente.nome || '';
         if(document.getElementById('cliente-cpf')) document.getElementById('cliente-cpf').value = cliente.cpf || '';
         if(document.getElementById('cliente-telefone')) document.getElementById('cliente-telefone').value = cliente.telefone || '';
         
-        // EMAIL
+        
         if (cliente.credencial) {
             const emailInput = document.getElementById('cliente-email');
             const emailVisual = document.getElementById('cliente-email-visual');
@@ -78,10 +72,10 @@ document.addEventListener("DOMContentLoaded", function() {
             if(emailVisual) emailVisual.value = cliente.credencial.email || ''; 
         }
 
-        // SIDEBAR
+        
         if(sidebarNome) sidebarNome.textContent = cliente.nome || 'Cliente';
 
-        // ENDEREÇO
+        
         if (cliente.endereco) {
             const fields = {
                 'end-logradouro': cliente.endereco.logradouro,
@@ -100,15 +94,13 @@ document.addEventListener("DOMContentLoaded", function() {
             }
         }
     }
-
-    // Sincroniza nome sidebar enquanto digita
     if(nomeInput && sidebarNome) {
         nomeInput.addEventListener('input', (e) => {
             sidebarNome.textContent = e.target.value || 'Cliente';
         });
     }
 
-    // --- 3. UPLOAD DE FOTO ---
+    
     if(btnCamera) {
         btnCamera.addEventListener('click', () => {
             if(inputFoto) inputFoto.click();
@@ -157,20 +149,17 @@ document.addEventListener("DOMContentLoaded", function() {
             inputFoto.value = null;
         });
     }
-
-    // --- 4. ATUALIZAR DADOS (LOGICA CORRIGIDA) ---
     if (formEditar) {
         formEditar.addEventListener('submit', async (event) => {
             event.preventDefault();
             
-            // 1. Monta o objeto BÁSICO (Sem a senha ainda)
+            
             const payload = {
                 nome: document.getElementById('cliente-nome').value,
                 cpf: document.getElementById('cliente-cpf').value,
                 telefone: document.getElementById('cliente-telefone').value,
                 credencial: {
                     email: document.getElementById('cliente-email').value
-                    // NOTA: 'senha' NÃO é adicionada aqui, para ir como nula se estiver vazia
                 },
                 endereco: {
                     logradouro: document.getElementById('end-logradouro').value,
@@ -184,28 +173,23 @@ document.addEventListener("DOMContentLoaded", function() {
                 }
             };
 
-            // 2. Verifica se o usuário digitou algo na "Nova Senha"
             const novaSenha = document.getElementById('nova-senha').value;
             const confirmaSenha = document.getElementById('confirma-senha').value;
 
-            // Só adiciona a senha ao envio SE o campo não estiver vazio
             if (novaSenha && novaSenha.trim() !== "") {
                 if (novaSenha !== confirmaSenha) {
                     alert('As senhas digitadas não conferem!');
-                    return; // Para o envio se as senhas forem diferentes
+                    return; 
                 }
-                // Se passou na validação, adiciona ao payload para o Java processar
+                
                 payload.credencial.senha = novaSenha;
             } 
-            // Se estiver vazio, o payload segue sem o campo 'senha'.
-            // O Java receberá null/vazio e manterá a senha antiga.
 
             try {
                 const clienteAtualizado = await apiClient(`/clientes/${userId}`, 'PUT', payload);
                 alert('Dados atualizados com sucesso!');
                 populatePage(clienteAtualizado);
                 
-                // Limpa os campos de senha por segurança visual
                 document.getElementById('nova-senha').value = '';
                 document.getElementById('confirma-senha').value = '';
             } catch (error) {

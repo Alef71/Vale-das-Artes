@@ -2,13 +2,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const API_BASE_URL = 'http://localhost:8080/api';
     const params = new URLSearchParams(window.location.search);
     const artistaId = params.get('id');
-
-    // Elementos da DOM
     const gridProdutos = document.getElementById('grid-produtos');
     const mainContent = document.querySelector('main');
     const contadorEl = document.getElementById('contador-produtos');
 
-    // Inicia
     carregarPerfil();
 
     async function carregarPerfil() {
@@ -23,14 +20,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const artista = await response.json();
             
-            // 1. Preenche Topo
             preencherInfoPerfil(artista);
 
-            // 2. Preenche Produtos
             const todosProdutos = artista.produtos || [];
             const produtosAtivos = todosProdutos.filter(p => p.ativo === true);
 
-            // Atualiza contador
             if (contadorEl) contadorEl.textContent = `${produtosAtivos.length} ITENS`;
 
             if (gridProdutos) {
@@ -55,14 +49,10 @@ document.addEventListener('DOMContentLoaded', () => {
     function preencherInfoPerfil(artista) {
         document.getElementById('nome-artesao').textContent = artista.nome || 'Artesão';
         
-        // Texto do Ateliê
         const atelieTxt = artista.nomeEmpresa ? `Ateliê ${artista.nomeEmpresa}` : 'Ateliê de Artes';
         document.getElementById('texto-atelie').textContent = atelieTxt;
-        
-        // Bio
         document.getElementById('biografia-artesao').textContent = artista.biografia || `Olá! Bem-vindo ao meu espaço criativo.`;
 
-        // Foto
         const imgElement = document.getElementById('img-artesao');
         if (imgElement) {
             imgElement.src = artista.fotoUrl 
@@ -70,7 +60,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 : `https://ui-avatars.com/api/?name=${encodeURIComponent(artista.nome)}&background=fff&color=3E2B22&size=300`;
         }
 
-        // Configuração Botão WhatsApp
         const btnZap = document.getElementById('btn-whatsapp');
         if (btnZap) {
             if (artista.telefone) {
@@ -79,18 +68,17 @@ document.addEventListener('DOMContentLoaded', () => {
                     window.open(`https://wa.me/55${num}`, '_blank');
                 };
             } else {
-                btnZap.style.display = 'none'; // Esconde se não tiver telefone
+                btnZap.style.display = 'none'; 
             }
         }
 
-        // Configuração Botão Seguir (Visual)
         const btnSeguir = document.getElementById('btn-seguir');
         if (btnSeguir) {
             btnSeguir.onclick = () => {
                 const icon = btnSeguir.querySelector('i');
                 if (icon.classList.contains('far')) {
                     icon.classList.replace('far', 'fas');
-                    btnSeguir.style.color = '#e91e63'; // Rosa ao curtir
+                    btnSeguir.style.color = '#e91e63'; 
                     btnSeguir.style.borderColor = '#e91e63';
                 } else {
                     icon.classList.replace('fas', 'far');
@@ -101,7 +89,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // --- CARD DE PRODUTO ---
     function criarCardProduto(produto) {
         const capa = produto.fotoUrl || 'https://via.placeholder.com/300?text=Sem+Foto';
         const preco = produto.preco ? produto.preco.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) : '0,00';

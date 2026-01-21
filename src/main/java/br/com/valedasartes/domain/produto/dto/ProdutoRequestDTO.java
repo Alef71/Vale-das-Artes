@@ -23,8 +23,6 @@ public class ProdutoRequestDTO {
     @NotBlank(message = "A categoria é obrigatória.")
     private String categoria;
 
-    // --- O campo 'artistaId' FOI REMOVIDO DESTE ARQUIVO ---
-
     
     public String getNome() { return nome; }
     public void setNome(String nome) { this.nome = nome; }
@@ -35,5 +33,4 @@ public class ProdutoRequestDTO {
     public String getCategoria() { return categoria; }
     public void setCategoria(String categoria) { this.categoria = categoria; }
     
-    // --- O GETTER/SETTER de 'artistaId' FOI REMOVIDO DESTE ARQUIVO ---
 }

@@ -55,12 +55,12 @@ public class AvaliacaoService {
                 .collect(Collectors.toList());
     }
 
-    // --- NOVO MÉTODO ADICIONADO ---
+   
     public List<AvaliacaoResponseDTO> buscarAvaliacoesPorProduto(Long produtoId) {
-        // Busca no banco usando o método novo do Repository
+        
         List<Avaliacao> avaliacoes = avaliacaoRepository.findByProdutoId(produtoId);
         
-        // Converte para DTO usando o construtor que já existe (AvaliacaoResponseDTO::new)
+        
         return avaliacoes.stream()
                 .map(AvaliacaoResponseDTO::new)
                 .collect(Collectors.toList());

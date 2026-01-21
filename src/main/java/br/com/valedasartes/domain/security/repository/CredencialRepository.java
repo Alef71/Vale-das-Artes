@@ -3,8 +3,8 @@ package br.com.valedasartes.domain.security.repository;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query; // <-- 1. IMPORTAR @Query
-import org.springframework.data.repository.query.Param; // <-- 2. IMPORTAR @Param
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param; 
 import org.springframework.stereotype.Repository;
 
 import br.com.valedasartes.domain.security.Credencial;

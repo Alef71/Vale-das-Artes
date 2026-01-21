@@ -37,8 +37,8 @@ public class Produto {
     @Column(nullable = false)
     private String categoria;
 
-    // --- 2. ADICIONAR A ANOTAÇÃO AQUI ---
-    @JsonBackReference // Diz ao Java: "Não imprima o 'pai' (Artista) de volta."
+    
+    @JsonBackReference 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_artista")
     private Artista artista;
@@ -46,14 +46,14 @@ public class Produto {
     @Column(name = "ativo", nullable = false)
     private boolean ativo = true;
 
-    // Campo da Foto (já estava OK)
+    
     @Column(name = "foto_url")
     private String fotoUrl;
 
     public Produto() {
     }
 
-    // (Construtor OK)
+    
     public Produto(String nome, String descricao, BigDecimal preco, String categoria, Artista artista) {
         this.nome = nome;
         this.descricao = descricao;
@@ -62,7 +62,7 @@ public class Produto {
         this.artista = artista;
     }
 
-    // (Getters e Setters existentes OK)
+    
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     public String getNome() { return nome; }
@@ -80,7 +80,7 @@ public class Produto {
     public String getFotoUrl() { return fotoUrl; }
     public void setFotoUrl(String fotoUrl) { this.fotoUrl = fotoUrl; }
 
-    // (Equals e HashCode OK)
+    
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

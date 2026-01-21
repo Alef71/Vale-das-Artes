@@ -81,14 +81,12 @@ public class ArtistaService {
                 .collect(Collectors.toList());
     }
 
-    // --- MUDANÇA PRINCIPAL AQUI ---
-    // Agora retorna o DTO direto e lança exceção se não achar.
     public ArtistaResponseDTO buscarPorId(Long id) {
         return artistaRepository.findCompletoById(id) 
                 .map(ArtistaResponseDTO::new)
                 .orElseThrow(() -> new RuntimeException("Artista não encontrado com ID: " + id));
     }
-    // -----------------------------
+  
 
     @Transactional
     public ArtistaResponseDTO atualizarArtista(Long id, ArtistaUpdateDTO dto) {

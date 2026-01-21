@@ -16,7 +16,6 @@ public class DestaqueUpdateRequestDTO {
     @NotNull(message = "O status de ativo/inativo é obrigatório.")
     private Boolean ativo;
 
-    // Getters e Setters
     public String getTitulo() { return titulo; }
     public void setTitulo(String titulo) { this.titulo = titulo; }
     public String getLink() { return link; }

@@ -5,7 +5,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder; // 1. Import necessário
+import org.springframework.security.crypto.password.PasswordEncoder; 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,10 +20,10 @@ import br.com.valedasartes.domain.security.Credencial;
 public class AdministradorService {
 
     private final AdministradorRepository administradorRepository;
-    private final PasswordEncoder passwordEncoder; // 2. Adiciona o encoder
+    private final PasswordEncoder passwordEncoder; 
 
     @Autowired
-    public AdministradorService(AdministradorRepository administradorRepository, PasswordEncoder passwordEncoder) { // 3. Injeta no construtor
+    public AdministradorService(AdministradorRepository administradorRepository, PasswordEncoder passwordEncoder) { 
         this.administradorRepository = administradorRepository;
         this.passwordEncoder = passwordEncoder;
     }

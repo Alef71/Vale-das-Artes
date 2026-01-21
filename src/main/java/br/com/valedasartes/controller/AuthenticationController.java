@@ -2,7 +2,7 @@ package br.com.valedasartes.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin; // <--- IMPORT NOVO
+import org.springframework.web.bind.annotation.CrossOrigin; 
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,7 +19,7 @@ import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/auth")
-@CrossOrigin(origins = "*") // <--- ADICIONE ISSO AQUI PARA LIBERAR O FRONT
+@CrossOrigin(origins = "*") 
 @Tag(name = "Autenticação", description = "Endpoints para autenticação de usuários")
 public class AuthenticationController {
 

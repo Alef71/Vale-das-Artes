@@ -3,7 +3,7 @@ package br.com.valedasartes.domain.produto.dto;
 import java.math.BigDecimal;
 
 import br.com.valedasartes.domain.artista.dto.ArtistaResumoDTO;
-import br.com.valedasartes.domain.produto.Produto; // Importe o DTO do artista
+import br.com.valedasartes.domain.produto.Produto; 
 
 public class ProdutoResponseDTO {
 
@@ -12,7 +12,7 @@ public class ProdutoResponseDTO {
     private final String descricao;
     private final BigDecimal preco;
     private final String categoria;
-    private final ArtistaResumoDTO artista; // Objeto Artista (com ID e Nome)
+    private final ArtistaResumoDTO artista; 
     private final String fotoUrl;
     private final boolean ativo;
 
@@ -23,9 +23,8 @@ public class ProdutoResponseDTO {
         this.preco = produto.getPreco();
         this.categoria = produto.getCategoria();
         this.fotoUrl = produto.getFotoUrl();
-        this.ativo = produto.isAtivo(); // Esta é a linha que deu erro
+        this.ativo = produto.isAtivo(); 
 
-        // Lógica do Artista
         if (produto.getArtista() != null) {
             this.artista = new ArtistaResumoDTO(produto.getArtista());
         } else {
@@ -33,7 +32,7 @@ public class ProdutoResponseDTO {
         }
     }
 
-    // --- Getters ---
+    
     public Long getId() { return id; }
     public String getNome() { return nome; }
     public String getDescricao() { return descricao; }

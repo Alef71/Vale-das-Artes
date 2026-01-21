@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     
-    // --- ELEMENTOS ---
+    
     const listaCarrinho = document.getElementById('lista-carrinho');
     const divVazio = document.getElementById('carrinho-vazio');
     const divConteudo = document.getElementById('conteudo-carrinho');
@@ -10,8 +10,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const spanSubtotal = document.getElementById('valor-subtotal');
     const btnFinalizar = document.getElementById('btn-finalizar-compra');
     const btnLimpar = document.getElementById('btn-limpar-carrinho');
-
-    // Inputs do Formulário
     const inputNome = document.getElementById('nome-cliente');
     const inputTelefone = document.getElementById('telefone-cliente');
     const inputRua = document.getElementById('rua');
@@ -19,10 +17,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const inputBairro = document.getElementById('bairro');
     const inputCidade = document.getElementById('cidade');
     
-    // Inicializa
+    
     renderizarCarrinho();
 
-    // --- FUNÇÃO PRINCIPAL DE RENDERIZAÇÃO ---
+    
     function renderizarCarrinho() {
         const carrinho = JSON.parse(localStorage.getItem('carrinho_vale_artes')) || [];
         
@@ -86,11 +84,11 @@ document.addEventListener('DOMContentLoaded', () => {
         if (spanSubtotal) spanSubtotal.textContent = formatarMoeda(valor);
     }
 
-    // --- LÓGICA DO WHATSAPP DINÂMICO ---
+    
     if (btnFinalizar) {
         btnFinalizar.addEventListener('click', () => {
             
-            // 1. Validar Inputs
+            
             if (!inputNome.value || !inputTelefone.value || !inputRua.value || !inputNumero.value || !inputBairro.value || !inputCidade.value) {
                 alert("Por favor, preencha todos os dados de entrega.");
                 return;
@@ -98,10 +96,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const carrinho = JSON.parse(localStorage.getItem('carrinho_vale_artes')) || [];
             if (carrinho.length === 0) return;
-
-            // 2. BUSCAR O NÚMERO DO ARTESÃO NO ITEM
-            // Pega o número do primeiro item do carrinho
-            // IMPORTANTE: O objeto salvo no localStorage deve ter a propriedade 'whatsapp'
             const numeroArtesao = carrinho[0].whatsapp; 
 
             if (!numeroArtesao) {
@@ -109,8 +103,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            // 3. Verificação de Segurança (Multiplos Artesãos)
-            // Se houver itens de artesãos com números diferentes, alertamos o usuário.
             const temMixDeArtesaos = carrinho.some(item => item.whatsapp !== numeroArtesao);
             
             if (temMixDeArtesaos) {
@@ -118,7 +110,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            // 4. Montar a Mensagem
+    
             let mensagem = `*Olá! Novo pedido pelo site Vale das Artes:*\n\n`;
             
             let totalPedido = 0;
@@ -140,7 +132,6 @@ document.addEventListener('DOMContentLoaded', () => {
             mensagem += `------------------------------\n`;
             mensagem += `Aguardo confirmação!`;
 
-            // 5. Gerar Link (Remove caracteres não numéricos do telefone do artesão)
             const numeroLimpo = numeroArtesao.toString().replace(/\D/g, ''); 
             const linkWhatsapp = `https://wa.me/${numeroLimpo}?text=${encodeURIComponent(mensagem)}`;
             
@@ -148,7 +139,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- FUNÇÕES GLOBAIS ---
     if (btnLimpar) {
         btnLimpar.addEventListener('click', () => {
             if (confirm("Deseja esvaziar todo o carrinho?")) {

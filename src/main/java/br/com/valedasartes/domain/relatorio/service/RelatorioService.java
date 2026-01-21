@@ -32,6 +32,5 @@ public class RelatorioService {
         return new RelatorioArtesaoDTO(itensVendidosDTO);
     }
 
-    // No futuro, podemos criar um método para o relatório do Admin aqui
-    // public RelatorioAdminDTO gerarRelatorioGeral() { ... }
+    
 }

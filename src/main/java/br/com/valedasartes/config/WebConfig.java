@@ -15,13 +15,11 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addResourceHandlers(@NonNull ResourceHandlerRegistry registry) {
         
-        // 1. Mapeamento para os recursos estáticos (HTML, JS, CSS, etc.)
-        // Isso resolve o 404 ao direcionar o Spring para as pastas padrão de frontend.
         registry.addResourceHandler("/**")
                 .addResourceLocations("classpath:/static/", "classpath:/public/")
-                .setCachePeriod(0); // Útil para garantir que o navegador não use cache antigo no desenvolvimento
+                .setCachePeriod(0); 
 
-        // 2. Mapeamento para os uploads (arquivos do sistema de arquivos)
+        
         registry.addResourceHandler("/uploads/**")
                 .addResourceLocations("file:" + uploadDir + "/");
     }

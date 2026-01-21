@@ -19,7 +19,6 @@ import br.com.valedasartes.domain.artista.repository.ArtistaRepository;
 import br.com.valedasartes.domain.auth.TokenRecuperacao;
 import br.com.valedasartes.domain.auth.dto.EsqueciSenhaDTO;
 import br.com.valedasartes.domain.auth.repository.TokenRecuperacaoRepository;
-// import br.com.valedasartes.domain.auth.service.AuthService; // Não precisamos do service para essa lógica direta
 import br.com.valedasartes.domain.cliente.Cliente;
 import br.com.valedasartes.domain.cliente.repository.ClienteRepository;
 
@@ -39,26 +38,21 @@ public class AuthController {
     @Autowired
     private ArtistaRepository artistaRepository;
 
-    // --- 1. Endpoint: Verifica Dados e Retorna Token (Simulação) ---
     @PostMapping("/esqueci-senha")
     public ResponseEntity<?> esqueciSenha(@RequestBody EsqueciSenhaDTO dados) {
         
-        // Remove caracteres não numéricos para comparação
         String cpfLimpo = dados.cpf().replaceAll("[^0-9]", "");
         String telLimpo = dados.telefone().replaceAll("[^0-9]", "");
 
-        // 1. Tenta achar Cliente
         Optional<Cliente> clienteOpt = clienteRepository.findByCpf(cpfLimpo);
         if (clienteOpt.isPresent()) {
             String telBanco = clienteOpt.get().getEndereco().getTelefone().replaceAll("[^0-9]", "");
             
-            // Verifica se o telefone bate (contém ou é igual)
             if (telBanco.contains(telLimpo) || telLimpo.contains(telBanco)) {
                 return gerarTokenResposta(clienteOpt.get().getId(), "CLIENTE");
             }
         }
 
-        // 2. Se não achou cliente, tenta Artista (Artesão)
         Optional<Artista> artistaOpt = artistaRepository.findByCpf(cpfLimpo);
         if (artistaOpt.isPresent()) {
             String telBanco = artistaOpt.get().getEndereco().getTelefone().replaceAll("[^0-9]", "");
@@ -71,7 +65,6 @@ public class AuthController {
         return ResponseEntity.badRequest().body("{\"mensagem\": \"CPF ou WhatsApp não conferem com nossos registros.\"}");
     }
 
-    // Método auxiliar para gerar o token e devolver no JSON
     private ResponseEntity<?> gerarTokenResposta(Long userId, String tipoUsuario) {
         String tokenString = UUID.randomUUID().toString();
         
@@ -79,11 +72,10 @@ public class AuthController {
         token.setToken(tokenString);
         token.setUsuarioId(userId);
         token.setTipoUsuario(tipoUsuario);
-        token.setDataExpiracao(LocalDateTime.now().plusMinutes(30)); // Valido por 30 min
+        token.setDataExpiracao(LocalDateTime.now().plusMinutes(30));
         
         tokenRepository.save(token);
 
-        // Retorna o token para o Front-end usar imediatamente
         Map<String, String> response = new HashMap<>();
         response.put("token", tokenString);
         response.put("mensagem", "Dados confirmados! Defina sua nova senha.");
@@ -91,7 +83,6 @@ public class AuthController {
         return ResponseEntity.ok(response);
     }
 
-    // --- 2. Endpoint para SALVAR a nova senha ---
     @PostMapping("/salvar-nova-senha")
     public ResponseEntity<?> salvarNovaSenha(@RequestBody Map<String, String> dados) {
         String token = dados.get("token");

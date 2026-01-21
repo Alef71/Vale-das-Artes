@@ -55,7 +55,7 @@ public class AvaliacaoController {
         return ResponseEntity.ok(avaliacoes);
     }
 
-    // --- NOVO MÉTODO ADICIONADO ---
+    
     @Operation(summary = "Lista avaliações por produto", description = "Retorna todas as avaliações de um produto específico.")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Lista retornada com sucesso"),
@@ -63,11 +63,10 @@ public class AvaliacaoController {
     })
     @GetMapping("/produto/{produtoId}")
     public ResponseEntity<List<AvaliacaoResponseDTO>> listarAvaliacoesPorProduto(@PathVariable Long produtoId) {
-        // Certifique-se que este método existe no seu Service
         List<AvaliacaoResponseDTO> avaliacoes = avaliacaoService.buscarAvaliacoesPorProduto(produtoId);
         return ResponseEntity.ok(avaliacoes);
     }
-    // ------------------------------
+    
 
     @Operation(summary = "Busca uma avaliação por ID", description = "Retorna os detalhes de uma avaliação específica.")
     @ApiResponses(value = {

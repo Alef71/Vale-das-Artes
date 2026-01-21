@@ -1,11 +1,10 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // ENDEREÇO DA API
     const API_BASE_URL = 'http://localhost:8080/api';
 
     carregarDestaques();
     carregarProdutos();
 
-    // --- FUNÇÕES ---
+  
 
     async function carregarDestaques() {
         const carouselInner = document.querySelector('#destaques-carousel .carousel-inner');
@@ -14,7 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const response = await fetch(`${API_BASE_URL}/destaques`);
             
-            // Se der erro (ex: 404), usa banner padrão
+            
             if (!response.ok) throw new Error('API Destaques indisponível');
 
             const destaques = await response.json();
@@ -37,7 +36,7 @@ document.addEventListener('DOMContentLoaded', () => {
             `).join('');
 
         } catch (error) {
-            // Banner padrão caso não tenha destaques
+           
             carouselInner.innerHTML = `
                 <div class="carousel-item active">
                     <img src="https://via.placeholder.com/1200x400/3E2B22/FFFFFF?text=Bem-vindo+ao+Vale+das+Artes" class="d-block w-100" alt="Banner Padrão">
@@ -57,8 +56,6 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!response.ok) throw new Error('Erro ao buscar produtos');
 
             const produtos = await response.json();
-
-            // Filtra produtos ativos
             const produtosExibir = produtos.filter(p => p.ativo !== false);
 
             if (produtosExibir.length === 0) {
@@ -78,17 +75,15 @@ document.addEventListener('DOMContentLoaded', () => {
         const preco = produto.preco ? produto.preco.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) : 'R$ 0,00';
         const img = produto.fotoUrl || 'https://via.placeholder.com/300?text=Sem+Foto';
         
-        // --- LÓGICA DO ARTESÃO (Baseada no seu DTO) ---
         let nomeArtesao = 'Artesão Parceiro';
         let idArtesao = null;
 
-        // O DTO retorna um objeto "artista"
+    
         if (produto.artista) {
             nomeArtesao = produto.artista.nome || nomeArtesao;
             idArtesao = produto.artista.id;
         }
 
-        // Cria o HTML do link ou apenas texto
         let htmlArtesao;
         if (idArtesao) {
             htmlArtesao = `<a href="perfil-artesao.html?id=${idArtesao}" class="link-artesao" title="Ver perfil">${nomeArtesao}</a>`;

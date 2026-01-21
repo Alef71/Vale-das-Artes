@@ -5,16 +5,13 @@ public class LoginResponseDTO {
     private final String mensagem;
     private final String token; 
     private final String role; 
-    private final Long userId; // <-- 1. CAMPO ADICIONADO
+    private final Long userId; 
 
-    /**
-     * Construtor atualizado para incluir a 'role' E 'userId'
-     */
-    public LoginResponseDTO(String mensagem, String token, String role, Long userId) { // <-- 2. PARÂMETRO 'userId' ADICIONADO
+    public LoginResponseDTO(String mensagem, String token, String role, Long userId) { 
         this.mensagem = mensagem;
         this.token = token;
         this.role = role;
-        this.userId = userId; // <-- 3. ATRIBUIÇÃO ADICIONADA
+        this.userId = userId; 
     }
 
     
@@ -22,6 +19,6 @@ public class LoginResponseDTO {
     public String getToken() { return token; }
     public String getRole() { return role; } 
     
-    // 4. GETTER ADICIONADO
+    
     public Long getUserId() { return userId; }
 }
