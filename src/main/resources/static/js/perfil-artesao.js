@@ -1,136 +1,132 @@
-/*
- * js/perfil-artesao.js
- * (VERSÃO ATUALIZADA - Exibição pública)
- */
-
-const API_BASE_URL = 'http://localhost:8080/api';
-
-// Formata valor para Real (R$)
-const formatarMoeda = (valor) => {
-    return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-};
-
-// Gera o HTML de um único card de produto
-const criarCardProduto = (produto, nomeArtesao) => {
-    // Foto do produto ou placeholder
-    const imagemSrc = produto.fotoUrl || 'https://via.placeholder.com/300?text=Sem+Foto';
-    const urlDetalhe = `produto-detalhe.html?id=${produto.id}`; 
-    const nomeArtesaoExibido = nomeArtesao || 'Artesão';
-
-    return `
-        <div class="card-produto">
-            <a href="${urlDetalhe}">
-                <img 
-                    src="${imagemSrc}" 
-                    alt="Produto: ${produto.nome}" 
-                    loading="lazy"
-                    onerror="this.onerror=null; this.src='https://via.placeholder.com/300?text=Sem+Foto';"
-                >
-            </a>
-            <div class="card-body">
-                <h3 class="card-title">${produto.nome}</h3>
-                <p class="card-artesao">Por: ${nomeArtesaoExibido}</p>
-                <p class="card-preco">${formatarMoeda(produto.preco)}</p>
-                <a href="${urlDetalhe}" class="btn-comprar">Ver Detalhes</a>
-            </div>
-        </div>
-    `;
-};
-
-// Preenche os dados do topo da página (Foto, Nome, Bio)
-const preencherInfoPerfil = (artista) => {
-    
-    // Nome e Ateliê
-    document.getElementById('nome-artesao').textContent = artista.nome || 'Artesão';
-    document.getElementById('nome-atelie').textContent = artista.nomeEmpresa || 'Ateliê do Artesão';
-    
-    // Biografia com fallback
-    const biografiaConteudo = artista.biografia 
-        ? artista.biografia 
-        : `Olá! Sou ${artista.nome}, artesão no Vale das Artes. Confira meus produtos abaixo.`; 
-        
-    document.getElementById('biografia-artesao').textContent = biografiaConteudo;
-
-    // Título da seção de produtos
-    const tituloSecao = document.querySelector('#produtos-do-artesao h2');
-    if(tituloSecao) tituloSecao.textContent = `Peças criadas por ${artista.nome || 'este artesão'}`;
-    
-    // Foto do Perfil
-    const imgElement = document.getElementById('img-artesao');
-    if (imgElement) {
-        if (artista.fotoUrl) {
-            // Adiciona timestamp para evitar cache antigo
-            imgElement.src = `${artista.fotoUrl}?t=${new Date().getTime()}`;
-        } else {
-            // Gera avatar com iniciais se não tiver foto
-            imgElement.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(artista.nome || 'A')}&background=ddd&color=333&size=200`;
-        }
-    }
-};
-
-// Função Principal
-const carregarPerfil = async () => {
+document.addEventListener('DOMContentLoaded', () => {
+    const API_BASE_URL = 'http://localhost:8080/api';
     const params = new URLSearchParams(window.location.search);
-    const artistaId = params.get('id'); 
-    
-    const gridProdutos = document.querySelector('.grid-produtos');
-    const mainContent = document.querySelector('main');
+    const artistaId = params.get('id');
 
-    // Validação inicial
-    if (!artistaId) {
-        mainContent.innerHTML = '<div style="text-align:center; padding:50px;"><h2>Erro: Link inválido. Falta o ID do artesão.</h2></div>';
-        return;
+    // Elementos da DOM
+    const gridProdutos = document.getElementById('grid-produtos');
+    const mainContent = document.querySelector('main');
+    const contadorEl = document.getElementById('contador-produtos');
+
+    // Inicia
+    carregarPerfil();
+
+    async function carregarPerfil() {
+        if (!artistaId) return;
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/artistas/${artistaId}`);
+            if (!response.ok) {
+                if(mainContent) mainContent.innerHTML = "<h2 style='text-align:center; padding:50px;'>Artesão não encontrado</h2>";
+                return;
+            }
+
+            const artista = await response.json();
+            
+            // 1. Preenche Topo
+            preencherInfoPerfil(artista);
+
+            // 2. Preenche Produtos
+            const todosProdutos = artista.produtos || [];
+            const produtosAtivos = todosProdutos.filter(p => p.ativo === true);
+
+            // Atualiza contador
+            if (contadorEl) contadorEl.textContent = `${produtosAtivos.length} ITENS`;
+
+            if (gridProdutos) {
+                if (produtosAtivos.length === 0) {
+                    gridProdutos.innerHTML = `<p class="loading-msg">Nenhuma peça disponível no momento.</p>`;
+                    return;
+                }
+
+                let html = '';
+                produtosAtivos.forEach(produto => {
+                    html += criarCardProduto(produto); 
+                });
+                gridProdutos.innerHTML = html;
+            }
+
+        } catch (error) {
+            console.error("Erro:", error);
+            if (gridProdutos) gridProdutos.innerHTML = "<p class='loading-msg'>Erro de conexão.</p>";
+        }
     }
 
-    // Estado de carregamento
-    gridProdutos.innerHTML = '<p style="text-align:center; color:#666;">Carregando vitrine...</p>';
-
-    try {
-        console.log(`Buscando dados do artesão ID: ${artistaId}...`);
+    function preencherInfoPerfil(artista) {
+        document.getElementById('nome-artesao').textContent = artista.nome || 'Artesão';
         
-        // Requisição ao Backend
-        const response = await fetch(`${API_BASE_URL}/artistas/${artistaId}`);
-
-        if (response.status === 404) {
-             mainContent.innerHTML = `<div style="text-align:center; padding:50px;"><h2>Ops! Artesão não encontrado.</h2><p>O link pode estar quebrado ou o usuário não existe mais.</p></div>`;
-             return;
-        }
-        if (!response.ok) {
-            throw new Error(`Erro API: ${response.status}`);
-        }
-
-        const artista = await response.json();
-
-        // 1. Preenche o cabeçalho do perfil
-        preencherInfoPerfil(artista);
-
-        // 2. Processa os produtos
-        // Assume que a API retorna os produtos dentro do objeto artista (artista.produtos)
-        // Se a API retornar produtos em endpoint separado, avise para ajustarmos.
-        const todosProdutos = artista.produtos || []; 
+        // Texto do Ateliê
+        const atelieTxt = artista.nomeEmpresa ? `Ateliê ${artista.nomeEmpresa}` : 'Ateliê de Artes';
+        document.getElementById('texto-atelie').textContent = atelieTxt;
         
-        // FILTRO IMPORTANTÍSSIMO: Mostrar apenas produtos ATIVOS
-        const produtosAtivos = todosProdutos.filter(p => p.ativo === true);
+        // Bio
+        document.getElementById('biografia-artesao').textContent = artista.biografia || `Olá! Bem-vindo ao meu espaço criativo.`;
 
-        if (produtosAtivos.length === 0) {
-            gridProdutos.innerHTML = '<p class="aviso" style="grid-column: 1/-1; text-align: center; padding: 20px; background: #f9f9f9;">Este artesão ainda não possui produtos ativos à venda no momento.</p>';
-            return;
+        // Foto
+        const imgElement = document.getElementById('img-artesao');
+        if (imgElement) {
+            imgElement.src = artista.fotoUrl 
+                ? `${artista.fotoUrl}?t=${new Date().getTime()}`
+                : `https://ui-avatars.com/api/?name=${encodeURIComponent(artista.nome)}&background=fff&color=3E2B22&size=300`;
         }
 
-        // 3. Gera os cards
-        const cardsHTML = produtosAtivos.map(produto => criarCardProduto(produto, artista.nome)).join('');
-        gridProdutos.innerHTML = cardsHTML;
+        // Configuração Botão WhatsApp
+        const btnZap = document.getElementById('btn-whatsapp');
+        if (btnZap) {
+            if (artista.telefone) {
+                btnZap.onclick = () => {
+                    const num = artista.telefone.replace(/\D/g, '');
+                    window.open(`https://wa.me/55${num}`, '_blank');
+                };
+            } else {
+                btnZap.style.display = 'none'; // Esconde se não tiver telefone
+            }
+        }
 
-    } catch (error) {
-        console.error('Falha ao carregar perfil:', error);
-        mainContent.innerHTML = `
-            <div style="text-align:center; padding:50px; color: #d35400;">
-                <h2>Erro de Conexão</h2>
-                <p>Não foi possível carregar o perfil. Verifique se o servidor está rodando.</p>
+        // Configuração Botão Seguir (Visual)
+        const btnSeguir = document.getElementById('btn-seguir');
+        if (btnSeguir) {
+            btnSeguir.onclick = () => {
+                const icon = btnSeguir.querySelector('i');
+                if (icon.classList.contains('far')) {
+                    icon.classList.replace('far', 'fas');
+                    btnSeguir.style.color = '#e91e63'; // Rosa ao curtir
+                    btnSeguir.style.borderColor = '#e91e63';
+                } else {
+                    icon.classList.replace('fas', 'far');
+                    btnSeguir.style.color = '';
+                    btnSeguir.style.borderColor = '';
+                }
+            };
+        }
+    }
+
+    // --- CARD DE PRODUTO ---
+    function criarCardProduto(produto) {
+        const capa = produto.fotoUrl || 'https://via.placeholder.com/300?text=Sem+Foto';
+        const preco = produto.preco ? produto.preco.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) : '0,00';
+        const urlDetalhe = `produto-detalhe.html?id=${produto.id}`;
+
+        return `
+            <div onclick="window.location.href='${urlDetalhe}'" 
+                 style="background: #fff; border-radius: 12px; overflow: hidden; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.05); transition: transform 0.2s;">
+                
+                <div style="aspect-ratio: 1/1; overflow: hidden;">
+                    <img src="${capa}" alt="${produto.nome}" style="width: 100%; height: 100%; object-fit: cover;">
+                </div>
+                
+                <div style="padding: 12px;">
+                    <p style="font-size: 0.7rem; color: #888; text-transform: uppercase; margin-bottom: 4px;">
+                        ${produto.categoria || 'Artesanato'}
+                    </p>
+                    <h4 style="font-size: 0.95rem; color: #3E2B22; margin-bottom: 8px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                        ${produto.nome}
+                    </h4>
+                    <span style="font-size: 1rem; font-weight: 700; color: #3E2B22;">
+                        R$ ${preco}
+                    </span>
+                </div>
             </div>
         `;
     }
-};
-
-// Inicia quando a tela carrega
-document.addEventListener('DOMContentLoaded', carregarPerfil);
+});

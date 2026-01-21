@@ -1,453 +1,287 @@
-/*
- * js/dashboard-admin.js
- *
- * VERSÃO 6.0: 
- * - Criação de destaque agora envia foto junto (FormData) igual ao Artesão.
- */
+/* js/dashboard-admin.js */
 
-console.log("LOG: dashboard-admin.js (v6.0 - Unified Upload) CARREGADO!");
+console.log("LOG: dashboard-admin.js INICIADO");
 
 document.addEventListener("DOMContentLoaded", function() {
 
-    // --- Variáveis de Estado ---
-    let currentDestaqueId = null;
-    let destaqueAtualTemFoto = false;
+    // --- Helpers Básicos ---
+    function getToken() { 
+        return localStorage.getItem('userToken'); 
+    }
+    
+    // Tenta pegar a URL global, senão usa padrão
+    const API_BASE = (typeof API_URL !== 'undefined') ? API_URL : 'http://localhost:8080';
 
-    // --- Helpers ---
-    function getToken() { return localStorage.getItem('userToken'); }
-    // OBS: Certifique-se que API_URL está definida no main.js, senão use '/api'
-    const API_BASE = (typeof API_URL !== 'undefined') ? API_URL : '/api';
-
-    // --- Verificação de Login ---
+    // --- 1. Verificação de Segurança (Login) ---
     async function checkLoginAndLoadData() {
         const token = getToken();
-        const role = localStorage.getItem('userRole');
+        // Verifica se é Admin (ajuste a role conforme seu backend: 'ROLE_ADMIN' ou 'ADMIN')
+        const role = localStorage.getItem('userRole'); 
 
-        if (!token || role !== 'ROLE_ADMIN') {
-            console.warn("Acesso negado.");
-            alert("Acesso negado. Administrador requerido.");
-            localStorage.clear();
-            window.location.href = '/login.html';
+        if (!token || !role || !role.includes('ADMIN')) {
+            console.warn("Acesso negado: Usuário não é admin ou não está logado.");
+            alert("Área restrita para Administradores.");
+            window.location.href = 'login.html';
             return;
         }
         
-        // Carrega os dados iniciais
+        console.log("Login verificado. Carregando dados...");
+        
+        // Carrega todas as listas
         loadDestaques();
+        loadAvaliacoes();
+        loadUsuarios();
+    }
+
+    function loadUsuarios() {
         loadArtistasPendentes();
-        loadTodosArtistas(); 
+        loadTodosArtistas();
         loadClientes();
     }
 
-    // --- Seletores do DOM ---
-    const formNovoDestaque = document.getElementById('form-novo-destaque');
-    const novoDestaqueStatus = document.getElementById('novo-destaque-status');
-    const listaDestaquesAtivos = document.getElementById('lista-destaques-ativos');
-    const listaArtesaosPendentes = document.getElementById('lista-artesaos-pendentes');
-    const listaArtesaosTodos = document.getElementById('lista-artesaos-todos'); 
-    const listaClientes = document.getElementById('lista-clientes');
+    // --- 2. Requisições Genéricas (Fetch Wrapper) ---
+    async function apiClient(endpoint, method = 'GET', body = null) {
+        const token = getToken();
+        const headers = { 'Authorization': `Bearer ${token}` };
+        if (body && !(body instanceof FormData)) {
+            headers['Content-Type'] = 'application/json';
+        }
 
-    // Modal de Edição
-    const destaqueModal = document.getElementById('editDestaqueModal');
-    const editDestaqueIdInput = document.getElementById('edit-destaque-id');
-    const formEditarDestaque = document.getElementById('form-editar-destaque');
-    const closeButtons = document.querySelectorAll('.close-button, #btn-fechar-destaque-modal');
+        const config = {
+            method: method,
+            headers: headers
+        };
 
-    // Menu de Foto (Para o Modal de Edição)
-    const destaqueFotoPreview = document.getElementById('destaque-foto-preview-menu');
-    const inputFotoDestaque = document.getElementById('input-foto-destaque');
-    const destaqueFotoMenu = document.getElementById('foto-options-menu-destaque');
-    const uploadStatusDestaque = document.getElementById('upload-status-destaque');
-    
-    // Botões do Menu de Foto
-    const btnAdicionarFotoDestaque = document.getElementById('btn-adicionar-foto-destaque');
-    const btnAtualizarFotoDestaque = document.getElementById('btn-atualizar-foto-destaque');
-    const btnRemoverFotoDestaque = document.getElementById('btn-remover-foto-destaque');
-    const btnCancelarFotoDestaque = document.getElementById('btn-cancelar-foto-destaque');
+        if (body) {
+            config.body = (body instanceof FormData) ? body : JSON.stringify(body);
+        }
 
-
-    // ===================================================================
-    // --- GESTÃO DE DESTAQUES (CRUD) ---
-    // ===================================================================
-
-    async function loadDestaques() {
-        if (!listaDestaquesAtivos) return;
-        
-        listaDestaquesAtivos.innerHTML = '<p>Carregando destaques...</p>';
         try {
-            const destaques = await apiClient('/destaques', 'GET');
+            const response = await fetch(`${API_BASE}${endpoint}`, config);
+            if (!response.ok) throw new Error(`Erro na API: ${response.status}`);
+            
+            // Se for DELETE ou PUT sem retorno, não tenta fazer json()
+            if (response.status === 204) return null;
+            
+            return await response.json();
+        } catch (error) {
+            console.error(`Erro em ${endpoint}:`, error);
+            throw error;
+        }
+    }
 
-            if (destaques.length === 0) {
-                listaDestaquesAtivos.innerHTML = '<p>Nenhum destaque cadastrado.</p>';
+    // =================================================================
+    // GESTÃO DE AVALIAÇÕES (MODERAÇÃO)
+    // =================================================================
+    const listaAvaliacoes = document.getElementById('lista-avaliacoes-todas');
+
+    async function loadAvaliacoes() {
+        if(!listaAvaliacoes) return;
+        listaAvaliacoes.innerHTML = '<p>Buscando avaliações...</p>';
+
+        try {
+            // Ajuste a rota conforme seu backend. Pode ser /avaliacoes ou /produtos/avaliacoes/todas
+            const data = await apiClient('/avaliacoes', 'GET'); 
+            
+            if (!data || data.length === 0) {
+                listaAvaliacoes.innerHTML = '<p>Nenhuma avaliação encontrada.</p>';
                 return;
             }
 
-            // Gera o HTML da lista
-            listaDestaquesAtivos.innerHTML = destaques.map(destaque => `
-                <div class="destaque-item ${destaque.ativo ? 'ativo' : 'inativo'}">
-                    <img src="${destaque.fotoUrl || 'https://via.placeholder.com/100x50?text=Sem+Foto'}" alt="Preview">
-                    <div style="flex: 1;">
-                        <strong>ID: ${destaque.id} - ${destaque.titulo}</strong>
-                        <p style="margin: 5px 0; font-size: 0.9rem; color: #666;">Link: ${destaque.link || 'N/A'}</p>
-                        <p style="font-size: 0.8rem;">Status: ${destaque.ativo ? 'ATIVO' : 'INATIVO'}</p>
+            listaAvaliacoes.innerHTML = data.map(av => `
+                <div class="item-lista avaliacao-box">
+                    <div class="item-conteudo">
+                        <strong>Produto ID: ${av.produtoId}</strong> | Nota: ${av.nota}/5
+                        <div class="comentario-texto">"${av.comentario || 'Sem comentário'}"</div>
+                        <small>Por: ${av.nomeCliente || 'Cliente'} (ID: ${av.clienteId})</small>
                     </div>
-                    <div class="destaque-acoes">
-                        <button class="btn btn-primary btn-editar-destaque" data-id="${destaque.id}" style="margin-right: 5px;">Editar</button>
-                        <button class="btn btn-danger btn-deletar-destaque" data-id="${destaque.id}">Deletar</button>
+                    <div class="item-acoes">
+                        <button class="btn-danger btn-del-avaliacao" data-id="${av.id}">Excluir</button>
                     </div>
                 </div>
             `).join('');
 
-            // Adiciona eventos aos botões criados dinamicamente
-            document.querySelectorAll('.btn-editar-destaque').forEach(btn => {
-                btn.addEventListener('click', async (e) => {
-                    const id = e.target.dataset.id;
-                    // Tenta pegar do array local ou busca na API
-                    const destaque = destaques.find(d => d.id == id) || await apiClient(`/destaques/${id}`, 'GET');
-                    openDestaqueModal(destaque);
-                });
-            });
-
-            document.querySelectorAll('.btn-deletar-destaque').forEach(btn => {
-                btn.addEventListener('click', (e) => handleDeletarDestaque(e.target.dataset.id));
+            // Listeners
+            document.querySelectorAll('.btn-del-avaliacao').forEach(btn => {
+                btn.addEventListener('click', (e) => deletarAvaliacao(e.target.dataset.id));
             });
 
         } catch (error) {
-            console.error(error);
-            listaDestaquesAtivos.innerHTML = '<p>Erro ao carregar destaques.</p>';
+            listaAvaliacoes.innerHTML = '<p style="color:red">Erro ao carregar avaliações.</p>';
         }
     }
 
-    // --- NOVA FUNÇÃO DE CRIAR DESTAQUE (Texto + Foto juntos) ---
-    async function handleCriarDestaque(e) {
-        e.preventDefault();
+    async function deletarAvaliacao(id) {
+        if(!confirm("Tem certeza que deseja apagar este comentário?")) return;
+        try {
+            await apiClient(`/avaliacoes/${id}`, 'DELETE');
+            alert("Avaliação removida!");
+            loadAvaliacoes(); // Cascata: Recarrega a lista
+        } catch (e) {
+            alert("Erro ao excluir avaliação.");
+        }
+    }
+
+
+    // =================================================================
+    // GESTÃO DE USUÁRIOS (ARTESÃOS E CLIENTES)
+    // =================================================================
+    
+    // --- Artesãos Pendentes ---
+    async function loadArtistasPendentes() {
+        const div = document.getElementById('lista-artesaos-pendentes');
+        if(!div) return;
         
-        if(novoDestaqueStatus) novoDestaqueStatus.textContent = 'Publicando...';
-        
-        const token = getToken();
-        // Cria o FormData com todos os inputs do formulário (titulo, link E foto)
-        const formData = new FormData(e.target);
+        try {
+            const users = await apiClient('/artistas/pendentes'); // Rota hipotética
+            if(users.length === 0) { div.innerHTML = '<p>Nenhum pendente.</p>'; return; }
+
+            div.innerHTML = users.map(u => `
+                <div class="item-lista">
+                    <div class="item-conteudo">
+                        <strong>${u.nome}</strong><br>Email: ${u.email}
+                    </div>
+                    <div class="item-acoes">
+                        <button class="btn-success btn-aprovar" data-id="${u.id}">Aprovar</button>
+                        <button class="btn-danger btn-reprovar" data-id="${u.id}">Reprovar</button>
+                    </div>
+                </div>
+            `).join('');
+
+            // Binds
+            document.querySelectorAll('.btn-aprovar').forEach(b => 
+                b.addEventListener('click', () => alterarStatusArtista(b.dataset.id, 'APROVADO')));
+            
+            document.querySelectorAll('.btn-reprovar').forEach(b => 
+                b.addEventListener('click', () => alterarStatusArtista(b.dataset.id, 'REPROVADO')));
+
+        } catch (e) { div.innerHTML = '<p>Erro ao carregar pendentes.</p>'; }
+    }
+
+    async function alterarStatusArtista(id, novoStatus) {
+        try {
+            // Ajuste para PUT ou PATCH conforme seu backend
+            await apiClient(`/artistas/${id}/status`, 'PATCH', { status: novoStatus });
+            loadArtistasPendentes();
+            loadTodosArtistas();
+        } catch(e) { alert('Erro ao atualizar status'); }
+    }
+
+    // --- Todos os Artesãos (Deletar em Cascata) ---
+    async function loadTodosArtistas() {
+        const div = document.getElementById('lista-artesaos-todos');
+        if(!div) return;
 
         try {
-            // Usa fetch nativo para enviar Multipart/Form-Data
-            const response = await fetch(`${API_BASE}/destaques`, {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                    // Não adicionar Content-Type aqui, o browser adiciona boundary automaticamente
-                },
-                body: formData
-            });
+            const users = await apiClient('/artistas');
+            div.innerHTML = users.map(u => `
+                <div class="item-lista">
+                    <div class="item-conteudo">
+                        <strong>${u.nome}</strong> (ID: ${u.id}) - Status: ${u.status}
+                    </div>
+                    <div class="item-acoes">
+                        <button class="btn-danger btn-del-artista" data-id="${u.id}">Excluir Conta</button>
+                    </div>
+                </div>
+            `).join('');
 
-            if (response.ok) {
-                const novoDestaque = await response.json();
-                if(novoDestaqueStatus) {
-                    novoDestaqueStatus.textContent = `Sucesso! Destaque ID ${novoDestaque.id} criado.`;
-                    novoDestaqueStatus.style.color = 'green';
-                }
+            document.querySelectorAll('.btn-del-artista').forEach(b => 
+                b.addEventListener('click', () => deletarUsuario(b.dataset.id, 'artistas')));
+        } catch(e) { console.log(e); }
+    }
+
+    // --- Clientes (Deletar em Cascata) ---
+    async function loadClientes() {
+        const div = document.getElementById('lista-clientes');
+        if(!div) return;
+
+        try {
+            const users = await apiClient('/clientes');
+            div.innerHTML = users.map(u => `
+                <div class="item-lista">
+                    <div class="item-conteudo">
+                        <strong>${u.nome}</strong> (ID: ${u.id})
+                    </div>
+                    <div class="item-acoes">
+                        <button class="btn-danger btn-del-cliente" data-id="${u.id}">Excluir Conta</button>
+                    </div>
+                </div>
+            `).join('');
+
+            document.querySelectorAll('.btn-del-cliente').forEach(b => 
+                b.addEventListener('click', () => deletarUsuario(b.dataset.id, 'clientes')));
+        } catch(e) { console.log(e); }
+    }
+
+    // Função genérica de delete (Cascata)
+    async function deletarUsuario(id, tipo) {
+        // tipo = 'clientes' ou 'artistas'
+        if(!confirm(`ATENÇÃO: Deletar este usuário apagará também seus dados (pedidos/produtos)?`)) return;
+
+        try {
+            await apiClient(`/${tipo}/${id}`, 'DELETE');
+            alert("Usuário deletado com sucesso.");
+            // Recarrega tudo para garantir que dados antigos sumiram
+            loadUsuarios(); 
+        } catch (e) {
+            alert("Erro ao deletar usuário.");
+        }
+    }
+
+
+    // =================================================================
+    // GESTÃO DE DESTAQUES
+    // =================================================================
+    const listaDestaques = document.getElementById('lista-destaques-ativos');
+    const formNovoDestaque = document.getElementById('form-novo-destaque');
+
+    async function loadDestaques() {
+        if(!listaDestaques) return;
+        try {
+            const destaques = await apiClient('/destaques');
+            listaDestaques.innerHTML = destaques.map(d => `
+                <div class="item-lista">
+                    <div class="item-conteudo" style="display:flex; align-items:center; gap:10px;">
+                        <img src="${d.fotoUrl || '#'}" style="width:60px; height:40px; object-fit:cover; border-radius:4px;">
+                        <div>
+                            <strong>${d.titulo}</strong>
+                            <div style="font-size:0.8em; color:#777;">${d.link || 'Sem link'}</div>
+                        </div>
+                    </div>
+                    <div class="item-acoes">
+                        <button class="btn-danger btn-del-destaque" data-id="${d.id}">Remover</button>
+                    </div>
+                </div>
+            `).join('');
+
+            document.querySelectorAll('.btn-del-destaque').forEach(b =>
+                b.addEventListener('click', (e) => deletarDestaque(e.target.dataset.id)));
+        } catch(e) {
+            listaDestaques.innerHTML = '<p>Erro ao carregar destaques.</p>';
+        }
+    }
+
+    if(formNovoDestaque) {
+        formNovoDestaque.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            try {
+                await apiClient('/destaques', 'POST', formData);
+                alert('Destaque criado!');
                 formNovoDestaque.reset();
                 loadDestaques();
-            } else {
-                const err = await response.json().catch(() => ({}));
-                throw new Error(err.message || 'Falha ao criar destaque.');
-            }
-        } catch (error) {
-            console.error(error);
-            if(novoDestaqueStatus) {
-                novoDestaqueStatus.textContent = 'Erro: ' + error.message;
-                novoDestaqueStatus.style.color = 'red';
-            }
-        }
+            } catch(e) { alert('Erro ao criar destaque'); }
+        });
     }
 
-    async function handleDeletarDestaque(id) {
-        if (!confirm(`Tem certeza que deseja deletar o destaque ID ${id}?`)) return;
+    async function deletarDestaque(id) {
+        if(!confirm("Remover este destaque?")) return;
         try {
             await apiClient(`/destaques/${id}`, 'DELETE');
-            alert('Destaque deletado.');
             loadDestaques();
-        } catch (error) {
-            alert('Erro ao deletar destaque.');
-        }
+        } catch(e) { alert('Erro ao deletar'); }
     }
 
-    async function handleEditarDestaqueSubmit(e) {
-        e.preventDefault();
-        const id = editDestaqueIdInput.value;
-        const body = {
-            titulo: document.getElementById('edit-destaque-titulo').value,
-            link: document.getElementById('edit-destaque-link').value,
-            ativo: document.getElementById('edit-destaque-ativo').checked
-        };
-        try {
-            await apiClient(`/destaques/${id}`, 'PUT', body);
-            alert('Destaque atualizado!');
-            closeDestaqueModal();
-            loadDestaques();
-        } catch (error) {
-            alert('Erro ao salvar alterações.');
-        }
-    }
-
-    // ===================================================================
-    // --- LÓGICA DO MODAL (ABRIR/FECHAR) ---
-    // ===================================================================
-
-    function openDestaqueModal(destaque) {
-        if (!destaque) return;
-        
-        currentDestaqueId = destaque.id;
-        
-        // Verifica se tem foto para configurar o menu
-        if (destaque.fotoUrl && destaque.fotoUrl.trim() !== "") {
-            destaqueAtualTemFoto = true;
-            destaqueFotoPreview.src = destaque.fotoUrl;
-        } else {
-            destaqueAtualTemFoto = false;
-            destaqueFotoPreview.src = 'https://via.placeholder.com/200?text=Sem+Foto';
-        }
-
-        // Preenche campos do formulário
-        document.getElementById('edit-destaque-id-display').textContent = destaque.id;
-        document.getElementById('edit-destaque-id').value = destaque.id;
-        document.getElementById('edit-destaque-titulo').value = destaque.titulo;
-        document.getElementById('edit-destaque-link').value = destaque.link || '';
-        document.getElementById('edit-destaque-ativo').checked = destaque.ativo;
-        
-        // Reseta estados visuais
-        if(uploadStatusDestaque) uploadStatusDestaque.textContent = '';
-        if(inputFotoDestaque) inputFotoDestaque.value = null; 
-        fecharMenuDestaque(); 
-        
-        // Exibe o modal
-        destaqueModal.style.display = 'flex'; 
-    }
-
-    function closeDestaqueModal() {
-        destaqueModal.style.display = 'none';
-        currentDestaqueId = null;
-        fecharMenuDestaque();
-    }
-
-
-    // ===================================================================
-    // --- LÓGICA DO MENU DE FOTO (MODAL DE EDIÇÃO) ---
-    // ===================================================================
-
-    function abrirMenuDestaque(e) {
-        if (e) {
-            e.stopPropagation();
-            e.preventDefault();
-        }
-
-        if (!destaqueFotoMenu) return; 
-
-        if (destaqueAtualTemFoto) {
-            btnAdicionarFotoDestaque.style.display = 'none';
-            btnAtualizarFotoDestaque.style.display = 'block';
-            btnRemoverFotoDestaque.style.display = 'block';
-        } else {
-            btnAdicionarFotoDestaque.style.display = 'block';
-            btnAtualizarFotoDestaque.style.display = 'none';
-            btnRemoverFotoDestaque.style.display = 'none';
-        }
-        
-        destaqueFotoMenu.style.display = 'flex'; 
-    }
-
-    function fecharMenuDestaque(e) {
-        if (e) e.stopPropagation();
-        if(destaqueFotoMenu) destaqueFotoMenu.style.display = 'none';
-    }
-
-    function acionarInputDeArquivoDestaque() {
-        inputFotoDestaque.click(); 
-        fecharMenuDestaque();
-    }
-
-    async function handleUploadDestaqueSubmit() {
-        const file = inputFotoDestaque.files[0];
-        if (!file || !currentDestaqueId) return;
-
-        uploadStatusDestaque.textContent = 'Enviando...';
-        
-        const token = getToken();
-        const formData = new FormData();
-        formData.append('foto', file);
-
-        try {
-            const response = await fetch(`${API_BASE}/destaques/${currentDestaqueId}/foto`, {
-                method: 'POST',
-                headers: { 'Authorization': `Bearer ${token}` },
-                body: formData
-            });
-
-            if (response.ok) {
-                const destaqueAtualizado = await response.json();
-                destaqueFotoPreview.src = destaqueAtualizado.fotoUrl;
-                destaqueAtualTemFoto = true;
-                uploadStatusDestaque.textContent = 'Foto atualizada com sucesso!';
-                loadDestaques(); 
-            } else {
-                throw new Error('Falha no upload.');
-            }
-        } catch (error) {
-            console.error('Erro upload:', error);
-            uploadStatusDestaque.textContent = 'Erro ao enviar foto.';
-        } finally {
-            inputFotoDestaque.value = null;
-        }
-    }
-
-    async function handleRemoveDestaqueSubmit() {
-        if (!currentDestaqueId || !destaqueAtualTemFoto) return;
-        
-        if (!confirm('Tem certeza que deseja remover a foto?')) {
-            fecharMenuDestaque();
-            return;
-        }
-        
-        fecharMenuDestaque();
-        uploadStatusDestaque.textContent = 'Removendo...';
-        
-        try {
-            await apiClient(`/destaques/${currentDestaqueId}/foto`, 'DELETE');
-            
-            destaqueFotoPreview.src = 'https://via.placeholder.com/200?text=Sem+Foto';
-            destaqueAtualTemFoto = false;
-            uploadStatusDestaque.textContent = 'Foto removida.';
-            loadDestaques();
-        } catch (error) {
-            console.error('Erro remover:', error);
-            uploadStatusDestaque.textContent = 'Erro ao remover foto.';
-        }
-    }
-
-
-    // ===================================================================
-    // --- GESTÃO DE USUÁRIOS ---
-    // ===================================================================
-
-    async function loadArtistasPendentes() {
-        if (!listaArtesaosPendentes) return;
-        try {
-            const artistas = await apiClient('/artistas/pendentes', 'GET');
-            if (artistas.length === 0) {
-                listaArtesaosPendentes.innerHTML = '<p>Nenhum artesão pendente.</p>';
-                return;
-            }
-            listaArtesaosPendentes.innerHTML = artistas.map(a => `
-                <div class="user-item">
-                    <span>${a.nome} (ID: ${a.id}) - ${a.email}</span>
-                    <div class="user-acoes">
-                        <button class="btn btn-success btn-aprovar-artista" data-id="${a.id}">Aprovar</button>
-                        <button class="btn btn-warning btn-reprovar-artista" data-id="${a.id}">Reprovar</button>
-                    </div>
-                </div>`).join('');
-            
-            // Eventos
-            document.querySelectorAll('.btn-aprovar-artista').forEach(btn => 
-                btn.addEventListener('click', (e) => updateArtistaStatus(e.target.dataset.id, 'APROVADO')));
-            document.querySelectorAll('.btn-reprovar-artista').forEach(btn => 
-                btn.addEventListener('click', (e) => updateArtistaStatus(e.target.dataset.id, 'REPROVADO')));
-
-        } catch (e) { listaArtesaosPendentes.innerHTML = '<p>Erro ao carregar.</p>'; }
-    }
-
-    async function updateArtistaStatus(id, status) {
-        try {
-            await apiClient(`/artistas/${id}/status`, 'PATCH', { status: status });
-            alert(`Artista ${status} com sucesso.`);
-            loadArtistasPendentes(); 
-            loadTodosArtistas(); 
-        } catch (e) { alert('Erro ao atualizar status.'); }
-    }
-
-    async function loadTodosArtistas() {
-        if (!listaArtesaosTodos) return;
-        try {
-            const artistas = await apiClient('/artistas', 'GET');
-            if (artistas.length === 0) {
-                listaArtesaosTodos.innerHTML = '<p>Nenhum artesão cadastrado.</p>';
-                return;
-            }
-            listaArtesaosTodos.innerHTML = artistas.map(a => `
-                <div class="user-item">
-                    <span>${a.nome} (ID: ${a.id}) - Status: ${a.status || 'N/A'}</span>
-                    <div class="user-acoes">
-                        <button class="btn btn-danger btn-deletar-artista" data-id="${a.id}">Deletar</button>
-                    </div>
-                </div>`).join('');
-            
-            document.querySelectorAll('.btn-deletar-artista').forEach(btn => 
-                btn.addEventListener('click', (e) => handleDeletarArtista(e.target.dataset.id)));
-        } catch (e) { listaArtesaosTodos.innerHTML = '<p>Erro ao carregar lista.</p>'; }
-    }
-
-    async function handleDeletarArtista(id) {
-        if (!confirm(`Deletar artista ID ${id}?`)) return;
-        try {
-            await apiClient(`/artistas/${id}`, 'DELETE');
-            alert('Artista deletado.');
-            loadTodosArtistas(); 
-            loadArtistasPendentes(); 
-        } catch (error) { alert('Erro ao deletar artista.'); }
-    }
-
-    async function loadClientes() {
-        if (!listaClientes) return;
-        try {
-            const clientes = await apiClient('/clientes', 'GET');
-            if (clientes.length === 0) {
-                listaClientes.innerHTML = '<p>Nenhum cliente cadastrado.</p>';
-                return;
-            }
-            listaClientes.innerHTML = clientes.map(c => `
-                <div class="user-item">
-                    <span>${c.nome} (ID: ${c.id}) - ${c.email}</span>
-                    <div class="user-acoes">
-                        <button class="btn btn-danger btn-deletar-cliente" data-id="${c.id}">Deletar</button>
-                    </div>
-                </div>`).join('');
-            
-            document.querySelectorAll('.btn-deletar-cliente').forEach(btn => 
-                btn.addEventListener('click', (e) => handleDeletarCliente(e.target.dataset.id)));
-        } catch (e) { listaClientes.innerHTML = '<p>Erro ao carregar clientes.</p>'; }
-    }
-
-    async function handleDeletarCliente(id) {
-        if (!confirm(`Deletar cliente ID ${id}?`)) return;
-        try {
-            await apiClient(`/clientes/${id}`, 'DELETE');
-            alert('Cliente deletado.');
-            loadClientes();
-        } catch (error) { alert('Erro ao deletar cliente.'); }
-    }
-
-    // ===================================================================
-    // --- EVENT LISTENERS (VÍNCULOS) ---
-    // ===================================================================
-
-    // Formulários
-    if(formNovoDestaque) formNovoDestaque.addEventListener('submit', handleCriarDestaque);
-    if(formEditarDestaque) formEditarDestaque.addEventListener('submit', handleEditarDestaqueSubmit);
-    
-    // Modal Geral
-    closeButtons.forEach(btn => btn.addEventListener('click', closeDestaqueModal));
-    window.onclick = function(event) {
-        if (event.target == destaqueModal) closeDestaqueModal();
-    }
-
-    // Foto Menu (Apenas para o Modal de Edição)
-    const wrapper = document.querySelector('.foto-wrapper');
-    if (wrapper) wrapper.addEventListener('click', abrirMenuDestaque);
-    if (btnCancelarFotoDestaque) btnCancelarFotoDestaque.addEventListener('click', fecharMenuDestaque);
-    
-    if (btnAdicionarFotoDestaque) btnAdicionarFotoDestaque.addEventListener('click', acionarInputDeArquivoDestaque);
-    if (btnAtualizarFotoDestaque) btnAtualizarFotoDestaque.addEventListener('click', acionarInputDeArquivoDestaque);
-    
-    if (inputFotoDestaque) inputFotoDestaque.addEventListener('change', handleUploadDestaqueSubmit);
-    if (btnRemoverFotoDestaque) btnRemoverFotoDestaque.addEventListener('click', handleRemoveDestaqueSubmit);
-
-    // Inicialização
+    // Inicializa
     checkLoginAndLoadData();
 });

@@ -1,6 +1,21 @@
 /* --- HEADER --- */
 .navbar {
-    background: #2C241B; /* Fundo escuro */
+    /* 1. Cor de fundo (Marrom) */
+    background-color: #431f0f !important;
+
+    /* 2. IMAGEM: Tente com os dois pontos "../" se usar arquivo CSS separado */
+    /* Se não funcionar, apague os "../" e deixe só "images/..." */
+    background-image: url('../images/vale-header.png') !important;
+    
+    /* 3. Posição e Repetição */
+    background-position: top left !important;
+    background-repeat: repeat-x !important;
+    
+    /* 4. TAMANHO FIXO NA ALTURA */
+    /* Define 60px de altura para a faixa. A largura é automática */
+    background-size: auto 25px !important;
+    
+    /* Restante das configurações */
     padding: 10px 0;
     box-shadow: 0 4px 20px rgba(0,0,0,0.4);
     position: sticky;
@@ -19,17 +34,18 @@
 
 /* LOGO */
 .logo-header {
-    height: 80px; /* Ajuste conforme necessário */
+    height: 80px; 
+    max-width: 200px;
     width: auto;
 }
 
-/* ÁREA DE AÇÕES (Direita) */
+/* ÁREA DE AÇÕES */
 .navbar-actions {
     display: flex;
     align-items: center;
 }
 
-/* --- ESTILO BOTÃO ÚNICO (VISITANTE) --- */
+/* BOTÃO VISITANTE */
 .btn-login-unico {
     background-color: #9c8b75;
     color: #fff;
@@ -47,19 +63,19 @@
     transform: translateY(-2px);
 }
 
-/* --- ESTILO LOGADO --- */
+/* LOGADO */
 #auth-logado {
     display: flex;
     align-items: center;
-    gap: 20px; /* Espaço entre Foto, Sair e Sacola */
+    gap: 20px; 
 }
 
-/* FOTO DO PERFIL - FORMATO OVAL */
+/* FOTO DE PERFIL (MANTIDA OVAL/COMPRIDA) */
 .nav-avatar-img {
-    height: 50px;       /* Altura fixa */
-    width: 90px;        /* Largura maior para ficar "comprida" */
-    border-radius: 50px; /* Borda bem redonda cria o efeito oval */
-    object-fit: cover;  /* A imagem preenche o oval sem esticar */
+    height: 50px;       
+    width: 90px;         /* 90px deixa ela oval como você pediu */
+    border-radius: 50px; /* Borda arredondada completa */
+    object-fit: cover;  
     border: 2px solid #9c8b75;
     cursor: pointer;
     transition: transform 0.3s;
@@ -70,14 +86,15 @@
     border-color: #fff;
 }
 
-/* TEXTO "SAIR" */
+/* TEXTO SAIR */
 .btn-sair-texto {
     color: #bda88d;
     text-decoration: none;
     font-size: 1rem;
     font-weight: 500;
-    margin-right: 10px; /* Um pouco de espaço extra antes da sacola */
+    margin-right: 10px;
     transition: color 0.3s;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
 }
 
 .btn-sair-texto:hover {
@@ -85,10 +102,11 @@
     text-decoration: underline;
 }
 
-/* ÍCONE SACOLA */
+/* SACOLA */
 .btn-sacola-icon svg {
     display: block;
     transition: stroke 0.3s;
+    filter: drop-shadow(1px 1px 2px rgba(0,0,0,0.5));
 }
 
 .btn-sacola-icon:hover svg {

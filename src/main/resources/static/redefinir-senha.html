@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vale das Artes - Nova Senha</title>
+    
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/style-componente-header.css">
+    <link rel="stylesheet" href="css/style-componente-footer.css">
+    
+    <link rel="stylesheet" href="css/style-login.css">
+</head>
+<body>
+
+    <header id="header-placeholder"></header>
+
+    <main>
+        <section id="auth-card" style="justify-content: center; min-height: 80vh;">
+            
+            <div id="forms-side" style="width: 100%; max-width: 450px; margin: 0 auto; padding: 40px;">
+                
+                <div class="auth-view active">
+                    <div class="header-box">
+                        <h2>Redefinir Senha</h2>
+                        <p>Crie uma nova senha segura para sua conta.</p>
+                    </div>
+
+                    <form id="form-nova-senha">
+                        <div class="input-group">
+                            <label for="nova-senha">Nova Senha</label>
+                            <div class="input-wrapper">
+                                <i class="fas fa-lock"></i>
+                                <input type="password" id="nova-senha" name="novaSenha" required placeholder="Mínimo 6 caracteres">
+                            </div>
+                        </div>
+
+                        <div class="input-group">
+                            <label for="confirma-senha">Confirmar Senha</label>
+                            <div class="input-wrapper">
+                                <i class="fas fa-lock"></i>
+                                <input type="password" id="confirma-senha" name="confirmaSenha" required placeholder="Repita a senha">
+                            </div>
+                        </div>
+
+                        <div id="status-msg" style="margin-bottom: 15px; font-size: 0.9rem; text-align: center;"></div>
+
+                        <button type="submit" class="btn-primary">Salvar Nova Senha</button>
+                    </form>
+
+                    <div class="footer-link">
+                        <a href="login.html"><i class="fas fa-arrow-left"></i> Voltar para Login</a>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+    </main>
+
+    <footer id="footer-placeholder"></footer>
+
+    <script src="js/main.js"></script>
+    <script src="js/redefinir-senha.js"></script>
+</body>
+</html>

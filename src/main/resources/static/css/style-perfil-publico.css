@@ -1,139 +1,201 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap');
+
 :root {
-    --primary: #594a42;
-    --secondary: #117a65;
-    --bg-light: #f9f9f9;
-    --text: #333;
-    --white: #fff;
+    --cor-fundo: #EAE4D8;       /* Bege Fundo */
+    --cor-primaria: #3E2B22;    /* Marrom Escuro */
+    --cor-secundaria: #5A4A42;  /* Marrom Médio */
+    --cor-branco: #FFFFFF;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Montserrat', sans-serif;
 }
 
 body {
-    font-family: 'Segoe UI', sans-serif;
-    background-color: var(--bg-light);
-    color: var(--text);
-    margin: 0;
+    background-color: var(--cor-fundo);
+    color: var(--cor-primaria);
+    overflow-x: hidden;
 }
 
-/* Header Simples */
-.site-header {
-    background: var(--primary);
-    color: white;
-    padding: 15px 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-.btn-voltar { color: white; text-decoration: none; }
+#header-placeholder { height: 70px; }
 
-.container {
-    max-width: 1100px;
-    margin: 0 auto;
+/* --- Navegação Topo --- */
+.profile-nav {
     padding: 20px;
-}
-
-/* Área de Destaque do Perfil */
-.profile-hero {
-    background: linear-gradient(to bottom, #594a42 50%, #f9f9f9 50%);
-    padding-top: 40px;
-    padding-bottom: 20px;
-}
-
-.profile-card {
-    background: white;
-    border-radius: 12px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-    padding: 30px;
-    display: flex;
-    align-items: center;
-    gap: 30px;
-    max-width: 900px;
+    max-width: 800px;
     margin: 0 auto;
 }
 
-.profile-image img {
-    width: 180px;
+.btn-voltar {
+    text-decoration: none;
+    color: var(--cor-primaria);
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 1rem;
+}
+
+/* --- Container Geral --- */
+.container-central {
+    max-width: 600px; /* Estreito para focar no centro */
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* --- CARD DE PERFIL VERTICAL --- */
+.profile-card-centered {
+    display: flex;
+    flex-direction: column; /* Empilha: Foto em cima, texto embaixo */
+    align-items: center;    /* Centraliza tudo horizontalmente */
+    text-align: center;     /* Centraliza o texto */
+    margin-top: 10px;
+    margin-bottom: 40px;
+}
+
+/* 1. Foto Redonda */
+.profile-avatar-wrapper {
+    width: 180px;      /* Tamanho fixo */
     height: 180px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 5px solid white;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-}
-
-.profile-info h1 { margin: 0; color: var(--primary); font-size: 2rem; }
-.profile-info h3 { margin: 5px 0 15px 0; color: var(--secondary); font-weight: 500; }
-.bio { color: #666; line-height: 1.6; max-width: 600px; }
-
-.profile-tags { margin-top: 15px; }
-.tag {
-    background: #eee; padding: 5px 10px;
-    border-radius: 20px; font-size: 0.85rem; color: #555;
-    margin-right: 10px; display: inline-flex; align-items: center; gap: 5px;
-}
-
-/* Grid de Produtos */
-.section-title {
-    text-align: center;
-    margin: 50px 0 30px 0;
-    color: var(--primary);
-    font-size: 1.8rem;
-    position: relative;
-}
-.section-title::after {
-    content: ''; display: block; width: 60px; height: 3px;
-    background: var(--secondary); margin: 10px auto;
-}
-
-.products-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 25px;
-    padding-bottom: 60px;
-}
-
-/* Card Público de Produto */
-.product-card-public {
-    background: white;
-    border-radius: 10px;
+    border-radius: 50%; /* Faz ficar redondo */
     overflow: hidden;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-    transition: transform 0.3s;
+    border: 4px solid var(--cor-branco);
+    box-shadow: 0 8px 20px rgba(62, 43, 34, 0.15);
+    margin-bottom: 20px;
 }
 
-.product-card-public:hover { transform: translateY(-5px); }
-
-.card-img-wrapper {
-    height: 220px; overflow: hidden;
+.profile-avatar-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 
-.card-img-wrapper img {
-    width: 100%; height: 100%; object-fit: cover;
-    transition: transform 0.3s;
+/* 2. Informações */
+.profile-info-center {
+    width: 100%;
 }
 
-.product-card-public:hover .card-img-wrapper img { transform: scale(1.05); }
-
-.card-body { padding: 15px; text-align: center; }
-
-.category {
-    font-size: 0.75rem; text-transform: uppercase; color: #999;
-    letter-spacing: 1px;
+.profile-info-center h1 {
+    font-size: 1.8rem;
+    color: var(--cor-primaria);
+    margin-bottom: 5px;
+    font-weight: 700;
 }
 
-.card-body h4 { margin: 10px 0; font-size: 1.1rem; color: var(--text); }
-
-.price {
-    font-size: 1.2rem; font-weight: bold; color: var(--primary);
+.profile-info-center h3 {
+    font-size: 1rem;
+    color: var(--cor-secundaria);
+    font-style: italic;
+    font-weight: 400;
     margin-bottom: 15px;
 }
 
-.btn-buy {
-    width: 100%; background: var(--secondary); color: white;
-    border: none; padding: 10px; border-radius: 6px;
-    cursor: pointer; font-weight: bold; transition: 0.2s;
+.bio-text {
+    font-size: 0.95rem;
+    line-height: 1.5;
+    color: var(--cor-secundaria);
+    margin-bottom: 25px;
+    max-width: 400px; /* Evita que o texto fique muito largo */
+    margin-left: auto;
+    margin-right: auto;
 }
-.btn-buy:hover { background: #0e6655; }
 
-/* Mobile */
-@media (max-width: 768px) {
-    .profile-card { flex-direction: column; text-align: center; padding: 20px; }
-    .profile-hero { background: var(--bg-light); padding-top: 10px; }
+/* 3. Botões */
+.profile-actions {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    width: 100%;
+}
+
+.btn-primary, .btn-secondary {
+    padding: 12px 30px;
+    border-radius: 50px;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: 0.3s;
+    border: none;
+    min-width: 140px;
+}
+
+/* Botão WhatsApp (Marrom Escuro) */
+.btn-primary {
+    background-color: var(--cor-primaria);
+    color: var(--cor-branco);
+    box-shadow: 0 4px 10px rgba(62, 43, 34, 0.3);
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    opacity: 0.9;
+}
+
+/* Botão Seguir (Branco com borda) */
+.btn-secondary {
+    background-color: var(--cor-branco);
+    color: var(--cor-primaria);
+    border: 1px solid transparent;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+.btn-secondary:hover {
+    border-color: var(--cor-primaria);
+}
+
+/* --- SEÇÃO DE PRODUTOS --- */
+.products-section {
+    padding-top: 20px;
+    padding-bottom: 60px;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 20px;
+    border-bottom: 1px solid rgba(62, 43, 34, 0.1);
+    padding-bottom: 10px;
+}
+
+.section-header h3 {
+    color: var(--cor-primaria);
+    font-size: 1.3rem;
+    font-weight: 700;
+}
+
+.item-count {
+    font-size: 0.8rem;
+    color: var(--cor-secundaria);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.grid-imoveis {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* 2 Colunas lado a lado */
+    gap: 15px;
+}
+
+.loading-msg {
+    grid-column: 1/-1;
+    text-align: center;
+    color: var(--cor-secundaria);
+    font-style: italic;
+    margin-top: 20px;
+}
+
+/* Responsivo para telas grandes */
+@media (min-width: 768px) {
+    .grid-imoveis {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 25px;
+    }
 }

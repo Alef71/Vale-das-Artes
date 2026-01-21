@@ -1,31 +1,49 @@
 /* =========================================
-   Váriaveis de Tema e Cores
+   Váriaveis e Tema (Baseado no Padrão Auth)
    ========================================= */
 :root {
-    --primary-color: #594a42;       /* Marrom Terra */
-    --primary-light: #7a685e;
-    --secondary-color: #117a65;     /* Verde Artesanato */
-    --secondary-hover: #0e6655;
-    --accent-color: #d35400;        /* Laranja Barro */
-    --bg-body: #f4f7f6;             
-    --bg-card: #ffffff;
-    --text-color: #333333;
-    --text-muted: #777777;
-    --border-color: #e0e0e0;
-    --shadow-soft: 0 4px 15px rgba(0,0,0,0.05);
-    --radius-lg: 12px;
-    --radius-sm: 6px;
+    /* --- Paleta do Login (Source B) --- */
+    --bg-page: #E8DCCA;       /* Bege Fundo */
+    --bg-card: #2C241B;       /* Marrom Escuro (Cards) */
+    --bg-input: #3b3026;      /* Fundo de Inputs */
+    
+    --accent: #9c8b75;        /* Acento (Taupe/Roxo suave) */
+    --accent-hover: #bdaea0;  /* Acento mais claro para hover */
+    
+    --text-main: #f0f0f0;     /* Texto Principal (Claro) */
+    --text-muted: #a0a0a0;    /* Texto Secundário */
+    
+    --border-subtle: #4a3e35; /* Bordas sutis no tema escuro */
+    
+    /* --- Mapeamento para o Dashboard --- */
+    --primary-color: var(--text-main);  
+    --secondary-color: var(--accent);
+    --bg-body: var(--bg-page);
+    
+    /* Sombras e Arredondamento */
+    --shadow-soft: 0 10px 30px rgba(0,0,0,0.4); /* Sombra mais forte para contraste */
+    --radius-lg: 20px;
+    --radius-sm: 8px;
 }
 
+/* =========================================
+   Reset e Scrollbar
+   ========================================= */
 * { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* Scrollbar Bonita (Do seu padrão) */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: var(--bg-input); }
+::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--accent-hover); }
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background-color: var(--bg-body);
-    color: var(--text-color);
+    color: var(--text-main);
     line-height: 1.6;
     padding-bottom: 60px;
-    scroll-behavior: smooth; /* Rolagem suave ao clicar no menu */
+    scroll-behavior: smooth;
 }
 
 /* =========================================
@@ -46,25 +64,30 @@ body {
 }
 
 #dashboard-title {
-    color: var(--primary-color);
+    color: var(--bg-card); /* Título escuro no fundo bege para contraste */
     font-size: 1.8rem;
     margin-bottom: 5px;
+    font-weight: 700;
 }
 
-.subtitle { color: var(--text-muted); font-size: 0.95rem; }
+.subtitle { 
+    color: #5e5044; /* Tom intermediário para subtítulo no fundo bege */
+    font-size: 0.95rem; 
+    font-weight: 500;
+}
 
 .link-perfil-publico {
     text-decoration: none;
-    color: var(--secondary-color);
+    color: var(--bg-card);
     font-weight: 600;
-    border: 2px solid var(--secondary-color);
+    border: 2px solid var(--bg-card);
     padding: 8px 20px;
     border-radius: 20px;
     transition: all 0.3s ease;
 }
 .link-perfil-publico:hover {
-    background-color: var(--secondary-color);
-    color: #fff;
+    background-color: var(--bg-card);
+    color: var(--text-main);
 }
 
 /* Grid Layout */
@@ -86,6 +109,8 @@ body {
     text-align: center;
     position: sticky;
     top: 20px;
+    color: var(--text-main);
+    border: 1px solid var(--border-subtle);
 }
 
 .avatar-wrapper {
@@ -99,17 +124,17 @@ body {
     height: 120px;
     border-radius: 50%;
     object-fit: cover;
-    border: 4px solid #fff;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    border: 4px solid var(--bg-input); /* Borda escura para integrar */
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
 }
 
 #btn-camera-upload {
     position: absolute;
     bottom: 5px;
     right: 5px;
-    background-color: var(--accent-color);
+    background-color: var(--accent);
     color: white;
-    border: 2px solid #fff;
+    border: 2px solid var(--bg-card);
     border-radius: 50%;
     width: 36px;
     height: 36px;
@@ -117,21 +142,23 @@ body {
     display: flex; align-items: center; justify-content: center;
     transition: transform 0.2s;
 }
-#btn-camera-upload:hover { transform: scale(1.1); }
+#btn-camera-upload:hover { transform: scale(1.1); background-color: var(--accent-hover); }
 
 .sidebar-role {
     font-size: 0.85rem;
-    color: var(--secondary-color);
-    background: #e8f6f3;
+    color: var(--bg-card);
+    background: var(--accent); /* Fundo de destaque */
     display: inline-block;
-    padding: 2px 10px;
-    border-radius: 10px;
-    margin-top: 5px;
-    font-weight: 600;
+    padding: 2px 12px;
+    border-radius: 12px;
+    margin-top: 10px;
+    font-weight: 700;
 }
 
 .divider {
-    border: 0; border-top: 1px solid #eee; margin: 20px 0;
+    border: 0; 
+    border-top: 1px solid var(--border-subtle); 
+    margin: 20px 0;
 }
 
 /* Menu de Navegação */
@@ -143,7 +170,7 @@ body {
 
 .menu-item {
     text-decoration: none;
-    color: var(--text-color);
+    color: var(--text-muted);
     padding: 12px 15px;
     border-radius: var(--radius-sm);
     display: flex;
@@ -157,19 +184,20 @@ body {
 .menu-item i { width: 20px; text-align: center; color: var(--text-muted); }
 
 .menu-item:hover {
-    background-color: #f8f9fa;
-    color: var(--primary-color);
+    background-color: var(--bg-input);
+    color: var(--text-main);
 }
-.menu-item:hover i { color: var(--primary-color); }
+.menu-item:hover i { color: var(--accent); }
 
 .menu-item.active {
-    background-color: var(--primary-color);
-    color: white;
+    background-color: var(--accent);
+    color: var(--bg-card); /* Texto escuro no fundo acento para leitura */
+    font-weight: bold;
 }
-.menu-item.active i { color: white; }
+.menu-item.active i { color: var(--bg-card); }
 
 .menu-item.disabled {
-    opacity: 0.5;
+    opacity: 0.4;
     cursor: not-allowed;
     background: none;
 }
@@ -182,18 +210,27 @@ body {
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-soft);
     padding: 30px;
-    border: 1px solid var(--border-color);
+    border: 1px solid var(--border-subtle);
+    color: var(--text-main);
 }
 
 .mb-30 { margin-bottom: 30px; }
 
-.header-card { margin-bottom: 25px; border-bottom: 1px solid #eee; padding-bottom: 15px; }
-.header-card h2 { color: var(--primary-color); font-size: 1.4rem; display: flex; align-items: center; gap: 10px; }
+.header-card { 
+    margin-bottom: 25px; 
+    border-bottom: 1px solid var(--border-subtle); 
+    padding-bottom: 15px; 
+}
+.header-card h2 { 
+    color: var(--text-main); 
+    font-size: 1.4rem; 
+    display: flex; align-items: center; gap: 10px; 
+}
 .header-card p { color: var(--text-muted); font-size: 0.9rem; margin-top: 5px; }
 
 /* Destaque para Novo Produto */
 .highlight-card {
-    border-left: 5px solid var(--secondary-color);
+    border-left: 5px solid var(--accent);
 }
 
 /* Grid de Produtos */
@@ -202,31 +239,37 @@ body {
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     gap: 20px;
 }
-.loading-text { grid-column: 1/-1; text-align: center; color: #999; padding: 20px; }
+.loading-text { grid-column: 1/-1; text-align: center; color: var(--text-muted); padding: 20px; }
 
-/* Estilo Card Produto (Gerado pelo JS) */
+/* Estilo Card Produto */
 .meu-produto-item {
-    background: #fff;
-    border: 1px solid #eee;
+    background: var(--bg-input); /* Fundo um pouco mais claro que o card */
+    border: 1px solid var(--border-subtle);
     border-radius: var(--radius-sm);
     padding: 15px;
     transition: transform 0.2s, box-shadow 0.2s;
+    color: var(--text-main);
 }
-.meu-produto-item:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.08); }
-.meu-produto-item.inativo { opacity: 0.6; background-color: #f9f9f9; }
+.meu-produto-item:hover { 
+    transform: translateY(-3px); 
+    border-color: var(--accent);
+}
+.meu-produto-item.inativo { opacity: 0.6; }
 
 .meu-produto-acoes {
     display: flex; gap: 5px; margin-top: 10px;
 }
 .meu-produto-acoes button {
-    flex: 1; padding: 6px; border: none; border-radius: 4px; cursor: pointer; color: white; font-size: 0.8rem;
+    flex: 1; padding: 6px; border: none; border-radius: 4px; cursor: pointer; color: white; font-size: 0.8rem; font-weight: 600;
 }
-.btn-editar-produto { background: #f39c12; }
-.btn-toggle-status.btn-inativar { background: #e74c3c; }
-.btn-toggle-status.btn-ativar { background: #2ecc71; }
+.btn-editar-produto { background: var(--accent); color: var(--bg-card); }
+.btn-editar-produto:hover { background: var(--accent-hover); }
+
+.btn-toggle-status.btn-inativar { background: #8e3b30; } /* Vermelho desaturado para combinar */
+.btn-toggle-status.btn-ativar { background: #3b8e55; }   /* Verde desaturado */
 
 /* =========================================
-   Formulários Harmoniosos
+   Formulários Harmoniosos (Estilo Dark)
    ========================================= */
 .form-grid {
     display: grid;
@@ -236,44 +279,71 @@ body {
 
 /* Upload Box */
 .upload-box {
-    border: 2px dashed #ccc;
+    border: 2px dashed var(--border-subtle);
     border-radius: var(--radius-sm);
     height: 150px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    color: #999;
+    color: var(--text-muted);
     cursor: pointer;
     transition: 0.3s;
     text-align: center;
     padding: 10px;
+    background: var(--bg-input);
 }
-.upload-box:hover { border-color: var(--secondary-color); color: var(--secondary-color); background: #f0f7f4; }
+.upload-box:hover { 
+    border-color: var(--accent); 
+    color: var(--accent); 
+    background: #42382e; /* Levemente mais claro */
+}
 .upload-box i { font-size: 2rem; margin-bottom: 5px; }
 .upload-box input { display: none; }
 
 .form-group { margin-bottom: 15px; }
-.form-group label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 0.9rem; color: #444; }
+.form-group label { 
+    display: block; margin-bottom: 5px; font-weight: 600; font-size: 0.9rem; 
+    color: var(--text-muted); 
+}
+
+/* Inputs Estilizados (Padrão Source B) */
 .form-group input, .form-group select, .form-group textarea {
     width: 100%;
-    padding: 10px 12px;
-    border: 1px solid #ddd;
+    padding: 12px 15px;
+    background: var(--bg-input);
+    border: 1px solid #555;
+    color: var(--text-main);
     border-radius: var(--radius-sm);
     font-family: inherit;
     transition: border-color 0.3s;
 }
-.form-group input:focus, .form-group textarea:focus { border-color: var(--secondary-color); outline: none; }
+
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus { 
+    border-color: var(--accent); 
+    outline: none; 
+}
+/* Placeholder cor */
+::placeholder { color: #666; }
+
 .form-row { display: flex; gap: 15px; }
 .half { flex: 1; }
 
+/* Botões */
 .btn-full {
-    width: 100%; padding: 12px; background: var(--primary-color); color: white; border: none;
-    border-radius: var(--radius-sm); font-weight: bold; cursor: pointer; transition: 0.3s;
+    width: 100%; padding: 12px; 
+    background: var(--accent); 
+    color: var(--bg-card); /* Texto escuro para contraste no bege/roxo */
+    border: none;
+    border-radius: var(--radius-sm); 
+    font-weight: bold; 
+    cursor: pointer; 
+    transition: 0.3s;
 }
-.btn-full:hover { background: var(--primary-light); }
-.btn-success { background: var(--secondary-color); }
-.btn-success:hover { background: var(--secondary-hover); }
+.btn-full:hover { background: var(--accent-hover); }
+
+.btn-success { background: #3b8e55; color: white; }
+.btn-success:hover { background: #4caf66; }
 
 /* =========================================
    Área de Edição com Preview (Split View)
@@ -285,25 +355,28 @@ body {
 }
 
 .preview-area {
-    background: #f8f9fa;
+    background: var(--bg-input); /* Fundo escuro para a área de preview */
     border-radius: var(--radius-lg);
     padding: 20px;
     display: flex;
     flex-direction: column;
+    border: 1px solid var(--border-subtle);
 }
-.preview-label { margin-bottom: 10px; color: var(--text-muted); font-size: 0.85rem; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
+.preview-label { margin-bottom: 10px; color: var(--accent); font-size: 0.85rem; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
 
 .preview-card {
-    background: white;
+    background: #fff; /* Mantendo branco para simular papel/impressão ou tela clara */
+    color: #333;      /* Texto escuro dentro do preview para legibilidade */
     border: 1px solid #ddd;
     border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
     flex-grow: 1;
     overflow: hidden;
 }
 
 .preview-header {
-    background: #eee; padding: 10px; display: flex; gap: 5px;
+    background: #f0f0f0; padding: 10px; display: flex; gap: 5px;
+    border-bottom: 1px solid #ddd;
 }
 .dot { width: 10px; height: 10px; border-radius: 50%; }
 .red { background: #ff5f56; }
@@ -311,22 +384,28 @@ body {
 .green { background: #27c93f; }
 
 .preview-content { padding: 20px; text-align: center; }
-.preview-content h4 { color: var(--primary-color); font-size: 1.2rem; }
-.preview-content small { display: block; color: var(--text-muted); margin-bottom: 10px; font-style: italic; }
+.preview-content h4 { color: #594a42; font-size: 1.2rem; } /* Cor original para o preview */
+.preview-content small { display: block; color: #777; margin-bottom: 10px; font-style: italic; }
 .preview-content hr { border: 0; border-top: 1px solid #eee; margin: 10px 0; }
 .preview-content p { color: #555; text-align: left; font-size: 0.95rem; line-height: 1.5; white-space: pre-wrap; }
 
-/* Modal (Mantendo estilo básico) */
+/* =========================================
+   Modal e Responsividade
+   ========================================= */
 .modal {
     display: none; position: fixed; z-index: 999; left: 0; top: 0; width: 100%; height: 100%;
-    background-color: rgba(0,0,0,0.5); backdrop-filter: blur(2px);
+    background-color: rgba(0,0,0,0.7); backdrop-filter: blur(3px);
 }
 .modal-content {
-    background: #fff; margin: 5% auto; padding: 30px; border-radius: var(--radius-lg);
+    background: var(--bg-card); /* Modal escuro */
+    margin: 5% auto; padding: 30px; border-radius: var(--radius-lg);
     width: 90%; max-width: 500px; position: relative;
     max-height: 90vh; overflow-y: auto;
+    border: 1px solid var(--accent);
+    color: var(--text-main);
 }
-.close-button { position: absolute; right: 20px; top: 15px; font-size: 24px; cursor: pointer; color: #999; }
+.close-button { position: absolute; right: 20px; top: 15px; font-size: 24px; cursor: pointer; color: var(--text-muted); }
+.close-button:hover { color: var(--accent); }
 
 /* Responsividade */
 @media (max-width: 768px) {

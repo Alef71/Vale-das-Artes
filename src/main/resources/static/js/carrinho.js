@@ -1,221 +1,179 @@
-/**
- * js/carrinho.js
- * * Script para gerenciar a página do carrinho de compras.
- *
- * (Nota: As constantes 'API_URL' e a função 'apiClient' 
- * já foram declaradas em 'main.js' e estão disponíveis aqui)
- */
-
-// --- ELEMENTOS DO DOM ---
-const loadingDiv = document.getElementById('carrinho-loading');
-const emptyDiv = document.getElementById('carrinho-vazio');
-const cartListDiv = document.getElementById('lista-carrinho');
-const orderSummaryAside = document.getElementById('resumo-pedido');
-const subtotalSpan = document.getElementById('valor-subtotal');
-const totalSpan = document.getElementById('valor-total');
-const finalizeButton = document.getElementById('btn-finalizar-compra');
-const clearCartButton = document.getElementById('btn-limpar-carrinho');
-
-
-// --- FUNÇÃO HELPER: Formatar Moeda ---
-// (Esta função é específica desta página, então mantemos aqui)
-function formatarMoeda(valor) {
-    return new Intl.NumberFormat('pt-BR', {
-        style: 'currency',
-        currency: 'BRL'
-    }).format(valor);
-}
-
-// --- FUNÇÕES DE RENDERIZAÇÃO ---
-
-/**
- * Renderiza a página inteira com base nos dados do CarrinhoResponseDTO
- * @param {object} carrinhoDTO - O objeto CarrinhoResponseDTO vindo da API
- */
-function renderizarPaginaCarrinho(carrinhoDTO) {
-    // Esconde o "Carregando"
-    if (loadingDiv) loadingDiv.style.display = 'none';
-
-    // Se o DTO for nulo ou não tiver itens, mostra "Carrinho Vazio"
-    if (!carrinhoDTO || !carrinhoDTO.itens || carrinhoDTO.itens.length === 0) {
-        if (emptyDiv) emptyDiv.style.display = 'block';
-        if (cartListDiv) cartListDiv.style.display = 'none';
-        if (orderSummaryAside) orderSummaryAside.style.display = 'none';
-        return;
-    }
-
-    // Se tem itens, mostra a lista e o resumo
-    if (emptyDiv) emptyDiv.style.display = 'none';
-    if (cartListDiv) cartListDiv.style.display = 'block';
-    if (orderSummaryAside) orderSummaryAside.style.display = 'block';
-
-    // 1. Renderiza o Resumo do Pedido
-    if (subtotalSpan) subtotalSpan.textContent = formatarMoeda(carrinhoDTO.valorTotal);
-    if (totalSpan) totalSpan.textContent = formatarMoeda(carrinhoDTO.valorTotal); // (Total é igual ao subtotal por enquanto)
-
-    // 2. Renderiza a Lista de Itens
-    if (cartListDiv) {
-        cartListDiv.innerHTML = ''; // Limpa a lista antiga
-
-        carrinhoDTO.itens.forEach(item => {
-            // 'item' aqui é o seu CarrinhoItemResponseDTO
-            const itemDiv = document.createElement('div');
-            itemDiv.className = 'carrinho-item'; // Dê um estilo para essa classe no seu CSS
-            
-            // Guarda o ID do produto no próprio elemento HTML
-            itemDiv.setAttribute('data-produto-id', item.produtoId);
-
-            // Cria o HTML para o item
-            itemDiv.innerHTML = `
-                <p class="item-nome">${item.nomeProduto}</p>
-                <p class="item-preco-unitario">Preço: ${formatarMoeda(item.precoUnitario)}</p>
-                <div class="item-quantidade">
-                    <span>Quantidade: ${item.quantidade}</span>
-                    <button class="btn-diminuir">-</button>
-                    <button class="btn-aumentar">+</button>
-                    <button class="btn-remover">Remover</button>
-                </div>
-                <p class="item-subtotal">Subtotal: ${formatarMoeda(item.precoUnitario * item.quantidade)}</p>
-            `;
-            
-            cartListDiv.appendChild(itemDiv);
-        });
-    }
-}
-
-
-// --- FUNÇÕES DE AÇÃO (Handlers de Evento) ---
-
-/**
- * Carrega o carrinho da API assim que a página abre.
- * Esta é a função principal de inicialização.
- */
-async function carregarCarrinho() {
-    const carrinhoId = localStorage.getItem('carrinhoId');
-
-    if (!carrinhoId) {
-        // Não há carrinho, mostra a tela de "vazio"
-        if (loadingDiv) loadingDiv.style.display = 'none';
-        if (emptyDiv) emptyDiv.style.display = 'block';
-        if (orderSummaryAside) orderSummaryAside.style.display = 'none';
-        return;
-    }
-
-    try {
-        // Busca o CarrinhoResponseDTO
-        // (Usa a função 'apiClient' que foi declarada no 'main.js')
-        const carrinhoDTO = await apiClient(`/carrinhos/${carrinhoId}`, 'GET');
-        // Renderiza a página com os dados
-        renderizarPaginaCarrinho(carrinhoDTO);
-    } catch (error) {
-        console.error("Falha ao carregar carrinho:", error);
-        // Se deu erro (ex: 404 Not Found), o carrinho pode ser antigo
-        if (error.message.includes('404')) {
-            localStorage.removeItem('carrinhoId'); // Limpa o ID inválido
-        }
-        if (loadingDiv) loadingDiv.style.display = 'none';
-        if (emptyDiv) {
-            emptyDiv.style.display = 'block';
-            emptyDiv.innerHTML = '<p>Erro ao carregar o carrinho. Tente recarregar a página.</p>';
-        }
-    }
-}
-
-/**
- * Ações de clique nos itens (Aumentar, Diminuir, Remover)
- */
-async function handleAcoesItens(evento) {
-    const target = evento.target; // O elemento exato que foi clicado (ex: o botão '-')
-    const carrinhoId = localStorage.getItem('carrinhoId');
-
-    const itemDiv = target.closest('.carrinho-item');
-    if (!itemDiv) return; 
-
-    const produtoId = itemDiv.dataset.produtoId;
-    let carrinhoAtualizadoDTO = null;
-
-    try {
-        if (target.classList.contains('btn-aumentar')) {
-            // Aumentar (Adicionar +1)
-            const dto = { produtoId: produtoId, quantidade: 1 };
-            carrinhoAtualizadoDTO = await apiClient(`/carrinhos/${carrinhoId}/itens`, 'POST', dto);
-        
-        } else if (target.classList.contains('btn-diminuir')) {
-            // Diminuir (Remover 1)
-            const dto = { produtoId: produtoId, quantidade: 1 };
-            // Passa o DTO como o 'body' da requisição DELETE
-            carrinhoAtualizadoDTO = await apiClient(`/carrinhos/${carrinhoId}/itens`, 'DELETE', dto); 
-        
-        } else if (target.classList.contains('btn-remover')) {
-            // Remover (Remover 99999)
-            const dto = { produtoId: produtoId, quantidade: 99999 };
-            carrinhoAtualizadoDTO = await apiClient(`/carrinhos/${carrinhoId}/itens`, 'DELETE', dto);
-        }
-
-        if (carrinhoAtualizadoDTO) {
-            renderizarPaginaCarrinho(carrinhoAtualizadoDTO);
-        }
-
-    } catch (error) {
-        alert('Não foi possível atualizar o item.');
-    }
-}
-
-/**
- * Limpa o carrinho
- */
-async function handleLimparCarrinho() {
-    const carrinhoId = localStorage.getItem('carrinhoId');
-    if (!carrinhoId) return;
-
-    if (!confirm('Tem certeza que deseja limpar o carrinho?')) {
-        return;
-    }
-
-    try {
-        const carrinhoVazioDTO = await apiClient(`/carrinhos/${carrinhoId}/limpar`, 'DELETE');
-        renderizarPaginaCarrinho(carrinhoVazioDTO); 
-    } catch (error) {
-        alert('Não foi possível limpar o carrinho.');
-    }
-}
-
-/**
- * Finaliza a compra (Cria um Pedido)
- */
-async function handleFinalizarCompra() {
-    const carrinhoId = localStorage.getItem('carrinhoId');
-    if (!carrinhoId) return;
-
-    if (!confirm('Deseja finalizar a compra e criar o pedido?')) {
-        return;
-    }
-
-    try {
-        // POST /api/pedidos/carrinho/{carrinhoId}
-        const pedidoDTOResponse = await apiClient(`/pedidos/carrinho/${carrinhoId}`, 'POST');
-
-        // SUCESSO!
-        alert(`Pedido #${pedidoDTOResponse.id} criado com sucesso!`);
-        localStorage.removeItem('carrinhoId');
-        window.location.href = `pedido-sucesso.html?id=${pedidoDTOResponse.id}`;
-
-    } catch (error) {
-        alert('Erro ao finalizar o pedido.');
-    }
-}
-
-
-// --- INICIALIZAÇÃO ---
 document.addEventListener('DOMContentLoaded', () => {
     
-    // 1. Carrega o carrinho imediatamente
-    carregarCarrinho();
+    // --- ELEMENTOS ---
+    const listaCarrinho = document.getElementById('lista-carrinho');
+    const divVazio = document.getElementById('carrinho-vazio');
+    const divConteudo = document.getElementById('conteudo-carrinho');
+    const divLoading = document.getElementById('carrinho-loading');
+    
+    const spanTotal = document.getElementById('valor-total');
+    const spanSubtotal = document.getElementById('valor-subtotal');
+    const btnFinalizar = document.getElementById('btn-finalizar-compra');
+    const btnLimpar = document.getElementById('btn-limpar-carrinho');
 
-    // 2. Adiciona os listeners nos botões de ação fixos
-    if (clearCartButton) clearCartButton.addEventListener('click', handleLimparCarrinho);
-    if (finalizeButton) finalizeButton.addEventListener('click', handleFinalizarCompra);
+    // Inputs do Formulário
+    const inputNome = document.getElementById('nome-cliente');
+    const inputTelefone = document.getElementById('telefone-cliente');
+    const inputRua = document.getElementById('rua');
+    const inputNumero = document.getElementById('numero');
+    const inputBairro = document.getElementById('bairro');
+    const inputCidade = document.getElementById('cidade');
+    
+    // Inicializa
+    renderizarCarrinho();
 
-    // 3. Adiciona o listener PAI para os botões dos itens
-    if (cartListDiv) cartListDiv.addEventListener('click', handleAcoesItens);
+    // --- FUNÇÃO PRINCIPAL DE RENDERIZAÇÃO ---
+    function renderizarCarrinho() {
+        const carrinho = JSON.parse(localStorage.getItem('carrinho_vale_artes')) || [];
+        
+        if(divLoading) divLoading.style.display = 'none';
+
+        if (carrinho.length === 0) {
+            if (divConteudo) divConteudo.style.display = 'none';
+            if (divVazio) divVazio.style.display = 'block';
+            return;
+        }
+
+        if (divVazio) divVazio.style.display = 'none';
+        if (divConteudo) divConteudo.style.display = 'grid'; 
+        
+        listaCarrinho.innerHTML = ''; 
+
+        let valorTotal = 0;
+
+        carrinho.forEach((item, index) => {
+            const subtotal = item.preco * item.quantidade;
+            valorTotal += subtotal;
+
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'carrinho-item';
+            
+            itemDiv.innerHTML = `
+                <div class="item-info">
+                    <img src="${item.fotoUrl || 'https://via.placeholder.com/80'}" alt="${item.nome}">
+                    <div class="item-detalhes">
+                        <h4>${item.nome}</h4>
+                        <small>Artesão: ${item.artesao || 'Vale das Artes'}</small>
+                        <p style="margin-top:5px; font-weight:bold;">${formatarMoeda(item.preco)}</p>
+                    </div>
+                </div>
+                
+                <div class="item-controles">
+                    <div style="display:flex; align-items:center; gap:5px;">
+                        <button onclick="alterarQuantidade(${index}, -1)" class="btn-qtd">-</button>
+                        <span style="font-weight:600; min-width:20px; text-align:center;">${item.quantidade}</span>
+                        <button onclick="alterarQuantidade(${index}, 1)" class="btn-qtd">+</button>
+                    </div>
+                    
+                    <div style="text-align:right; margin-left:15px;">
+                        <p style="font-weight:bold; color:var(--cor-secundaria);">${formatarMoeda(subtotal)}</p>
+                        <button onclick="removerItem(${index})" class="btn-remover">Remover</button>
+                    </div>
+                </div>
+            `;
+            listaCarrinho.appendChild(itemDiv);
+        });
+
+        atualizarTotais(valorTotal);
+    }
+
+    function formatarMoeda(valor) {
+        return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    }
+
+    function atualizarTotais(valor) {
+        if (spanTotal) spanTotal.textContent = formatarMoeda(valor);
+        if (spanSubtotal) spanSubtotal.textContent = formatarMoeda(valor);
+    }
+
+    // --- LÓGICA DO WHATSAPP DINÂMICO ---
+    if (btnFinalizar) {
+        btnFinalizar.addEventListener('click', () => {
+            
+            // 1. Validar Inputs
+            if (!inputNome.value || !inputTelefone.value || !inputRua.value || !inputNumero.value || !inputBairro.value || !inputCidade.value) {
+                alert("Por favor, preencha todos os dados de entrega.");
+                return;
+            }
+
+            const carrinho = JSON.parse(localStorage.getItem('carrinho_vale_artes')) || [];
+            if (carrinho.length === 0) return;
+
+            // 2. BUSCAR O NÚMERO DO ARTESÃO NO ITEM
+            // Pega o número do primeiro item do carrinho
+            // IMPORTANTE: O objeto salvo no localStorage deve ter a propriedade 'whatsapp'
+            const numeroArtesao = carrinho[0].whatsapp; 
+
+            if (!numeroArtesao) {
+                alert("Erro: O número de WhatsApp do artesão não foi encontrado nos dados do produto.");
+                return;
+            }
+
+            // 3. Verificação de Segurança (Multiplos Artesãos)
+            // Se houver itens de artesãos com números diferentes, alertamos o usuário.
+            const temMixDeArtesaos = carrinho.some(item => item.whatsapp !== numeroArtesao);
+            
+            if (temMixDeArtesaos) {
+                alert("Seu carrinho contém produtos de artesãos diferentes!\n\nPor favor, finalize a compra de um artesão por vez para enviar a mensagem ao número correto.");
+                return;
+            }
+
+            // 4. Montar a Mensagem
+            let mensagem = `*Olá! Novo pedido pelo site Vale das Artes:*\n\n`;
+            
+            let totalPedido = 0;
+            carrinho.forEach(item => {
+                const subtotal = item.preco * item.quantidade;
+                totalPedido += subtotal;
+                mensagem += `📦 ${item.quantidade}x *${item.nome}*\n`;
+                mensagem += `   (Artesão: ${item.artesao}) - ${formatarMoeda(subtotal)}\n`;
+            });
+
+            mensagem += `\n💰 *Valor Total: ${formatarMoeda(totalPedido)}*\n`;
+            
+            mensagem += `\n------------------------------\n`;
+            mensagem += `📍 *Dados do Cliente:*\n`;
+            mensagem += `*Nome:* ${inputNome.value}\n`;
+            mensagem += `*Contato:* ${inputTelefone.value}\n`;
+            mensagem += `*Endereço:* ${inputRua.value}, Nº ${inputNumero.value}\n`;
+            mensagem += `*Bairro:* ${inputBairro.value} - ${inputCidade.value}\n`;
+            mensagem += `------------------------------\n`;
+            mensagem += `Aguardo confirmação!`;
+
+            // 5. Gerar Link (Remove caracteres não numéricos do telefone do artesão)
+            const numeroLimpo = numeroArtesao.toString().replace(/\D/g, ''); 
+            const linkWhatsapp = `https://wa.me/${numeroLimpo}?text=${encodeURIComponent(mensagem)}`;
+            
+            window.open(linkWhatsapp, '_blank');
+        });
+    }
+
+    // --- FUNÇÕES GLOBAIS ---
+    if (btnLimpar) {
+        btnLimpar.addEventListener('click', () => {
+            if (confirm("Deseja esvaziar todo o carrinho?")) {
+                localStorage.removeItem('carrinho_vale_artes');
+                renderizarCarrinho();
+            }
+        });
+    }
+
+    window.alterarQuantidade = function(index, delta) {
+        let carrinho = JSON.parse(localStorage.getItem('carrinho_vale_artes')) || [];
+        carrinho[index].quantidade += delta;
+        if (carrinho[index].quantidade <= 0) {
+            if (confirm("Remover este item?")) carrinho.splice(index, 1);
+            else carrinho[index].quantidade = 1;
+        }
+        localStorage.setItem('carrinho_vale_artes', JSON.stringify(carrinho));
+        renderizarCarrinho();
+    };
+
+    window.removerItem = function(index) {
+        if(!confirm("Tem certeza que deseja remover?")) return;
+        let carrinho = JSON.parse(localStorage.getItem('carrinho_vale_artes')) || [];
+        carrinho.splice(index, 1);
+        localStorage.setItem('carrinho_vale_artes', JSON.stringify(carrinho));
+        renderizarCarrinho();
+    };
 });

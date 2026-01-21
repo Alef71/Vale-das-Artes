@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize; // Import necessário
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -31,7 +32,7 @@ import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/clientes")
-@CrossOrigin(origins = "*") // Libera acesso para o Front-End
+@CrossOrigin(origins = "*") 
 @Tag(name = "Clientes", description = "Endpoints para gerenciamento de clientes")
 public class ClienteController {
 
@@ -83,9 +84,7 @@ public class ClienteController {
     })
     @PutMapping("/{id}")
     public ResponseEntity<ClienteResponseDTO> atualizarCliente(@PathVariable Long id, @Valid @RequestBody ClienteRequestDTO dto) {
-        // Usa o Service que espera um DTO, garantindo compatibilidade com o Front
         ClienteResponseDTO clienteAtualizado = clienteService.atualizarCliente(id, dto);
-        
         if (clienteAtualizado != null) {
             return ResponseEntity.ok(clienteAtualizado);
         }
@@ -93,10 +92,6 @@ public class ClienteController {
     }
 
     @Operation(summary = "Upload de foto de perfil do cliente")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Foto atualizada com sucesso"),
-        @ApiResponse(responseCode = "404", description = "Cliente não encontrado")
-    })
     @PostMapping(value = "/{id}/foto", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ClienteResponseDTO> uploadFoto(
             @PathVariable Long id, 
@@ -104,16 +99,11 @@ public class ClienteController {
             Authentication authentication) {
         
         Credencial credencial = (Credencial) authentication.getPrincipal();
-        
         ClienteResponseDTO clienteAtualizado = clienteService.uploadFoto(id, file, credencial);
         return ResponseEntity.ok(clienteAtualizado);
     }
     
     @Operation(summary = "Remove a foto de perfil do cliente")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Foto removida com sucesso"),
-        @ApiResponse(responseCode = "404", description = "Cliente não encontrado")
-    })
     @DeleteMapping(value = "/{id}/foto")
     public ResponseEntity<ClienteResponseDTO> removerFoto(
             @PathVariable Long id,
@@ -124,11 +114,16 @@ public class ClienteController {
         return ResponseEntity.ok(clienteAtualizado);
     }
 
-    @Operation(summary = "Deleta um cliente")
+    /**
+     * Deleta um cliente - Apenas Administradores podem realizar esta ação.
+     */
+    @Operation(summary = "Deleta um cliente (Acesso ADMIN)")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "204", description = "Cliente deletado com sucesso"),
+        @ApiResponse(responseCode = "403", description = "Acesso negado"),
         @ApiResponse(responseCode = "404", description = "Cliente não encontrado")
     })
+    @PreAuthorize("hasRole('ADMIN')") // Garante o poder do Admin
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletarCliente(@PathVariable Long id) {
         clienteService.deletarCliente(id);

@@ -5,69 +5,87 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vale das Artes - Detalhe do Produto</title>
     
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
+
     <link rel="stylesheet" href="css/style-componente-header.css">
     <link rel="stylesheet" href="css/style-componente-footer.css">
-    
-    <link rel="stylesheet" href="css/style-produto-detalhe.css">
+    <link rel="stylesheet" href="css/style-produto-detalhe.css?v=2">
 </head>
 <body>
 
     <header id="header-placeholder"></header>
 
     <main>
-        <section id="detalhe-produto">
-            <div class="produto-imagem">
-                <img 
-                    src="" 
-                    alt="Carregando imagem..." 
-                    id="img-produto"
-                    onerror="this.onerror=null; this.src='https://via.placeholder.com/400?text=Sem+Foto';"
-                >
+        <section class="nav-topo">
+            <a href="javascript:history.back()" class="btn-voltar">
+                <i class="fas fa-chevron-left"></i> Voltar
+            </a>
+        </section>
+
+        <section id="detalhe-produto" class="container-produto">
+            
+            <div class="produto-imagem-wrapper">
+                <img src="" 
+                     alt="Carregando imagem..." 
+                     id="img-produto"
+                     onerror="this.src='https://via.placeholder.com/400?text=Sem+Foto';">
             </div>
 
             <div class="produto-info">
-                <h1 id="nome-produto">Carregando produto...</h1>
+                <h1 id="nome-produto">Carregando...</h1>
                 
                 <p class="produto-artesao">
-                    Vendido por: <a href="#" id="link-artesao">...</a>
+                    Feito por: <a href="#" id="link-artesao">...</a>
                 </p>
                 
                 <p class="produto-preco" id="preco-produto">R$ --,--</p>
                 
                 <div class="produto-acao">
-                    <label for="quantidade">Quantidade:</label>
-                    <input type="number" id="quantidade" value="1" min="1">
-                    <button type="button" id="btn-add-carrinho">Adicionar ao Carrinho</button>
+                    <div class="input-qtd">
+                        <label for="quantidade">Qtd:</label>
+                        <input type="number" id="quantidade" value="1" min="1">
+                    </div>
+                    <button type="button" id="btn-add-carrinho" class="btn-comprar">
+                        <i class="fas fa-shopping-bag"></i> Adicionar ao Carrinho
+                    </button>
                 </div>
 
-                <h2>Descrição</h2>
-                <p id="descricao-produto">
-                    Aguarde, carregando detalhes do produto...
-                </p>
+                <div class="descricao-box">
+                    <h3>Descrição</h3>
+                    <p id="descricao-produto">
+                        Aguarde, carregando detalhes do produto...
+                    </p>
+                </div>
             </div>
         </section>
 
-        <hr>
-
-        <section id="avaliacoes">
+        <section id="avaliacoes" class="container-avaliacoes">
             <h2>Avaliações de Clientes</h2>
             
             <div id="lista-avaliacoes">
-                <p style="color: #777; font-style: italic;">Nenhuma avaliação ainda.</p>
+                <p class="msg-vazia">Nenhuma avaliação ainda.</p>
             </div>
 
-            <div id="form-nova-avaliacao-container">
+            <div class="form-avaliacao-wrapper">
                 <h3>Deixe sua avaliação</h3>
-                <form id="form-nova-avaliacao">
-                    <div>
-                        <label for="avaliacao-nota">Nota (1 a 5):</label>
-                        <input type="number" id="avaliacao-nota" name="nota" min="1" max="5" required>
+                
+                <form id="form-avaliacao">
+                    <div class="grupo-input">
+                        <label for="nota-avaliacao">Nota:</label>
+                        <select id="nota-avaliacao" required>
+                            <option value="5">★★★★★ (5)</option>
+                            <option value="4">★★★★☆ (4)</option>
+                            <option value="3">★★★☆☆ (3)</option>
+                            <option value="2">★★☆☆☆ (2)</option>
+                            <option value="1">★☆☆☆☆ (1)</option>
+                        </select>
                     </div>
-                    <div>
-                        <label for="avaliacao-comentario">Comentário (Opcional):</label>
-                        <textarea id="avaliacao-comentario" name="comentario" rows="4" placeholder="O que você achou do produto?"></textarea>
+                    <div class="grupo-input">
+                        <label for="comentario-avaliacao">Comentário:</label>
+                        <textarea id="comentario-avaliacao" rows="3" placeholder="O que você achou desta peça?" required></textarea>
                     </div>
-                    <button type="submit">Enviar Avaliação</button>
+                    <button type="submit" class="btn-enviar">Enviar Avaliação</button>
                 </form>
             </div>
         </section>
@@ -77,6 +95,5 @@
 
     <script src="js/main.js"></script>
     <script src="js/produto-detalhe.js"></script> 
-    
 </body>
 </html>

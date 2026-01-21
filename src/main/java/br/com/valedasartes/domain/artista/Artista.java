@@ -23,7 +23,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table; // ⬅️ IMPORTANTE: Adicionado o import
+import jakarta.persistence.Table;
 
 @Entity(name = "Artista")
 @Table(name = "artista")
@@ -55,22 +55,23 @@ public class Artista {
     @Column(name = "foto_url")
     private String fotoUrl;
     
-    // --- NOVO CAMPO: STATUS DE APROVAÇÃO (CORRIGIDO) ---
     @Enumerated(EnumType.STRING)
     @Column(name = "status_aprovacao", nullable = false)
-    @ColumnDefault("'PENDENTE'") // ⬅️ CORREÇÃO CRÍTICA: Define o valor padrão para migração
+    @ColumnDefault("'PENDENTE'")
     private ArtistaStatus statusAprovacao = ArtistaStatus.PENDENTE;
-    // --- FIM NOVO CAMPO ---
 
+    // ✅ CASCADE ALL: Se apagar o Artista, apaga todos os Produtos dele
     @JsonManagedReference
     @OneToMany(mappedBy = "artista", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Produto> produtos = new ArrayList<>();
 
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    // ✅ CASCADE ALL: Se apagar o Artista, apaga a Credencial de acesso dele
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     @JoinColumn(name = "id_credencial", referencedColumnName = "id_credencial", unique = true)
     private Credencial credencial;
 
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    // ✅ CASCADE ALL: Se apagar o Artista, apaga o Endereço dele
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     @JoinColumn(name = "id_endereco", referencedColumnName = "id_endereco", unique = true)
     private Endereco endereco;
 
@@ -109,13 +110,17 @@ public class Artista {
     public void setBiografia(String biografia) { this.biografia = biografia; }
     public String getFotoUrl() { return fotoUrl; }
     public void setFotoUrl(String fotoUrl) { this.fotoUrl = fotoUrl; }
-    
-    // --- GETTERS E SETTERS DO STATUS ---
     public ArtistaStatus getStatusAprovacao() { return statusAprovacao; }
     public void setStatusAprovacao(ArtistaStatus statusAprovacao) { this.statusAprovacao = statusAprovacao; }
 
     @Override
-    public boolean equals(Object o) { return Objects.equals(id, ((Artista) o).id); }
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Artista artista = (Artista) o;
+        return Objects.equals(id, artista.id);
+    }
+    
     @Override
     public int hashCode() { return Objects.hash(id); }
 }

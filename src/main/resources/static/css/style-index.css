@@ -1,387 +1,231 @@
-/* =========================================
-   Reset e Variáveis (Cores Mantidas)
-   ========================================= */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap');
+
 :root {
-    --cor-primaria: #2b231a;       /* Café escuro */
-    --cor-secundaria: #91816d;     /* Marrom médio */
-    --cor-fundo-pagina: #e8dcca;   /* Bege fundo */
-    --cor-texto-principal: #333333;
-<<<<<<< HEAD
-    --cor-cartao: #ffffff;
-    --fonte-serif: 'Playfair Display', Georgia, serif;
-    --fonte-sans: 'Inter', sans-serif;
-    --transicao-padrao: 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
-    --sombra-padrao: 0 4px 6px rgba(0, 0, 0, 0.1);
-    --sombra-elevada: 0 10px 20px rgba(0, 0, 0, 0.15);
-=======
-    
-    /* Variáveis de apoio */
-    --cor-preco: #27ae60;          /* Verde para preços */
-    --borda-radius: 8px;
-    --fonte-padrao: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
->>>>>>> 84dbe6b7b6b27ac31371f540a1ef5d205aeadbc0
+    --cor-fundo: #EAE4D8;       /* Bege Fundo */
+    --cor-primaria: #3E2B22;    /* Marrom Escuro */
+    --cor-secundaria: #5A4A42;  /* Marrom Médio */
+    --cor-branco: #FFFFFF;
+    --cor-destaque: #D4A373;    /* Laranja/Ocre */
+    --sombra-suave: 0 4px 12px rgba(62, 43, 34, 0.1);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Montserrat', sans-serif;
 }
 
 body {
-    font-family: var(--fonte-padrao);
-    background-color: var(--cor-fundo-pagina);
-    color: var(--cor-texto-principal);
+    background-color: var(--cor-fundo);
+    color: var(--cor-primaria);
     line-height: 1.6;
-    margin: 0;
-    padding: 0;
-    min-height: 100vh;
+    overflow-x: hidden; /* Importante para evitar barra de rolagem horizontal */
 }
 
+#header-placeholder { height: 70px; }
+
 main {
-<<<<<<< HEAD
-    max-width: 1280px;
+    max-width: 1200px;
     margin: 0 auto;
     padding: 40px 20px;
+    min-height: 80vh;
 }
 
 /* --- TÍTULOS --- */
 section h2 {
-    font-family: var(--fonte-serif);
-    font-size: 2.5em;
-    font-weight: 700;
-    color: var(--cor-primaria);
-    text-align: center;
-    margin-bottom: 40px;
-    position: relative;
-}
-
-/* Adiciona um sublinhado sutil e elegante */
-=======
-    max-width: 1200px;
-    margin: 2rem auto;
-    padding: 0 1rem;
-    min-height: 80vh;
-}
-
-/* =========================================
-   Títulos das Seções
-   ========================================= */
-section h2 {
     font-size: 2rem;
     color: var(--cor-primaria);
     text-align: center;
-    margin-bottom: 2rem;
+    margin-bottom: 30px;
     position: relative;
-    display: inline-block;
-    width: 100%;
+    font-weight: 700;
 }
 
->>>>>>> 84dbe6b7b6b27ac31371f540a1ef5d205aeadbc0
 section h2::after {
     content: '';
     display: block;
     width: 60px;
-<<<<<<< HEAD
-    height: 3px;
-=======
     height: 4px;
->>>>>>> 84dbe6b7b6b27ac31371f540a1ef5d205aeadbc0
     background-color: var(--cor-secundaria);
     margin: 10px auto 0;
     border-radius: 2px;
 }
 
-<<<<<<< HEAD
-/* --- DESTAQUES (CARROSSEL) --- */
+/* --- CARROSSEL (ATUALIZADO) --- */
 #destaques {
-    padding: 0;
+    /* Truque para ocupar a tela toda mesmo dentro do container */
+    width: 100vw;
+    position: relative;
+    left: 50%;
+    right: 50%;
+    margin-left: -50vw;
+    margin-right: -50vw;
+    
     margin-bottom: 60px;
-    border-radius: 12px;
-    box-shadow: var(--sombra-elevada);
+    border-radius: 0; /* Removi borda arredondada pois agora encosta na tela */
     overflow: hidden;
+    box-shadow: var(--sombra-suave);
+    background-color: var(--cor-branco);
 }
 
 #destaques-carousel {
-    max-width: 100%;
-    margin: 0 auto;
-    height: 450px;
-    overflow: hidden;
-    position: relative;
-    border-radius: 12px;
+    width: 100%;
+    height: 1200px; /* Reduzi de 400px para 250px para ver mais da imagem */
+    background-color: #ddd; 
 }
 
 .carousel-item {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    opacity: 0;
-    transition: opacity 0.8s ease-in-out;
-}
-
-.carousel-item.active {
-    opacity: 1;
-=======
-/* =========================================
-   Seção de Destaques (CORRIGIDA - Sem cortar)
-   ========================================= */
-#destaques {
-    margin-bottom: 3rem;
-    background-color: transparent; 
-    padding: 0;                    
-    box-shadow: none;              
-}
-
-#destaques-carousel {
-    width: 100%;
-    /* Altura automática para se ajustar à imagem */
-    height: auto; 
-    overflow: hidden;
-    border-radius: var(--borda-radius);
-    box-shadow: 0 6px 15px rgba(0,0,0,0.2); 
->>>>>>> 84dbe6b7b6b27ac31371f540a1ef5d205aeadbc0
+    height: 1200px; /* Acompanha a altura do carrossel */
 }
 
 .carousel-item img {
     width: 100%;
-<<<<<<< HEAD
     height: 100%;
-    object-fit: cover;
-    filter: brightness(0.85);
+    object-fit: cover;      /* Cobre o espaço */
+    object-position: center; /* Centraliza a imagem */
 }
 
-/* --- PRODUTOS RECENTES (GRID) --- */
-=======
-    /* Altura automática: a imagem define a altura, nada é cortado */
-    height: auto; 
-    object-fit: contain; /* Garante que a imagem inteira apareça */
-    display: block; /* Remove espaços extras abaixo da imagem */
+.carousel-caption {
+    background: rgba(62, 43, 34, 0.7);
+    border-radius: 8px;
+    padding: 10px;
+    bottom: 20px;
 }
 
-/* =========================================
-   Grid de Produtos
-   ========================================= */
->>>>>>> 84dbe6b7b6b27ac31371f540a1ef5d205aeadbc0
+/* --- GRID PRODUTOS --- */
 #produtos-recentes {
-    padding-bottom: 3rem;
+    padding-bottom: 40px;
 }
 
 .grid-produtos {
     display: grid;
-<<<<<<< HEAD
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
     gap: 30px;
 }
 
-/* --- CARTÃO DE PRODUTO --- */
-.produto-card {
-    background-color: var(--cor-cartao);
-    border: 1px solid rgba(43, 35, 26, 0.08);
+/* --- CARD PRODUTO --- */
+.card-produto {
+    background-color: #EAE4D8;
     border-radius: 12px;
     overflow: hidden;
-    box-shadow: var(--sombra-padrao);
-    transition: transform var(--transicao-padrao), box-shadow var(--transicao-padrao), border-color var(--transicao-padrao);
-    cursor: pointer;
-}
-
-.produto-card:hover {
-    transform: translateY(-5px);
-    /* Sombra que 'acende' ao passar o mouse */
-    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2), 
-                0 0 0 3px var(--cor-secundaria);
-    border-color: var(--cor-secundaria);
-}
-
-.produto-card-imagem-container {
-    overflow: hidden;
-    height: 250px;
-=======
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-    gap: 2rem;
-}
-
-/* =========================================
-   Card do Produto (SEM fundo branco)
-   ========================================= */
-.card-produto {
-    background-color: transparent; 
-    box-shadow: none;              
-    border: none;                  
-    border-radius: var(--borda-radius);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
     display: flex;
     flex-direction: column;
     height: 100%;
-    transition: transform 0.3s ease;
 }
 
 .card-produto:hover {
-    transform: translateY(-5px); 
->>>>>>> 84dbe6b7b6b27ac31371f540a1ef5d205aeadbc0
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(62, 43, 34, 0.15);
 }
 
-.card-produto a {
+.card-produto a.link-imagem {
     text-decoration: none;
-    color: inherit;
+    display: block;
 }
 
-/* Estilo da Imagem do Produto */
+.img-container {
+    width: 100%;
+    height: 250px;
+    overflow: hidden;
+    background-color: #f4f4f4;
+    border-bottom: 1px solid #eee;
+}
+
 .card-produto img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-<<<<<<< HEAD
-    display: block;
-    transition: transform 0.6s ease;
-}
-
-.produto-card:hover .produto-card-imagem {
-    transform: scale(1.05);
-}
-
-.produto-card-info {
-    padding: 20px 15px;
-    text-align: center;
-}
-
-.produto-card-info h3 {
-    font-family: var(--fonte-serif);
-    font-size: 1.25em;
-    color: var(--cor-primaria);
-    margin: 0 0 8px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.produto-card-info p {
-    color: var(--cor-secundaria);
-    font-weight: 600;
-    font-size: 1.25em;
-    margin: 5px 0 0;
-}
-
-/* --- MEDIA QUERIES (Responsividade Aprimorada) --- */
-
-@media (max-width: 992px) {
-    main {
-        padding: 30px 20px;
-    }
-    .grid-produtos {
-        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-        gap: 20px;
-    }
-    #destaques-carousel {
-        height: 350px;
-=======
-    border-radius: var(--borda-radius); 
-    box-shadow: 0 4px 8px rgba(0,0,0,0.15); 
-    transition: box-shadow 0.3s ease;
+    transition: transform 0.5s ease;
 }
 
 .card-produto:hover img {
-    box-shadow: 0 8px 16px rgba(0,0,0,0.25);
+    transform: scale(1.05);
 }
 
 .card-body {
-    padding: 1rem 0.5rem; 
+    padding: 20px;
     display: flex;
     flex-direction: column;
     flex-grow: 1;
-    text-align: left;
+    text-align: center;
 }
 
 .card-title {
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     color: var(--cor-primaria);
-    margin: 0.8rem 0 0.3rem 0;
+    margin-bottom: 5px;
     font-weight: 700;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 }
 
+/* --- ESTILO DO LINK DO ARTESÃO --- */
 .card-artesao {
-    font-size: 0.95rem;
+    font-size: 0.9rem;
     color: var(--cor-secundaria);
-    margin-bottom: 0.5rem;
+    margin-bottom: 15px;
     font-style: italic;
 }
 
-.card-preco {
-    font-size: 1.4rem;
-    color: var(--cor-preco);
-    font-weight: bold;
-    margin-top: auto;
-    margin-bottom: 1rem;
-}
-
-/* =========================================
-   Botão Comprar (Estilo Login / Auth)
-   ========================================= */
-.btn-comprar {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    padding: 12px;
-    margin-top: auto; 
-    background-color: #9c8b75; 
-    color: white !important;   
-    border: none;
-    border-radius: 8px;
-    font-weight: bold;
-    font-size: 1rem;
-    text-decoration: none; 
-    cursor: pointer;
+.link-artesao {
+    color: var(--cor-primaria);
+    font-weight: 700;
+    text-decoration: none;
+    border-bottom: 1px dotted var(--cor-primaria);
     transition: all 0.3s ease;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    position: relative;
+    z-index: 10; /* Garante clique */
 }
 
-.btn-comprar:hover {
-    background-color: #f0f0e4; 
-    color: #2C241B !important; 
-    box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+.link-artesao:hover {
+    color: var(--cor-destaque);
+    border-bottom: 1px solid var(--cor-destaque);
 }
 
-.btn-comprar:active {
-    transform: scale(0.98);
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+.card-preco {
+    font-size: 1.3rem;
+    color: var(--cor-primaria);
+    font-weight: 700;
+    margin-top: auto;
+    margin-bottom: 15px;
 }
 
-/* =========================================
-   Responsividade
-   ========================================= */
+.btn-comprar-vitrine {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: var(--cor-primaria);
+    color: var(--cor-branco) !important;
+    border-radius: 50px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: 0.3s;
+}
+
+.btn-comprar-vitrine:hover {
+    background-color: var(--cor-secundaria);
+}
+
+/* Mobile */
 @media (max-width: 768px) {
-    section h2 {
-        font-size: 1.6rem;
->>>>>>> 84dbe6b7b6b27ac31371f540a1ef5d205aeadbc0
-    }
-
-<<<<<<< HEAD
-@media (max-width: 576px) {
-    main {
-        padding: 20px 10px;
-    }
-    
-    section h2 {
-        font-size: 2em;
-        margin-bottom: 30px;
+    /* Ajustei a altura no mobile também para ficar proporcional */
+    #destaques-carousel, .carousel-item {
+        height: 180px; 
     }
 
     .grid-produtos {
-        grid-template-columns: 1fr;
-        gap: 20px;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
     }
-
-    #destaques-carousel {
-        height: 280px;
-        border-radius: 0;
+    .card-body {
+        padding: 15px 10px;
     }
-    
-    .produto-card {
-        border-radius: 8px;
-=======
-    /* Ajuste para o banner no mobile não distorcer */
-    #destaques-carousel, 
-    .carousel-item img {
-        height: auto;
-        min-height: auto;
-    }
-    
-    .grid-produtos {
-        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-        gap: 1rem;
->>>>>>> 84dbe6b7b6b27ac31371f540a1ef5d205aeadbc0
+    .img-container {
+        height: 180px;
     }
 }

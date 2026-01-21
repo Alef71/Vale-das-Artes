@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vale das Artes - Início</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
     <link rel="stylesheet" href="css/style-componente-header.css">
     <link rel="stylesheet" href="css/style-componente-footer.css">
     <link rel="stylesheet" href="css/style-index.css">
@@ -14,17 +17,25 @@
 
     <main>
         <section id="destaques">
-            <h2>Destaques da Semana</h2>
-            
             <div id="destaques-carousel" class="carousel slide" data-bs-ride="carousel">
                 <div class="carousel-inner">
+                    <div class="carousel-item active">
+                        <img src="https://via.placeholder.com/1200x400/EAE4D8/3E2B22?text=Carregando..." class="d-block w-100" alt="Loading">
                     </div>
                 </div>
-            </section>
+                <button class="carousel-control-prev" type="button" data-bs-target="#destaques-carousel" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Anterior</span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#destaques-carousel" data-bs-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Próximo</span>
+                </button>
+            </div>
+        </section>
 
         <section id="produtos-recentes">
-            <h2>Produtos Recentes</h2>
-            
+            <h2>Nossos Produtos</h2>
             <div class="grid-produtos">
                 </div>
         </section>
@@ -32,6 +43,8 @@
 
     <footer id="footer-placeholder"></footer>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
     <script src="js/main.js"></script>
     <script src="js/index.js"></script> 
 

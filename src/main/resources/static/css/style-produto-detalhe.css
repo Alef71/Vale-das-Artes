@@ -1,290 +1,337 @@
-/* =========================================
-   Reset e Variáveis (Mesma paleta do Perfil)
-   ========================================= */
-   :root {
-    --cor-primaria: #2c241b; /* Café escuro */
-    --cor-secundaria: #5d4037; /* Marrom médio */
-    --cor-destaque: #d7ccc8; /* Bege */
-    --cor-fundo: #fafafa;
-    --cor-card: #ffffff;
-    --cor-texto: #333333;
-    --cor-preco: #2e7d32; /* Verde */
-    --sombra-suave: 0 4px 12px rgba(0,0,0,0.08);
-    --borda-radius: 8px;
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap');
+
+:root {
+    --cor-fundo: #EAE4D8;       /* Bege Fundo Principal */
+    --cor-primaria: #3E2B22;    /* Marrom Escuro */
+    --cor-secundaria: #5A4A42;  /* Marrom Médio */
+    --cor-conteudo: #EAE4D8;    /* CREME (Substituto do Branco) */
+    --cor-destaque: #D4A373;    /* Detalhes Ocre */
+    --cor-estrelas: #FFD700;    /* Dourado das Estrelas */
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Montserrat', sans-serif;
 }
 
 body {
     background-color: var(--cor-fundo);
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    color: var(--cor-texto);
-    margin: 0;
-    line-height: 1.6;
+    color: var(--cor-primaria);
+    padding-bottom: 50px;
 }
 
-main {
-    max-width: 1100px;
-    margin: 2rem auto;
-    padding: 0 1rem;
-    min-height: 80vh;
-}
-
-/* =========================================
-   Seção Principal: Detalhes do Produto
-   ========================================= */
-#detalhe-produto {
-    background-color: var(--cor-card);
-    border-radius: var(--borda-radius);
-    box-shadow: var(--sombra-suave);
-    padding: 2rem;
-    display: grid;
-    grid-template-columns: 1fr 1fr; /* Duas colunas iguais */
-    gap: 3rem;
-    align-items: start;
-}
-
-/* Coluna da Imagem */
-.produto-imagem {
+/* --- AJUSTE DO HEADER PARA NÃO TAMPAR O CONTEÚDO --- */
+/* Aumentei a altura para empurrar o conteúdo para baixo */
+#header-placeholder { 
+    height: 110px; 
     width: 100%;
-    display: flex;
-    justify-content: center;
-    background-color: #fff;
-    border-radius: var(--borda-radius);
-    overflow: hidden;
-    border: 1px solid #eee;
+    display: block;
 }
 
-.produto-imagem img {
+/* Botão Voltar */
+.nav-topo {
+    max-width: 1000px;
+    margin: 30px auto 20px auto; /* Mais margem no topo */
+    padding: 0 20px;
+}
+
+.btn-voltar {
+    text-decoration: none;
+    color: var(--cor-primaria);
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: 0.2s;
+}
+.btn-voltar:hover { opacity: 0.7; }
+
+/* Container Principal do Produto */
+.container-produto {
+    max-width: 1000px;
+    margin: 0 auto;
+    background: var(--cor-conteudo); /* Creme, não branco */
+    border-radius: 12px;
+    padding: 30px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    box-shadow: 0 4px 15px rgba(62, 43, 34, 0.08);
+    border: 1px solid rgba(255,255,255,0.4); /* Leve borda para destaque */
+}
+
+/* Imagem */
+.produto-imagem-wrapper {
+    width: 100%;
+    border-radius: 8px;
+    overflow: hidden;
+    background-color: #f0ebe0; /* Fundo levemente mais escuro para a imagem */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #e0dad0;
+}
+
+.produto-imagem-wrapper img {
     width: 100%;
     height: auto;
-    max-height: 500px; /* Limite de altura */
-    object-fit: contain; /* Mostra a imagem inteira */
-    transition: transform 0.3s ease;
+    object-fit: cover;
+    max-height: 500px;
 }
 
-.produto-imagem img:hover {
-    transform: scale(1.02); /* Zoom leve ao passar o mouse */
-}
-
-/* Coluna de Informações */
+/* Informações */
 .produto-info h1 {
-    font-size: 2.5rem;
+    font-size: 2rem;
     color: var(--cor-primaria);
-    margin-top: 0;
-    margin-bottom: 0.5rem;
+    margin-bottom: 10px;
     line-height: 1.2;
 }
 
 .produto-artesao {
-    font-size: 1.1rem;
-    color: #666;
-    margin-bottom: 1.5rem;
+    font-size: 0.95rem;
+    color: #666; /* Cinza escuro para contraste */
+    margin-bottom: 20px;
 }
 
 .produto-artesao a {
     color: var(--cor-secundaria);
+    font-weight: 700;
     text-decoration: none;
-    font-weight: 600;
     border-bottom: 1px dotted var(--cor-secundaria);
 }
 
-.produto-artesao a:hover {
-    color: var(--cor-primaria);
-    border-bottom: 1px solid var(--cor-primaria);
-}
-
 .produto-preco {
-    font-size: 2.2rem;
-    color: var(--cor-preco);
+    font-size: 2rem;
+    color: var(--cor-primaria);
     font-weight: 700;
-    margin: 1.5rem 0;
+    margin-bottom: 25px;
 }
 
-/* Área de Ação (Input + Botão) */
+/* Ações (Qtd + Botão) */
 .produto-acao {
     display: flex;
+    gap: 15px;
+    margin-bottom: 30px;
     align-items: center;
-    gap: 1rem;
-    margin-bottom: 2rem;
-    padding-bottom: 2rem;
-    border-bottom: 1px solid #eee;
 }
 
-.produto-acao label {
+.input-qtd {
+    display: flex;
+    align-items: center;
+    gap: 5px;
     font-weight: 600;
+}
+
+.input-qtd input {
+    width: 60px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #fffaf0; /* Fundo input creme */
+    text-align: center;
+    font-size: 1rem;
     color: var(--cor-primaria);
 }
 
-.produto-acao input[type="number"] {
-    width: 60px;
-    padding: 10px;
-    font-size: 1.1rem;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    text-align: center;
-}
-
-#btn-add-carrinho {
-    flex-grow: 1; /* Ocupa o resto do espaço */
+.btn-comprar {
+    flex: 1;
     background-color: var(--cor-primaria);
-    color: white;
+    color: #fff;
     border: none;
     padding: 12px 20px;
-    font-size: 1.1rem;
+    border-radius: 50px;
     font-weight: 600;
-    border-radius: 4px;
     cursor: pointer;
-    text-transform: uppercase;
-    transition: background 0.3s ease, transform 0.1s;
+    font-size: 1rem;
+    transition: 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
 }
 
-#btn-add-carrinho:hover {
+.btn-comprar:hover {
     background-color: var(--cor-secundaria);
-}
-
-#btn-add-carrinho:active {
-    transform: scale(0.98);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
 }
 
 /* Descrição */
-.produto-info h2 {
-    font-size: 1.5rem;
-    color: var(--cor-primaria);
-    margin-bottom: 1rem;
-}
-
-#descricao-produto {
-    color: #555;
-    line-height: 1.8;
-    text-align: justify;
-}
-
-/* Separador */
-hr {
-    border: 0;
-    height: 1px;
-    background: #e0e0e0;
-    margin: 3rem 0;
-}
-
-/* =========================================
-   Seção de Avaliações
-   ========================================= */
-#avaliacoes {
-    background-color: var(--cor-card);
-    border-radius: var(--borda-radius);
-    padding: 2rem;
-    box-shadow: var(--sombra-suave);
-}
-
-#avaliacoes h2 {
-    color: var(--cor-primaria);
-    border-left: 5px solid var(--cor-secundaria);
-    padding-left: 15px;
-    margin-bottom: 2rem;
-}
-
-/* Estilo para cada avaliação (caso o JS gere divs com class 'avaliacao-card') */
-.avaliacao-card {
-    border-bottom: 1px solid #f0f0f0;
-    padding: 1rem 0;
-}
-.avaliacao-card:last-child {
-    border-bottom: none;
-}
-.avaliacao-autor { font-weight: bold; color: var(--cor-primaria); }
-.avaliacao-texto { color: #555; margin-top: 5px; }
-
-/* Formulário de Avaliação */
-#form-nova-avaliacao-container {
-    background-color: #f9f9f9;
-    padding: 2rem;
-    border-radius: var(--borda-radius);
-    margin-top: 2rem;
-    border: 1px solid #eee;
-}
-
-#form-nova-avaliacao-container h3 {
-    margin-top: 0;
+.descricao-box h3 {
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+    border-bottom: 1px solid #dcd5cc;
+    padding-bottom: 5px;
     color: var(--cor-secundaria);
 }
 
-#form-nova-avaliacao {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-}
-
-#form-nova-avaliacao div {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-}
-
-#form-nova-avaliacao label {
-    font-weight: 600;
-    color: #444;
-}
-
-#form-nova-avaliacao input,
-#form-nova-avaliacao textarea {
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-family: inherit;
-    resize: vertical; /* Permite redimensionar altura do textarea */
-}
-
-#form-nova-avaliacao input:focus,
-#form-nova-avaliacao textarea:focus {
-    border-color: var(--cor-secundaria);
-    outline: none;
-    box-shadow: 0 0 0 2px rgba(93, 64, 55, 0.2);
-}
-
-#form-nova-avaliacao button {
-    align-self: flex-start;
-    background-color: var(--cor-secundaria);
-    color: white;
-    border: none;
-    padding: 10px 25px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-weight: 600;
-    transition: background 0.3s;
-}
-
-#form-nova-avaliacao button:hover {
-    background-color: var(--cor-primaria);
+.descricao-box p {
+    line-height: 1.6;
+    color: #4a3b32;
+    text-align: justify;
 }
 
 /* =========================================
-   Responsividade (Mobile)
+   ÁREA DE AVALIAÇÕES
    ========================================= */
+
+.container-avaliacoes {
+    max-width: 1000px;
+    margin: 30px auto;
+    background: var(--cor-conteudo); /* Creme, não branco */
+    border-radius: 12px;
+    padding: 30px;
+    box-shadow: 0 4px 15px rgba(62, 43, 34, 0.08);
+}
+
+.container-avaliacoes h2 {
+    color: var(--cor-primaria);
+    margin-bottom: 20px;
+    font-weight: 700;
+}
+
+.msg-vazia {
+    font-style: italic;
+    color: #888;
+    text-align: center;
+    padding: 20px;
+}
+
+/* LISTA DE AVALIAÇÕES */
+#lista-avaliacoes {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.avaliacao-item {
+    background-color: #f4f1eb; /* Um tom ligeiramente mais escuro que o container */
+    border: 1px solid #e6dfd5;
+    border-radius: 8px;
+    padding: 15px 20px;
+    transition: transform 0.2s;
+}
+
+.avaliacao-item:hover {
+    border-color: var(--cor-destaque);
+}
+
+.avaliacao-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.avaliacao-nome {
+    font-weight: 700;
+    color: var(--cor-primaria);
+    font-size: 1rem;
+}
+
+/* ESTRELAS DOURADAS */
+.avaliacao-nota {
+    color: var(--cor-estrelas); /* #FFD700 */
+    font-size: 1.1rem;
+    letter-spacing: 2px;
+    text-shadow: 0 1px 1px rgba(0,0,0,0.1);
+}
+
+.avaliacao-texto {
+    color: #444;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    margin-bottom: 5px;
+    font-style: italic;
+}
+
+.avaliacao-data {
+    display: block;
+    font-size: 0.8rem;
+    color: #8c7b70;
+    text-align: right;
+}
+
+/* =========================================
+   FORMULÁRIO DE AVALIAÇÃO
+   ========================================= */
+
+.form-avaliacao-wrapper {
+    margin-top: 40px;
+    padding-top: 25px;
+    border-top: 1px solid #dcd5cc;
+}
+
+/* Título "Deixe sua avaliação" em Marrom Médio */
+.form-avaliacao-wrapper h3 {
+    font-size: 1.2rem;
+    margin-bottom: 20px;
+    color: var(--cor-secundaria); 
+    font-weight: 600;
+}
+
+.grupo-input {
+    margin-bottom: 15px;
+}
+
+.grupo-input label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 600;
+    color: var(--cor-primaria);
+}
+
+.grupo-input select, .grupo-input textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #d0c8be;
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 1rem;
+    background-color: #fffaf5; /* Fundo bem claro para digitar */
+    color: var(--cor-primaria);
+}
+
+.grupo-input select:focus, .grupo-input textarea:focus {
+    outline: none;
+    border-color: var(--cor-secundaria);
+    background-color: #fff;
+}
+
+.btn-enviar {
+    background-color: var(--cor-secundaria);
+    color: #fff;
+    border: none;
+    padding: 12px 30px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 1rem;
+    transition: background 0.3s, transform 0.2s;
+    margin-top: 10px;
+}
+
+.btn-enviar:hover {
+    background-color: var(--cor-primaria);
+    transform: translateY(-1px);
+}
+
+/* Responsivo */
 @media (max-width: 768px) {
-    #detalhe-produto {
-        grid-template-columns: 1fr; /* Vira uma coluna só */
-        gap: 2rem;
-        padding: 1.5rem;
+    .container-produto {
+        grid-template-columns: 1fr;
+        padding: 20px;
     }
-
-    .produto-imagem img {
-        max-height: 350px;
+    .produto-imagem-wrapper img {
+        max-height: 300px;
     }
-
-    .produto-info h1 {
-        font-size: 2rem;
-    }
-
-    .produto-preco {
-        font-size: 1.8rem;
-    }
-
     .produto-acao {
-        flex-direction: column; /* Input em cima, botão embaixo */
+        flex-direction: column;
         align-items: stretch;
     }
-
-    .produto-acao input[type="number"] {
-        width: 100%; /* Input ocupa largura total */
+    .btn-comprar {
+        width: 100%;
     }
 }

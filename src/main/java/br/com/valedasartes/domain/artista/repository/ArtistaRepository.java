@@ -1,6 +1,6 @@
 package br.com.valedasartes.domain.artista.repository;
 
-import java.util.List; // <-- NOVO IMPORT
+import java.util.List;
 import java.util.Optional; 
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -9,7 +9,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import br.com.valedasartes.domain.artista.Artista;
-import br.com.valedasartes.domain.artista.ArtistaStatus; // <-- NOVO IMPORT
+import br.com.valedasartes.domain.artista.ArtistaStatus;
 
 @Repository
 public interface ArtistaRepository extends JpaRepository<Artista, Long> {
@@ -30,4 +30,11 @@ public interface ArtistaRepository extends JpaRepository<Artista, Long> {
      * Usado para listar os PENDENTES no painel Admin.
      */
     List<Artista> findByStatusAprovacao(ArtistaStatus status);
+
+    Optional<Artista> findByCpfAndTelefone(String cpf, String telefone);
+
+    Optional<Artista> findByTelefone(String telefone);
+
+    // ✅ MÉTODO QUE ESTAVA FALTANDO
+    Optional<Artista> findByCpf(String cpf);
 }

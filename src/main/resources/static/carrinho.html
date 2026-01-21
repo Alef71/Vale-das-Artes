@@ -1,57 +1,108 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vale das Artes - Meu Carrinho</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vale das Artes - Finalizar Pedido</title>
+    
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="css/style-componente-header.css">
     <link rel="stylesheet" href="css/style-componente-footer.css">
-    </head>
+    <link rel="stylesheet" href="css/style-carrinho.css">
+</head>
 <body>
 
-    <header id="header-placeholder"></header>
+    <header id="header-placeholder"></header>
 
-    <main>
-        <section id="carrinho-compras">
-            <h1>Meu Carrinho</h1>
+    <main>
+        <h1>Meu Carrinho de Compras</h1>
 
-            <div id="carrinho-loading">
-                <p>Carregando carrinho...</p>
-            </div>
+        <div id="carrinho-loading">
+            <p>Carregando carrinho...</p>
+        </div>
 
-            <div id="carrinho-vazio" style="display: none;">
-                <p>Seu carrinho está vazio.</p>
-            </div>
+        <div id="carrinho-vazio" style="display: none;">
+            <p class="msg-vazia">Seu carrinho está vazio.</p>
+            <div style="text-align: center; margin-top:20px;">
+                <a href="index.html" style="color:var(--cor-secundaria); font-weight:bold;">Voltar para a loja</a>
+            </div>
+        </div>
 
-            <div id="lista-carrinho">
-                            </div>
+        <div id="conteudo-carrinho" class="checkout-grid" style="display: none;">
+            
+            <section id="lista-carrinho">
+                </section>
 
-            <aside id="resumo-pedido" style="display: none;">
-                <h2>Resumo do Pedido</h2>
-                
-                <div class="resumo-linha">
-                    <span>Subtotal:</span>
-                    <span id="valor-subtotal">R$ 0,00</span>
-          _   </div>
-                <div class="resumo-linha">
-                    <span>Frete:</span>
-                    <span>(a calcular)</span>
-                </div>
-                <div class="resumo-linha total">
-                    <span>Total:</span>
-                    <span id="valor-total">R$ 0,00</span>
-              _ </div>
-                
-                <button id="btn-finalizar-compra">Finalizar Compra</button>
-                <button id="btn-limpar-carrinho">Limpar Carrinho</button>
-            </aside>
+            <aside class="sidebar-checkout">
+                
+                <div class="form-entrega">
+                    <h2>Dados de Entrega</h2>
+                    <p style="font-size:0.8rem; margin-bottom:15px; color:#666;">Preencha para enviarmos ao Artesão.</p>
+                    
+                    <div class="form-group">
+                        <label for="nome-cliente">Seu Nome:</label>
+                        <input type="text" id="nome-cliente" placeholder="Ex: Maria Silva">
+                    </div>
 
-        </section>
-    </main>
+                    <div class="form-group">
+                        <label for="telefone-cliente">Seu WhatsApp/Tel:</label>
+                        <input type="tel" id="telefone-cliente" placeholder="(xx) 9xxxx-xxxx">
+                    </div>
 
-    <footer id="footer-placeholder"></footer>
+                    <div class="row-inputs">
+                        <div class="form-group" style="flex:2;">
+                            <label for="rua">Rua/Avenida:</label>
+                            <input type="text" id="rua" placeholder="Nome da rua">
+                        </div>
+                        <div class="form-group" style="flex:1;">
+                            <label for="numero">Nº:</label>
+                            <input type="text" id="numero" placeholder="123">
+                        </div>
+                    </div>
 
-        <script src="js/main.js"></script> 
-    <script src="js/carrinho.js"></script>
+                    <div class="form-group">
+                        <label for="bairro">Bairro:</label>
+                        <input type="text" id="bairro" placeholder="Seu bairro">
+                    </div>
+
+                    <div class="row-inputs">
+                        <div class="form-group">
+                            <label for="cidade">Cidade:</label>
+                            <input type="text" id="cidade" placeholder="Cidade">
+                        </div>
+                        <div class="form-group">
+                            <label for="cep">CEP:</label>
+                            <input type="text" id="cep" placeholder="00000-000">
+                        </div>
+                    </div>
+                </div>
+
+                <h2>Resumo do Pedido</h2>
+                <div class="resumo-linha">
+                    <span>Subtotal:</span>
+                    <span id="valor-subtotal">R$ 0,00</span>
+                </div>
+                <div class="resumo-linha">
+                    <span>Taxa de Entrega:</span>
+                    <span style="font-size:0.8em; color:#666;">(Combinar no Zap)</span>
+                </div>
+                <div class="resumo-linha total">
+                    <span>Total Estimado:</span>
+                    <span id="valor-total">R$ 0,00</span>
+                </div>
+                
+                <button id="btn-finalizar-compra">
+                    <i class="fab fa-whatsapp"></i> Finalizar no WhatsApp
+                </button>
+                <button id="btn-limpar-carrinho">Esvaziar Carrinho</button>
+            </aside>
+        </div>
+
+    </main>
+
+    <footer id="footer-placeholder"></footer>
+
+    <script src="js/main.js"></script> 
+    <script src="js/carrinho.js"></script>
 </body>
 </html>

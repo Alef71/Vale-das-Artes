@@ -49,9 +49,13 @@
                                 <input type="password" id="login-senha" name="senha" required placeholder="••••••">
                             </div>
                         </div>
+
+                        <div style="text-align: right; margin-bottom: 15px;">
+                            <a href="#" id="btn-esqueci-senha" style="font-size: 0.85rem; color: #d4af37; text-decoration: none;">Esqueci minha senha</a>
+                        </div>
+
                         <button type="submit" class="btn-primary">Entrar</button>
                     </form>
-
 
                     <div class="footer-link">
                         <span>Não tem conta?</span>
@@ -189,6 +193,37 @@
                     </div>
                 </div>
 
+                <div id="view-recuperar" class="auth-view hidden">
+                    <div class="header-box">
+                        <h2>Recuperar Senha</h2>
+                        <p>Informe CPF e WhatsApp para confirmar sua identidade.</p>
+                    </div>
+
+                    <form id="form-recuperar">
+                        <div class="input-group">
+                            <label for="recuperar-cpf">Seu CPF</label>
+                            <div class="input-wrapper">
+                                <i class="fas fa-id-card"></i>
+                                <input type="text" id="recuperar-cpf" required placeholder="000.000.000-00">
+                            </div>
+                        </div>
+
+                        <div class="input-group">
+                            <label for="recuperar-telefone">Seu WhatsApp</label>
+                            <div class="input-wrapper">
+                                <i class="fab fa-whatsapp"></i>
+                                <input type="text" id="recuperar-telefone" required placeholder="(XX) 9XXXX-XXXX">
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn-primary">Enviar Link</button>
+                    </form>
+
+                    <div class="footer-link">
+                        <a href="#" id="btn-voltar-login-rec"><i class="fas fa-arrow-left"></i> Voltar ao Login</a>
+                    </div>
+                </div>
+
             </div>
         </section>
     </main>
@@ -198,7 +233,6 @@
     <script src="js/main.js"></script>
     <script src="js/auth.js"></script>
     <script>
-        // Função Global para despachar evento de seleção de perfil
         function selectRole(role) {
             const event = new CustomEvent('roleSelected', { detail: role });
             document.dispatchEvent(event);

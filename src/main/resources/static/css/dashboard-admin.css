@@ -1,347 +1,213 @@
-/* =========================================
-   Variáveis e Reset
-   ========================================= */
+/* css/style-dashboard-admin.css */
+
+/* --- Configurações Gerais e Cores do Vale das Artes --- */
 :root {
-    --cor-primaria: #2c241b;       /* Café escuro */
-    --cor-secundaria: #5d4037;     /* Marrom médio */
-    --cor-fundo: #f4f4f4;          /* Cinza claro */
-    --cor-card: #ffffff;           /* Branco */
-    --cor-borda: #ddd;
-    --cor-sucesso: #27ae60;
-    --cor-erro: #c0392b;
-    --cor-aviso: #f39c12;
-    --sombra: 0 4px 6px rgba(0,0,0,0.1);
-    --radius: 8px;
+    --cor-primaria: #2c241b; /* Marrom escuro do header */
+    --cor-secundaria: #5d4037; /* Marrom mais claro */
+    --cor-fundo: #fdfbf7; /* Bege clarinho para não ficar branco puro */
+    --cor-texto: #333;
+    --cor-branca: #ffffff;
+    --cor-perigo: #c0392b; /* Vermelho para deletar */
+    --cor-sucesso: #27ae60; /* Verde para aprovar */
 }
 
 body {
-    background-color: var(--cor-fundo);
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    color: #333;
+    background-color: var(--cor-fundo);
+    color: var(--cor-texto);
+    margin: 0;
+    padding: 0;
 }
 
 main {
     max-width: 1200px;
-    margin: 2rem auto;
-    padding: 0 1rem;
-    min-height: 80vh;
+    margin: 40px auto;
+    padding: 0 20px;
 }
 
-/* =========================================
-   Estrutura do Dashboard
-   ========================================= */
-.dashboard-header {
-    margin-bottom: 2rem;
-    border-left: 5px solid var(--cor-primaria);
-    padding-left: 15px;
+/* --- Card Principal do Dashboard --- */
+#dashboard {
+    background: var(--cor-branca);
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05); /* Sombra suave */
+    border: 1px solid #eee;
 }
 
-.dashboard-header h1 {
+h1 {
     color: var(--cor-primaria);
-    margin: 0;
+    margin-bottom: 10px;
+    border-bottom: 2px solid var(--cor-primaria);
+    padding-bottom: 15px;
 }
 
-.admin-card {
-    background: var(--cor-card);
-    border-radius: var(--radius);
-    box-shadow: var(--sombra);
-    margin-bottom: 2rem;
-    overflow: hidden;
-}
-
-.card-header {
-    background-color: var(--cor-primaria);
-    color: white;
-    padding: 1rem 1.5rem;
-}
-
-.card-header h2 {
-    margin: 0;
-    font-size: 1.2rem;
-    font-weight: 600;
-}
-
-.card-body {
-    padding: 1.5rem;
-}
-
-.separator {
-    height: 1px;
-    background-color: #eee;
-    margin: 2rem 0;
-}
-
-/* =========================================
-   Formulários
-   ========================================= */
-.form-group {
-    margin-bottom: 1rem;
-}
-
-.form-group label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: 600;
+h2 {
     color: var(--cor-secundaria);
+    margin-top: 40px;
+    margin-bottom: 20px;
 }
 
-.form-group input[type="text"] {
+h3 {
+    color: #666;
+    font-size: 1.1rem;
+}
+
+hr {
+    border: 0;
+    border-top: 1px solid #e0e0e0;
+    margin: 30px 0;
+}
+
+/* --- Formulários --- */
+.form-container {
+    background-color: #f9f9f9;
+    padding: 25px;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+    margin-bottom: 30px;
+}
+
+form label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 8px;
+    color: var(--cor-primaria);
+}
+
+form input[type="text"],
+form input[type="number"],
+form select,
+form input[type="file"] {
     width: 100%;
-    padding: 10px;
-    border: 1px solid var(--cor-borda);
+    padding: 12px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
     border-radius: 4px;
-    box-sizing: border-box;
+    box-sizing: border-box; /* Garante que o padding não estoure a largura */
 }
 
-.checkbox-group {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.checkbox-group input {
-    width: auto;
-}
-
-/* =========================================
-   Botões
-   ========================================= */
-.btn {
+/* --- Botões --- */
+button {
     padding: 10px 20px;
     border: none;
     border-radius: 4px;
     cursor: pointer;
-    font-weight: 600;
-    transition: background 0.3s;
-    text-transform: uppercase;
-    font-size: 0.9rem;
+    font-weight: bold;
+    font-size: 0.95rem;
+    transition: background 0.3s, transform 0.1s;
 }
 
-.btn-primary { background-color: var(--cor-primaria); color: white; }
-.btn-primary:hover { background-color: var(--cor-secundaria); }
-
-.btn-success { background-color: var(--cor-sucesso); color: white; }
-.btn-success:hover { opacity: 0.9; }
-
-.btn-danger { background-color: var(--cor-erro); color: white; }
-.btn-danger:hover { opacity: 0.9; }
-
-.btn-warning { background-color: var(--cor-aviso); color: white; }
-
-.btn-secondary { background-color: #7f8c8d; color: white; }
-.btn-secondary:hover { background-color: #95a5a6; }
-
-.full-width { width: 100%; }
-
-/* =========================================
-   Listas (Destaques e Usuários)
-   ========================================= */
-.grid-list {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 1rem;
+button:active {
+    transform: scale(0.98);
 }
 
-.destaque-item, .user-item {
-    background: #fff;
-    border: 1px solid #eee;
-    border-radius: var(--radius);
-    padding: 1rem;
+/* Botão Padrão (Salvar/Criar) */
+button[type="submit"], .btn-primary {
+    background-color: var(--cor-primaria);
+    color: white;
+}
+button[type="submit"]:hover, .btn-primary:hover {
+    background-color: var(--cor-secundaria);
+}
+
+/* Botão de Deletar/Reprovar */
+.btn-danger {
+    background-color: var(--cor-perigo);
+    color: white;
+}
+.btn-danger:hover {
+    background-color: #a93226;
+}
+
+/* Botão de Aprovar */
+.btn-success {
+    background-color: var(--cor-sucesso);
+    color: white;
+}
+.btn-success:hover {
+    background-color: #219150;
+}
+
+/* --- Listas de Itens (Destaques, Usuários, Avaliações) --- */
+.lista-container {
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    transition: transform 0.2s;
+    gap: 15px;
 }
 
-.destaque-item:hover, .user-item:hover {
-    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
-    transform: translateY(-2px);
-}
-
-.destaque-item.ativo { border-left: 4px solid var(--cor-sucesso); }
-.destaque-item.inativo { border-left: 4px solid var(--cor-erro); }
-
-.destaque-item img {
-    width: 100%;
-    height: 120px;
-    object-fit: cover;
-    border-radius: 4px;
-    background-color: #eee;
-}
-
-.user-item {
-    flex-direction: row;
-    justify-content: space-between;
+.item-lista {
+    background: #fff;
+    border: 1px solid #eee;
+    padding: 20px;
+    border-radius: 8px;
+    display: flex;
+    justify-content: space-between; /* Texto na esquerda, botões na direita */
     align-items: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.02);
 }
 
-.user-acoes {
+.item-lista:hover {
+    border-color: #ccc;
+}
+
+.item-conteudo {
+    flex: 1; /* Ocupa o espaço disponível */
+    padding-right: 20px;
+}
+
+.item-acoes {
     display: flex;
-    gap: 5px;
+    gap: 10px;
+    flex-shrink: 0; /* Impede que os botões encolham */
 }
 
-.user-acoes .btn {
-    padding: 5px 10px;
-    font-size: 0.8rem;
+/* Estilo Específico para Avaliações */
+.avaliacao-box {
+    background-color: #fff8e1; /* Um amarelo bem clarinho para destacar que é review */
+    border-left: 4px solid #ffc107;
 }
 
-/* =========================================
-   Modal Customizado
-   ========================================= */
-.modal-overlay {
-    position: fixed;
-    z-index: 1000;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0,0,0,0.6); /* Fundo escuro transparente */
-    display: flex;
+.comentario-texto {
+    font-style: italic;
+    color: #555;
+    margin-top: 5px;
+    background: rgba(255,255,255,0.5);
+    padding: 5px;
+    border-radius: 4px;
+}
+
+/* --- Modal --- */
+.modal-custom {
+    display: none; 
+    position: fixed; 
+    z-index: 1000; 
+    left: 0; 
+    top: 0; 
+    width: 100%; 
+    height: 100%; 
+    background-color: rgba(0,0,0,0.6); 
+    overflow: auto;
     justify-content: center;
     align-items: center;
 }
 
-.modal-content {
+.modal-content-custom {
     background-color: #fff;
+    padding: 30px;
+    border-radius: 8px;
     width: 90%;
     max-width: 500px;
-    border-radius: var(--radius);
-    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-    animation: slideDown 0.3s ease;
-    display: flex;
-    flex-direction: column;
-    max-height: 90vh;
-}
-
-@keyframes slideDown {
-    from { transform: translateY(-50px); opacity: 0; }
-    to { transform: translateY(0); opacity: 1; }
-}
-
-.modal-header {
-    padding: 1rem 1.5rem;
-    border-bottom: 1px solid #eee;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.modal-body {
-    padding: 1.5rem;
-    overflow-y: auto;
-}
-
-.modal-footer {
-    padding: 1rem 1.5rem;
-    background-color: #f9f9f9;
-    border-top: 1px solid #eee;
-    text-align: right;
-    border-bottom-left-radius: var(--radius);
-    border-bottom-right-radius: var(--radius);
+    position: relative;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
 }
 
 .close-button {
-    font-size: 1.5rem;
-    cursor: pointer;
-    color: #999;
-}
-.close-button:hover { color: #333; }
-
-/* =========================================
-   MENU DE FOTO FLUTUANTE (Destaque)
-   ========================================= */
-.foto-manager-container {
-    text-align: center;
-    margin-top: 1rem;
-    margin-bottom: 1rem;
-}
-
-.foto-wrapper {
-    position: relative; /* Importante: Menu se posiciona relativo a isso */
-    display: inline-block;
-    cursor: pointer;
-    width: 100%;
-    max-width: 300px;
-}
-
-#destaque-foto-preview-menu {
-    width: 100%;
-    height: 150px;
-    object-fit: cover;
-    border-radius: var(--radius);
-    border: 2px solid #ddd;
-    transition: filter 0.3s;
-    display: block; /* Garante bloco para respeitar dimensões */
-}
-
-/* Efeito ao passar o mouse */
-.foto-wrapper:hover #destaque-foto-preview-menu {
-    filter: brightness(0.6); /* Escurece */
-}
-
-/* Texto Overlay "Clique para Editar" */
-.overlay-texto {
     position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    color: white;
+    top: 15px;
+    right: 20px;
+    font-size: 28px;
     font-weight: bold;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    pointer-events: none; /* Clique passa para a imagem */
-    opacity: 0;
-    transition: opacity 0.3s;
-    z-index: 1500;
-}
-
-.foto-wrapper:hover .overlay-texto {
-    opacity: 1;
-}
-
-/* O Menu Popup */
-.foto-menu-popup {
-    display: none; /* JS controla o display: block */
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: white;
-    padding: 10px;
-    border-radius: var(--radius);
-    box-shadow: 0 10px 40px rgba(0,0,0,0.5); /* Sombra forte para destacar */
-    width: 180px;
-    z-index: 2000; /* IMPORTANTE: Maior que o modal (1000) */
-    flex-direction: column;
-    gap: 5px;
-    border: 1px solid #ccc;
-}
-
-.btn-menu {
-    width: 100%;
-    padding: 8px;
-    border: none;
-    background: #f0f0f0;
+    color: #aaa;
     cursor: pointer;
-    text-align: center;
-    font-size: 0.9rem;
-    border-radius: 4px;
 }
-
-.btn-menu:hover { background: #e0e0e0; }
-.btn-menu.danger { color: var(--cor-erro); }
-.btn-menu.danger:hover { background: #fadbd8; }
-.btn-menu.secondary { border-top: 1px solid #ddd; margin-top: 5px; }
-
-/* Responsividade */
-@media (max-width: 768px) {
-    .user-item {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-    .user-acoes {
-        width: 100%;
-        margin-top: 10px;
-        justify-content: flex-end;
-    }
-}
+.close-button:hover { color: #000; }

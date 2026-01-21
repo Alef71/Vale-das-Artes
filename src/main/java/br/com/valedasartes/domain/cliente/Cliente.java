@@ -2,8 +2,9 @@ package br.com.valedasartes.domain.cliente;
 
 import java.util.Objects;
 
+import br.com.valedasartes.domain.carrinho.Carrinho;
 import br.com.valedasartes.domain.endereco.Endereco;
-import br.com.valedasartes.domain.security.Credencial;
+import br.com.valedasartes.domain.security.Credencial; // Certifique-se de que o import está correto
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -43,6 +44,10 @@ public class Cliente {
     @JoinColumn(name = "id_credencial", referencedColumnName = "id_credencial", unique = true)
     private Credencial credencial;
 
+    // ✅ NOVO RELACIONAMENTO ADICIONADO
+    @OneToOne(mappedBy = "cliente", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Carrinho carrinho;
+
     public Cliente() {
     }
 
@@ -54,6 +59,7 @@ public class Cliente {
         this.credencial = credencial;
     }
 
+    // Getters e Setters
     public Long getId() {
         return id;
     }
@@ -108,6 +114,15 @@ public class Cliente {
 
     public void setFotoUrl(String fotoUrl) {
         this.fotoUrl = fotoUrl;
+    }
+
+    // Getter e Setter para Carrinho
+    public Carrinho getCarrinho() {
+        return carrinho;
+    }
+
+    public void setCarrinho(Carrinho carrinho) {
+        this.carrinho = carrinho;
     }
 
     @Override

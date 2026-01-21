@@ -5,31 +5,70 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vale das Artes - Perfil do Artesão</title>
     
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
+
     <link rel="stylesheet" href="css/style-componente-header.css">
     <link rel="stylesheet" href="css/style-componente-footer.css">
     
-    <link rel="stylesheet" href="css/style-perfil-artesao.css"> 
+    <link rel="stylesheet" href="css/style-perfil-publico.css?v=5"> 
 </head>
 <body>
 
     <header id="header-placeholder"></header>
 
     <main>
-        <section id="perfil-artesao-header">
-            <div class="perfil-foto">
-                <img src="" alt="Foto do Artesão" id="img-artesao" onerror="this.src='https://via.placeholder.com/200?text=Sem+Foto'">
-            </div>
-            <div class="perfil-info">
-                <h1 id="nome-artesao">Carregando...</h1>
-                <h2 id="nome-atelie"></h2>
-                <p id="biografia-artesao"></p>
-            </div>
+        <section class="profile-nav">
+            <a href="javascript:history.back()" class="btn-voltar">
+                <i class="fas fa-chevron-left"></i> Voltar
+            </a>
         </section>
 
-        <section id="produtos-do-artesao">
-            <h2>Produtos deste Artesão</h2>
-            <div class="grid-produtos">
+        <div class="container-central">
+            
+            <div class="profile-card-centered">
+                
+                <div class="profile-avatar-wrapper">
+                    <img src="https://via.placeholder.com/300" 
+                         alt="Foto do Artesão" 
+                         id="img-artesao" 
+                         onerror="this.src='https://via.placeholder.com/300?text=Foto'">
                 </div>
+                
+                <div class="profile-info-center">
+                    <h1 id="nome-artesao">Carregando...</h1>
+                    
+                    <h3 id="nome-atelie">
+                        <span id="texto-atelie">...</span>
+                    </h3>
+                    
+                    <p id="biografia-artesao" class="bio-text">
+                        Aguardando informações...
+                    </p>
+
+                    <div class="profile-actions">
+                        <button id="btn-whatsapp" class="btn-primary">
+                            <i class="fab fa-whatsapp"></i> WhatsApp
+                        </button>
+                        
+                        <button id="btn-seguir" class="btn-secondary">
+                            <i class="far fa-heart"></i> Seguir
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+
+        <section class="container-central products-section">
+            <div class="section-header">
+                <h3>Produtos do Ateliê</h3>
+                <span class="item-count" id="contador-produtos">Vitrine</span>
+            </div>
+
+            <div id="grid-produtos" class="grid-imoveis">
+                <p class="loading-msg">Carregando vitrine...</p>
+            </div>
         </section>
     </main>
 

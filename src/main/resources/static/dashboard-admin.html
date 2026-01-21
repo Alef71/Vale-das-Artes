@@ -3,107 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vale das Artes - Painel do Administrador</title>
+    <title>Vale das Artes - Painel Administrativo</title>
     
     <link rel="stylesheet" href="css/style-componente-header.css">
     <link rel="stylesheet" href="css/style-componente-footer.css">
-    <link rel="stylesheet" href="css/style-dashboard-admin.css">
     
-    <style>
-        /* Estilos Gerais do Dashboard Admin */
-        body { font-family: 'Segoe UI', sans-serif; background-color: #f4f4f4; }
-        main { max-width: 1200px; margin: 2rem auto; padding: 0 1rem; }
-        
-        #dashboard { background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        h1, h2 { color: #2c241b; }
-        hr { border: 0; border-top: 1px solid #eee; margin: 2rem 0; }
-
-        /* Estilos do Formulário */
-        form div { margin-bottom: 1rem; }
-        label { display: block; font-weight: bold; margin-bottom: 5px; color: #555; }
-        input[type="text"], input[type="number"], select, textarea {
-            width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;
-        }
-        /* Estilo para o input file no formulário de criação */
-        input[type="file"] {
-            padding: 5px; background: #fff; border: 1px solid #ccc; width: 100%; border-radius: 4px;
-        }
-
-        button {
-            padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;
-            background-color: #2c241b; color: white; transition: background 0.3s;
-        }
-        button:hover { background-color: #5d4037; }
-        .btn-danger { background-color: #c0392b; }
-        .btn-danger:hover { background-color: #e74c3c; }
-
-        /* --- ESTILOS DO MENU DE FOTO (MODAL DE EDIÇÃO) --- */
-        .foto-manager-container { 
-            position: relative; width: 100%; max-width: 300px; margin: 20px auto; text-align: center;
-        }
-
-        .foto-wrapper {
-            position: relative; display: inline-block; width: 100%; cursor: pointer;
-        }
-        
-        .destaque-pic-preview { 
-            width: 100%; height: 150px; object-fit: cover; border-radius: 8px; border: 2px solid #ddd;
-            transition: filter 0.3s; display: block;
-        }
-
-        .foto-wrapper:hover .destaque-pic-preview { filter: brightness(0.6); }
-
-        .overlay-texto {
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            color: white; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;
-            pointer-events: none; opacity: 0; transition: opacity 0.3s; z-index: 1500;
-        }
-
-        .foto-wrapper:hover .overlay-texto { opacity: 1; }
-
-        /* Menu Flutuante */
-        .foto-options-menu { 
-            display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); 
-            width: 200px; background: white; border-radius: 8px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); 
-            z-index: 2000; padding: 10px; text-align: center; border: 1px solid #ccc;
-        }
-        
-        .foto-options-menu .menu-option { 
-            display: block; width: 100%; padding: 10px; margin: 5px 0; border: none; border-radius: 4px; 
-            cursor: pointer; background-color: #f0f0f0; color: #333; font-size: 0.9rem;
-        }
-        .foto-options-menu .menu-option:hover { background-color: #e0e0e0; }
-        .foto-options-menu .menu-option.danger { background-color: #fbebee; color: #d9534f; }
-        .foto-options-menu .menu-option.danger:hover { background-color: #f5c6cb; }
-
-        /* --- MODAL --- */
-        .modal-custom {
-            display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%;
-            background-color: rgba(0,0,0,0.5); overflow: auto;
-        }
-        .modal-content-custom {
-            background-color: #fefefe; margin: 5% auto; padding: 25px; border-radius: 8px;
-            width: 90%; max-width: 500px; position: relative; box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-        }
-        .close-button {
-            position: absolute; top: 15px; right: 20px; font-size: 24px; font-weight: bold; color: #aaa; cursor: pointer;
-        }
-        .close-button:hover { color: #333; }
-        
-        /* Listas */
-        .destaque-item {
-            background: #fff; border: 1px solid #eee; padding: 15px; margin-bottom: 10px;
-            border-radius: 8px; display: flex; align-items: center; gap: 15px;
-        }
-        .destaque-item img { width: 100px; height: 60px; object-fit: cover; border-radius: 4px; }
-        .destaque-item.ativo { border-left: 5px solid #27ae60; }
-        .destaque-item.inativo { border-left: 5px solid #c0392b; }
-        
-        .user-item { 
-            background: #fafafa; border: 1px solid #eee; padding: 10px; margin-bottom: 5px; 
-            display: flex; justify-content: space-between; align-items: center; 
-        }
-    </style>
+    <link rel="stylesheet" href="css/dashboard-admin.css">
 </head>
 <body>
 
@@ -112,66 +17,65 @@
     <main>
         <section id="dashboard">
             <h1>Painel de Administração</h1>
-            <p>Gerencie o conteúdo do site e os usuários.</p>
+            <p>Gerencie produtos, usuários e modere a comunidade.</p>
 
             <hr>
 
             <section id="gerenciar-destaques">
-                <h2>Gerenciar Destaques</h2>
+                <h2>Gerenciar Destaques (Carrossel)</h2>
                 
-                <div style="background: #f9f9f9; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                <div class="form-container">
                     <h3>Criar Novo Destaque</h3>
-                    <p style="font-size: 0.9rem; color: #666; margin-bottom: 15px;">
-                        Preencha os dados e selecione a imagem de capa.
-                    </p>
-                    
                     <form id="form-novo-destaque" enctype="multipart/form-data">
                         <div>
                             <label for="destaque-titulo">Título:</label>
-                            <input type="text" id="destaque-titulo" name="titulo" placeholder="Ex: Promoção de Natal" required>
+                            <input type="text" id="destaque-titulo" name="titulo" placeholder="Ex: Oferta de Verão" required>
                         </div>
                         <div>
                             <label for="destaque-link">Link (Opcional):</label>
-                            <input type="text" id="destaque-link" name="link" placeholder="/produto-detalhe.html?id=...">
+                            <input type="text" id="destaque-link" name="link" placeholder="/produto-detalhe.html?id=123">
                         </div>
-                        
                         <div>
-                            <label for="destaque-foto-input">Imagem do Destaque:</label>
+                            <label for="destaque-foto-input">Imagem:</label>
                             <input type="file" id="destaque-foto-input" name="foto" accept="image/*" required>
                         </div>
-
                         <button type="submit">Publicar Destaque</button>
-                        <p id="novo-destaque-status" style="margin-top: 10px; font-weight: bold;"></p>
+                        <p id="novo-destaque-status"></p>
                     </form>
                 </div>
 
                 <h3>Destaques Ativos</h3>
-                <div id="lista-destaques-ativos">
+                <div id="lista-destaques-ativos" class="lista-container">
                     <p>Carregando destaques...</p>
                 </div>
             </section>
 
             <hr>
 
-            <section id="gerenciar-usuarios">
-                <h2>Aprovações Pendentes</h2>
-                <div id="lista-artesaos-pendentes">
-                    <p>Carregando...</p>
-                </div>
-
-                <h2 style="margin-top: 30px;">Todos os Usuários</h2>
+            <section id="gerenciar-avaliacoes">
+                <h2>Moderação de Avaliações</h2>
+                <p>Remova comentários ofensivos ou impróprios.</p>
                 
-                <h3>Artesãos</h3>
-                <div id="lista-artesaos-todos">
-                    <p>Carregando...</p>
-                </div>
-
-                <h3>Clientes</h3>
-                <div id="lista-clientes">
-                    <p>Carregando...</p>
+                <div id="lista-avaliacoes-todas" class="lista-container">
+                    <p>Carregando avaliações...</p>
                 </div>
             </section>
 
+            <hr>
+
+            <section id="gerenciar-usuarios">
+                <h2>Gestão de Usuários</h2>
+
+                <h3>Todos os Artesãos</h3>
+                <div id="lista-artesaos-todos" class="lista-container">
+                    <p>Carregando...</p>
+                </div>
+
+                <h3>Todos os Clientes</h3>
+                <div id="lista-clientes" class="lista-container">
+                    <p>Carregando...</p>
+                </div>
+            </section>
         </section>
     </main>
 
@@ -180,58 +84,28 @@
     <div id="editDestaqueModal" class="modal-custom">
         <div class="modal-content-custom">
             <span class="close-button" id="btn-fechar-destaque-modal">&times;</span>
-            
-            <h2>Editar Destaque <span id="edit-destaque-id-display" style="font-size: 0.8em; color: #777;"></span></h2>
-            
-            <div class="foto-manager-container" style="margin: 0 auto 20px auto;">
-                <label style="text-align: left; display:block; margin-bottom:5px;">Imagem do Destaque:</label>
-                
-                <div class="foto-wrapper">
-                    <img id="destaque-foto-preview-menu" 
-                         src="https://via.placeholder.com/300x150?text=Sem+Foto" 
-                         alt="Foto do Destaque" 
-                         class="destaque-pic-preview">
-                    
-                    <div class="overlay-texto">Clique para Editar</div>
-
-                    <div id="foto-options-menu-destaque" class="foto-options-menu">
-                        <p style="font-weight: bold; margin-bottom: 5px; color:#333;">Opções</p>
-                        
-                        <button type="button" id="btn-adicionar-foto-destaque" class="menu-option">Adicionar Foto</button>
-                        <button type="button" id="btn-atualizar-foto-destaque" class="menu-option">Trocar Foto</button>
-                        <button type="button" id="btn-remover-foto-destaque" class="menu-option danger">Remover Foto</button>
-                        <hr style="margin: 5px 0;">
-                        <button type="button" id="btn-cancelar-foto-destaque" class="menu-option">Cancelar</button>
-                    </div>
-                </div>
-                
-                <input type="file" id="input-foto-destaque" accept="image/*" style="display: none;">
-                <p id="upload-status-destaque" style="font-size: 0.9rem; margin-top: 5px; color: #555;"></p>
-            </div>
-
+            <h2>Editar Destaque</h2>
             <form id="form-editar-destaque">
                 <input type="hidden" id="edit-destaque-id">
                 <div>
-                    <label for="edit-destaque-titulo">Título:</label>
-                    <input type="text" id="edit-destaque-titulo" name="titulo" required>
+                    <label>Título:</label>
+                    <input type="text" id="edit-destaque-titulo" required>
                 </div>
                 <div>
-                    <label for="edit-destaque-link">Link:</label>
-                    <input type="text" id="edit-destaque-link" name="link">
+                    <label>Link:</label>
+                    <input type="text" id="edit-destaque-link">
                 </div>
                 <div>
-                    <label style="display: flex; align-items: center; gap: 10px;">
-                        <input type="checkbox" id="edit-destaque-ativo" style="width: auto;">
-                        Destaque Visível no Site (Ativo)
+                    <label>
+                        <input type="checkbox" id="edit-destaque-ativo"> Ativo no site
                     </label>
                 </div>
-                <button type="submit" style="width: 100%; margin-top: 10px;">Salvar Alterações</button>
+                <button type="submit" style="width:100%; margin-top:10px;">Salvar</button>
             </form>
         </div>
     </div>
-    
+
     <script src="js/main.js"></script>
     <script src="js/dashboard-admin.js"></script> 
-    
 </body>
 </html>
