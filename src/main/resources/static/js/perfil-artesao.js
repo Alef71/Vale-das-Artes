@@ -47,12 +47,35 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function preencherInfoPerfil(artista) {
+        // 1. Nome e Ateliê
         document.getElementById('nome-artesao').textContent = artista.nome || 'Artesão';
-        
         const atelieTxt = artista.nomeEmpresa ? `Ateliê ${artista.nomeEmpresa}` : 'Ateliê de Artes';
         document.getElementById('texto-atelie').textContent = atelieTxt;
+
+        // 2. Lógica de Localização (Endereço)
+        const containerLoc = document.getElementById('container-localizacao');
+        const textoLoc = document.getElementById('texto-cidade-estado');
+        
+        // Verifica se o objeto endereço existe e se tem cidade
+        if (artista.endereco && artista.endereco.cidade) {
+            const cidade = artista.endereco.cidade;
+            // Pega o estado (ou uf como fallback)
+            const estado = artista.endereco.estado || artista.endereco.uf || ''; 
+            
+            // Formata: "Belo Horizonte - MG" ou só "Belo Horizonte"
+            textoLoc.textContent = estado ? `${cidade} - ${estado}` : cidade;
+            
+            // Mostra o ícone e o texto
+            if (containerLoc) containerLoc.style.display = 'block';
+        } else {
+            // Esconde se não tiver endereço
+            if (containerLoc) containerLoc.style.display = 'none';
+        }
+
+        // 3. Biografia
         document.getElementById('biografia-artesao').textContent = artista.biografia || `Olá! Bem-vindo ao meu espaço criativo.`;
 
+        // 4. Foto do Perfil
         const imgElement = document.getElementById('img-artesao');
         if (imgElement) {
             imgElement.src = artista.fotoUrl 
@@ -60,10 +83,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 : `https://ui-avatars.com/api/?name=${encodeURIComponent(artista.nome)}&background=fff&color=3E2B22&size=300`;
         }
 
+        // 5. Botão WhatsApp
         const btnZap = document.getElementById('btn-whatsapp');
         if (btnZap) {
             if (artista.telefone) {
+                btnZap.style.display = 'inline-block';
                 btnZap.onclick = () => {
+                    // Remove tudo que não for número para o link
                     const num = artista.telefone.replace(/\D/g, '');
                     window.open(`https://wa.me/55${num}`, '_blank');
                 };
@@ -72,21 +98,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        const btnSeguir = document.getElementById('btn-seguir');
-        if (btnSeguir) {
-            btnSeguir.onclick = () => {
-                const icon = btnSeguir.querySelector('i');
-                if (icon.classList.contains('far')) {
-                    icon.classList.replace('far', 'fas');
-                    btnSeguir.style.color = '#e91e63'; 
-                    btnSeguir.style.borderColor = '#e91e63';
-                } else {
-                    icon.classList.replace('fas', 'far');
-                    btnSeguir.style.color = '';
-                    btnSeguir.style.borderColor = '';
-                }
-            };
-        }
+        
     }
 
     function criarCardProduto(produto) {

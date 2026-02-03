@@ -1,10 +1,16 @@
 document.addEventListener('DOMContentLoaded', () => {
     const API_BASE_URL = 'http://localhost:8080/api';
+    const filtroCategoria = document.getElementById('filtro-categoria');
 
     carregarDestaques();
     carregarProdutos();
 
-  
+    if (filtroCategoria) {
+        filtroCategoria.addEventListener('change', (e) => {
+            const categoriaSelecionada = e.target.value;
+            carregarProdutos(categoriaSelecionada);
+        });
+    }
 
     async function carregarDestaques() {
         const carouselInner = document.querySelector('#destaques-carousel .carousel-inner');
@@ -12,7 +18,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         try {
             const response = await fetch(`${API_BASE_URL}/destaques`);
-            
             
             if (!response.ok) throw new Error('API Destaques indisponível');
 
@@ -36,7 +41,6 @@ document.addEventListener('DOMContentLoaded', () => {
             `).join('');
 
         } catch (error) {
-           
             carouselInner.innerHTML = `
                 <div class="carousel-item active">
                     <img src="https://via.placeholder.com/1200x400/3E2B22/FFFFFF?text=Bem-vindo+ao+Vale+das+Artes" class="d-block w-100" alt="Banner Padrão">
@@ -45,25 +49,29 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    async function carregarProdutos() {
+    async function carregarProdutos(categoria = '') {
         const gridProdutos = document.querySelector('.grid-produtos');
         if (!gridProdutos) return;
 
         gridProdutos.innerHTML = '<p style="text-align:center; width:100%;">Carregando vitrine...</p>';
 
         try {
-            const response = await fetch(`${API_BASE_URL}/produtos`);
+            let url = `${API_BASE_URL}/produtos`;
+            if (categoria) {
+                url += `?categoria=${encodeURIComponent(categoria)}`;
+            }
+
+            const response = await fetch(url);
             if (!response.ok) throw new Error('Erro ao buscar produtos');
 
             const produtos = await response.json();
-            const produtosExibir = produtos.filter(p => p.ativo !== false);
 
-            if (produtosExibir.length === 0) {
-                gridProdutos.innerHTML = '<p>Nenhum produto encontrado.</p>';
+            if (produtos.length === 0) {
+                gridProdutos.innerHTML = '<p style="text-align:center; width:100%;">Nenhum produto encontrado.</p>';
                 return;
             }
 
-            gridProdutos.innerHTML = produtosExibir.map(produto => criarCardProduto(produto)).join('');
+            gridProdutos.innerHTML = produtos.map(produto => criarCardProduto(produto)).join('');
 
         } catch (error) {
             console.error(error);
@@ -78,7 +86,6 @@ document.addEventListener('DOMContentLoaded', () => {
         let nomeArtesao = 'Artesão Parceiro';
         let idArtesao = null;
 
-    
         if (produto.artista) {
             nomeArtesao = produto.artista.nome || nomeArtesao;
             idArtesao = produto.artista.id;

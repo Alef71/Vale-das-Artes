@@ -1,9 +1,13 @@
 :root {
-    --cor-primaria: #2b231a;
-    --cor-secundaria: #91816d;
-    --cor-fundo-pagina: #f5f5f5;
-    --cor-texto-claro: #ffffff;
-    --cor-texto-principal: #333333;
+    /* --- Nova Paleta de Cores --- */
+    --cor-fundo: #EAE4D8;       /* Bege claro (Adicionado) */
+    --cor-primaria: #EAE4D8;    /* Marrom escuro (Atualizado) */
+    --cor-secundaria: #5A4A42;  /* Marrom médio (Atualizado) */
+    --cor-branco: #3E2B22;      /* (Adicionado) */
+    --cor-fundo-pagina: var(--cor-fundo); 
+    
+    --cor-texto-claro: var(--cor-branco);
+    --cor-texto-principal: #FFFFFF;
     --fonte-serif: 'Arial', serif;
     --fonte-sans: 'Arial', sans-serif;
 }

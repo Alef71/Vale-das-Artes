@@ -64,7 +64,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 elImg.src = produto.fotoUrl || 'https://via.placeholder.com/400?text=Sem+Foto';
             }
 
-            
             const linkArtesao = document.getElementById('link-artesao');
             if (linkArtesao) {
                 let nomeArtesao = 'Artesão Parceiro';
@@ -79,6 +78,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 linkArtesao.textContent = nomeArtesao;
                 if (idArtesao) linkArtesao.href = `perfil-artesao.html?id=${idArtesao}`;
             }
+            
             const btnAdd = document.getElementById('btn-add-carrinho');
             if (btnAdd) {
                 const novoBtn = btnAdd.cloneNode(true);
@@ -201,6 +201,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         };
     }
+    
     async function carregarAvaliacoes() {
         const lista = document.getElementById('lista-avaliacoes');
         if(!lista) return;
@@ -220,7 +221,7 @@ document.addEventListener('DOMContentLoaded', () => {
             lista.innerHTML = avaliacoes.map(a => `
                 <div class="avaliacao-item">
                     <div class="avaliacao-header">
-                        <span class="avaliacao-nome">${a.nomeCliente || 'Cliente'}</span> 
+                        <span class="avaliacao-nome">${a.nomeCliente || 'Anônimo'}</span> 
                         <span class="avaliacao-nota">${'★'.repeat(a.nota)}</span>
                     </div>
                     <p class="avaliacao-texto">${a.comentario}</p>
@@ -234,9 +235,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function enviarAvaliacao(e) {
         e.preventDefault();
+        
         const token = localStorage.getItem('userToken');
         const userId = localStorage.getItem('userId');
         
+        // PEGA O NOME QUE ESTÁ SALVO NO MOMENTO DO LOGIN
+        // Se estiver "Sheva" aqui, é porque você precisa deslogar e logar de novo.
+        const nomeUsuarioLogado = localStorage.getItem('userName'); 
+
+        console.log("Tentando enviar avaliação como:", nomeUsuarioLogado); // <--- OLHE O CONSOLE (F12)
+
         if (!token || !userId) {
             alert("Faça login para avaliar.");
             window.location.href = 'login.html'; 
@@ -250,7 +258,9 @@ document.addEventListener('DOMContentLoaded', () => {
             nota: parseFloat(notaInput.value),
             comentario: comentarioInput.value,
             produtoId: parseInt(produtoId),
-            clienteId: parseInt(userId)
+            clienteId: parseInt(userId),
+            // AQUI ESTÁ O PULO DO GATO: Enviamos o nome que pegamos do localStorage
+            nomeCliente: nomeUsuarioLogado 
         };
 
         try {
@@ -263,11 +273,13 @@ document.addEventListener('DOMContentLoaded', () => {
             if (res.ok) {
                 alert("Avaliação enviada!");
                 comentarioInput.value = '';
-                carregarAvaliacoes();
+                carregarAvaliacoes(); 
             } else {
-                alert("Erro ao enviar avaliação.");
+                const erroData = await res.json().catch(() => ({}));
+                alert("Erro ao enviar avaliação: " + (erroData.message || "Tente novamente"));
             }
         } catch (error) {
+            console.error(error);
             alert("Erro de conexão.");
         }
     }

@@ -13,6 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 import br.com.valedasartes.config.FileStorageService;
 import br.com.valedasartes.domain.artista.Artista;
 import br.com.valedasartes.domain.artista.ArtistaStatus;
+import br.com.valedasartes.domain.artista.dto.ArtistaEnderecoUpdateDTO;
 import br.com.valedasartes.domain.artista.dto.ArtistaRequestDTO;
 import br.com.valedasartes.domain.artista.dto.ArtistaResponseDTO;
 import br.com.valedasartes.domain.artista.dto.ArtistaUpdateDTO;
@@ -46,7 +47,14 @@ public class ArtistaService {
 
         Endereco endereco = new Endereco();
         endereco.setLogradouro(dto.getEndereco().getLogradouro());
-        endereco.setNumero(dto.getEndereco().getNumero());
+        
+        try {
+             String numStr = String.valueOf(dto.getEndereco().getNumero());
+             endereco.setNumero(Integer.parseInt(numStr));
+        } catch (NumberFormatException e) {
+             endereco.setNumero(0); 
+        }
+
         endereco.setComplemento(dto.getEndereco().getComplemento());
         endereco.setBairro(dto.getEndereco().getBairro());
         endereco.setCidade(dto.getEndereco().getCidade());
@@ -101,6 +109,57 @@ public class ArtistaService {
                 return new ArtistaResponseDTO(artistaAtualizado);
                 
             }).orElse(null);
+    }
+
+    // --- MÉTODO CORRIGIDO ---
+    @Transactional
+    public ArtistaResponseDTO atualizarEndereco(Long id, ArtistaEnderecoUpdateDTO dto) {
+        Artista artista = artistaRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Artista não encontrado"));
+
+        Endereco endereco = artista.getEndereco();
+        
+        // Se não existir endereço, cria um novo e vincula
+        if (endereco == null) {
+            endereco = new Endereco();
+            endereco.setArtista(artista); 
+            artista.setEndereco(endereco);
+        }
+
+        // Atualiza os campos
+        endereco.setCep(dto.cep());
+        endereco.setLogradouro(dto.logradouro());
+        endereco.setComplemento(dto.complemento());
+        endereco.setBairro(dto.bairro());
+        endereco.setCidade(dto.cidade());
+        
+        // CORREÇÃO 1: Usa dto.estado() para bater com o DTO novo
+        endereco.setEstado(dto.estado()); 
+        
+        // CORREÇÃO 2: Salva o telefone
+        endereco.setTelefone(dto.telefone());
+
+        // Lógica segura de conversão de Número (String -> Integer)
+        if (dto.numero() != null && !dto.numero().trim().isEmpty()) {
+            try {
+                // Remove caracteres não numéricos (ex: "46A" vira "46")
+                String numeroLimpo = dto.numero().replaceAll("\\D", "");
+                if (!numeroLimpo.isEmpty()) {
+                    endereco.setNumero(Integer.parseInt(numeroLimpo));
+                } else {
+                    endereco.setNumero(0); // Se for só texto (ex: "S/N"), salva 0
+                }
+            } catch (NumberFormatException e) {
+                endereco.setNumero(0);
+            }
+        } else {
+            endereco.setNumero(null); 
+        }
+
+        // Salva explicitamente
+        artistaRepository.save(artista);
+        
+        return new ArtistaResponseDTO(artista);
     }
     
     @Transactional

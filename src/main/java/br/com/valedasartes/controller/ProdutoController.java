@@ -3,33 +3,26 @@ package br.com.valedasartes.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import br.com.valedasartes.domain.produto.dto.ProdutoRequestDTO;
 import br.com.valedasartes.domain.produto.dto.ProdutoResponseDTO;
 import br.com.valedasartes.domain.produto.service.ProdutoService;
-import br.com.valedasartes.domain.security.Credencial;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/produtos")
-@Tag(name = "Produtos", description = "Endpoints para gerenciamento de produtos")
 public class ProdutoController {
 
     private final ProdutoService produtoService;
@@ -39,74 +32,67 @@ public class ProdutoController {
         this.produtoService = produtoService;
     }
 
-    @Operation(summary = "Cria um novo produto (privado, Artista)")
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ProdutoResponseDTO> criarProduto(
-            @Valid @ModelAttribute ProdutoRequestDTO dto,
-            @RequestParam("foto") MultipartFile foto,
-            Authentication authentication
+    @Operation(summary = "Lista produtos para a vitrine (Recentes, max 20, filtro opcional)")
+    @GetMapping
+    public ResponseEntity<List<ProdutoResponseDTO>> listarProdutosPublico(
+            @RequestParam(required = false) String categoria
     ) {
-        Credencial credencial = (Credencial) authentication.getPrincipal();
-        Long artistaId = credencial.getArtista().getId();
-        ProdutoResponseDTO novoProduto = produtoService.criarProduto(dto, foto, artistaId);
-        return new ResponseEntity<>(novoProduto, HttpStatus.CREATED);
-    }
-    
-    @Operation(summary = "Lista todos os produtos ativos (público)")
-    @GetMapping 
-    public ResponseEntity<List<ProdutoResponseDTO>> listarProdutosPublico() {
-        
-        List<ProdutoResponseDTO> produtos = produtoService.listarTodosOsProdutosAtivos();
+        List<ProdutoResponseDTO> produtos = produtoService.listarProdutosVitrine(categoria);
         return ResponseEntity.ok(produtos);
     }
 
-    @Operation(summary = "Lista os produtos do artista logado (privado)")
+    @Operation(summary = "Lista produtos do artista logado (Rota específica 'meus-produtos')")
     @GetMapping("/meus-produtos")
-    public ResponseEntity<List<ProdutoResponseDTO>> listarMeusProdutos(Authentication authentication) {
-        Credencial credencial = (Credencial) authentication.getPrincipal(); 
-        Long artistaId = credencial.getArtista().getId();
-        List<ProdutoResponseDTO> produtos = produtoService.listarProdutosPorArtistaId(artistaId);
-        return ResponseEntity.ok(produtos);
+    public ResponseEntity<List<ProdutoResponseDTO>> listarMeusProdutos(@RequestParam Long artistaId) {
+        return ResponseEntity.ok(produtoService.listarProdutosPorArtistaId(artistaId));
     }
 
-
-    @Operation(summary = "Busca um produto por ID (público)")
+    @Operation(summary = "Busca produto por ID")
     @GetMapping("/{id}")
-    public ResponseEntity<ProdutoResponseDTO> buscarProdutoPorId(@PathVariable Long id) {
+    public ResponseEntity<ProdutoResponseDTO> buscarPorId(@PathVariable Long id) {
         return produtoService.buscarProdutoPorId(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @Operation(summary = "Atualiza um produto (privado, Artista)")
-    @PutMapping("/{id}")
-    public ResponseEntity<ProdutoResponseDTO> atualizarProduto(
-            @PathVariable Long id, 
-            @Valid @RequestBody ProdutoRequestDTO dto,
-            Authentication authentication
-    ) {
-        Credencial credencial = (Credencial) authentication.getPrincipal();
-        Long artistaId = credencial.getArtista().getId();
-        ProdutoResponseDTO produtoAtualizado = produtoService.atualizarProduto(id, dto, artistaId);
-        if (produtoAtualizado != null) {
-            return ResponseEntity.ok(produtoAtualizado);
-        }
-        return ResponseEntity.notFound().build();
-    }
-    
-    @Operation(summary = "Ativa ou Inativa um produto (privado, Artista)")
-    @PutMapping("/{id}/toggle-status")
-    public ResponseEntity<ProdutoResponseDTO> toggleProdutoAtivo(
-            @PathVariable Long id,
-            Authentication authentication
-    ) {
-        Credencial credencial = (Credencial) authentication.getPrincipal();
-        Long artistaId = credencial.getArtista().getId();
-        ProdutoResponseDTO produtoAtualizado = produtoService.toggleProdutoAtivo(id, artistaId);
-        return ResponseEntity.ok(produtoAtualizado);
+    @Operation(summary = "Lista produtos de um artista específico (Via URL)")
+    @GetMapping("/artista/{artistaId}")
+    public ResponseEntity<List<ProdutoResponseDTO>> listarPorArtista(@PathVariable Long artistaId) {
+        return ResponseEntity.ok(produtoService.listarProdutosPorArtistaId(artistaId));
     }
 
-    @Operation(summary = "Deleta um produto (privado, Artista)")
+    @Operation(summary = "Cria um novo produto com foto")
+    @PostMapping(consumes = {"multipart/form-data"})
+    public ResponseEntity<ProdutoResponseDTO> criarProduto(
+            @RequestPart("dados") ProdutoRequestDTO dto,
+            @RequestPart("foto") MultipartFile foto,
+            @RequestParam Long artistaId) {
+        
+        ProdutoResponseDTO novoProduto = produtoService.criarProduto(dto, foto, artistaId);
+        return ResponseEntity.ok(novoProduto);
+    }
+
+    @Operation(summary = "Atualiza dados do produto")
+    @PutMapping("/{id}")
+    public ResponseEntity<ProdutoResponseDTO> atualizarProduto(
+            @PathVariable Long id,
+            @RequestBody ProdutoRequestDTO dto,
+            @RequestParam Long artistaId) {
+        
+        ProdutoResponseDTO atualizado = produtoService.atualizarProduto(id, dto, artistaId);
+        if (atualizado == null) return ResponseEntity.notFound().build();
+        return ResponseEntity.ok(atualizado);
+    }
+
+    @Operation(summary = "Ativa/Desativa um produto")
+    @PutMapping("/{id}/toggle-ativo")
+    public ResponseEntity<ProdutoResponseDTO> toggleAtivo(
+            @PathVariable Long id, 
+            @RequestParam Long artistaId) {
+        return ResponseEntity.ok(produtoService.toggleProdutoAtivo(id, artistaId));
+    }
+
+    @Operation(summary = "Deleta produto")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletarProduto(@PathVariable Long id) {
         produtoService.deletarProduto(id);

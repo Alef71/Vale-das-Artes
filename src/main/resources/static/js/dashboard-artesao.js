@@ -4,26 +4,39 @@ console.log("LOG: dashboard-artesao.js CARREGADO! API:", API_BASE_URL);
 
 document.addEventListener("DOMContentLoaded", function() {
     
+    // Formulários
     const formNovoProduto = document.getElementById('form-novo-produto');
     const formEditarPerfil = document.getElementById('form-editar-artesao');
     const formEditarProduto = document.getElementById('form-editar-produto');
     const formEndereco = document.getElementById('form-endereco');
+    
+    // Elementos de Exibição
     const listaMeusProdutos = document.getElementById('lista-meus-produtos');
     const sidebarNome = document.getElementById('artesao-nome-display');
 
+    // Elementos de Upload de Foto de Perfil
     const previewFoto = document.getElementById('foto-preview-artista');
     const inputFoto = document.getElementById('input-foto-artista');
     const btnCamera = document.getElementById('btn-camera-upload'); 
     const uploadStatus = document.getElementById('upload-status-artista');
 
+    // Elementos de Upload de Foto de Produto (Preview)
+    const inputProdutoFoto = document.getElementById('produto-foto');
+    const imgProdutoPreview = document.getElementById('produto-preview-img');
+    const divUploadPlaceholder = document.getElementById('upload-placeholder');
+
+    // Elementos de Endereço
     const cepInput = document.getElementById('endereco-cep');
+    const btnBuscarCep = document.getElementById('btn-buscar-cep');
     const logradouroInput = document.getElementById('endereco-logradouro');
     const numeroInput = document.getElementById('endereco-numero');
     const complementoInput = document.getElementById('endereco-complemento');
     const bairroInput = document.getElementById('endereco-bairro');
     const cidadeInput = document.getElementById('endereco-cidade');
-    const ufInput = document.getElementById('endereco-uf');
+    const ufInput = document.getElementById('endereco-estado'); // ID correto do HTML
+    const telefoneInput = document.getElementById('endereco-telefone'); // Novo campo adicionado
 
+    // Elementos do Modal de Edição
     const editModal = document.getElementById('editProductModal');
     const closeModalButton = editModal ? editModal.querySelector('.close-button') : null;
     
@@ -33,12 +46,16 @@ document.addEventListener("DOMContentLoaded", function() {
     const editProductPriceInput = document.getElementById('edit-produto-preco');
     const editProductCategoryInput = document.getElementById('edit-produto-categoria');
 
+    // --- Helpers de Autenticação ---
     function getToken() { return localStorage.getItem('userToken'); }
     function getUserId() { return localStorage.getItem('userId'); }
 
+    // --- Cliente API Genérico ---
     async function apiClient(endpoint, method, body = null) {
         const token = getToken();
         const headers = { 'Authorization': `Bearer ${token}` };
+        
+        // Se não for FormData (upload de arquivo), define JSON
         if (body && !(body instanceof FormData)) {
             headers['Content-Type'] = 'application/json';
         }
@@ -64,6 +81,7 @@ document.addEventListener("DOMContentLoaded", function() {
         return await response.json();
     }
 
+    // --- Carga Inicial de Dados ---
     async function checkLoginAndLoadData() {
         const token = getToken();
         const role = localStorage.getItem('userRole');
@@ -78,9 +96,18 @@ document.addEventListener("DOMContentLoaded", function() {
         try {
             const [artista, produtos] = await Promise.all([
                 apiClient(`/artistas/${userId}`, 'GET'),
-                apiClient(`/produtos/meus-produtos`, 'GET')
+                apiClient(`/produtos/meus-produtos?artistaId=${userId}`, 'GET')
             ]);
             
+            if (artista.nome) localStorage.setItem('userName', artista.nome);
+            if (artista.fotoUrl) localStorage.setItem('userPhoto', artista.fotoUrl);
+
+            // Atualiza avatar do header se existir
+            const headerAvatar = document.getElementById('nav-user-avatar');
+            if (headerAvatar && artista.fotoUrl) {
+                headerAvatar.src = `${artista.fotoUrl}?t=${new Date().getTime()}`;
+            }
+
             populatePage(artista, produtos); 
 
         } catch (error) {
@@ -93,6 +120,7 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     }
 
+    // --- Preencher a Tela ---
     function populatePage(artista, produtos) {
         const title = document.getElementById('dashboard-title');
         if(title) title.textContent = `Painel do Artesão - Bem-vindo, ${artista.nome || 'Artesão'}!`;
@@ -103,10 +131,16 @@ document.addEventListener("DOMContentLoaded", function() {
             linkPerfilPublico.href = `perfil-artesao.html?id=${artista.id}`;
         }
 
-        document.getElementById('artesao-nome').value = artista.nome || '';
-        document.getElementById('artesao-nome-empresa').value = artista.nomeEmpresa || '';
-        document.getElementById('artesao-biografia').value = artista.biografia || '';
+        // Dados Pessoais
+        const elNome = document.getElementById('artesao-nome');
+        const elEmpresa = document.getElementById('artesao-nome-empresa');
+        const elBio = document.getElementById('artesao-biografia');
 
+        if(elNome) elNome.value = artista.nome || '';
+        if(elEmpresa) elEmpresa.value = artista.nomeEmpresa || '';
+        if(elBio) elBio.value = artista.biografia || '';
+
+        // Foto de Perfil
         if (previewFoto) {
             const timestamp = new Date().getTime();
             if (artista.fotoUrl) {
@@ -116,46 +150,71 @@ document.addEventListener("DOMContentLoaded", function() {
             }
         }
 
-        if (artista.endereco) {
-            if(cepInput) cepInput.value = artista.endereco.cep || '';
-            if(logradouroInput) logradouroInput.value = artista.endereco.logradouro || '';
-            if(numeroInput) numeroInput.value = artista.endereco.numero || '';
-            if(complementoInput) complementoInput.value = artista.endereco.complemento || '';
-            if(bairroInput) bairroInput.value = artista.endereco.bairro || '';
-            if(cidadeInput) cidadeInput.value = artista.endereco.cidade || '';
-            if(ufInput) ufInput.value = artista.endereco.uf || '';
+        // --- Preenchimento de Endereço ---
+        if (artista && artista.endereco) {
+            const setVal = (el, val) => { if(el) el.value = val || ''; };
+
+            setVal(cepInput, artista.endereco.cep);
+            setVal(logradouroInput, artista.endereco.logradouro);
+            setVal(numeroInput, artista.endereco.numero);
+            setVal(complementoInput, artista.endereco.complemento);
+            setVal(bairroInput, artista.endereco.bairro);
+            setVal(cidadeInput, artista.endereco.cidade);
+            setVal(telefoneInput, artista.endereco.telefone); // Telefone
+            
+            // Lógica para UF/Estado: tenta 'estado', se não tiver, tenta 'uf'
+            setVal(ufInput, artista.endereco.estado || artista.endereco.uf); 
         }
 
         renderProdutos(produtos);
         
+        // Dispara evento para atualizar o preview da bio
         const event = new Event('keyup');
-        if(document.getElementById('artesao-biografia')) document.getElementById('artesao-biografia').dispatchEvent(event);
+        if(elBio) elBio.dispatchEvent(event);
+    }
+
+    // --- Lógica de Busca de CEP ---
+    async function buscarCep(cep) {
+        cep = cep.replace(/\D/g, '');
+        if (cep.length === 8) {
+            try {
+                // Feedback visual
+                if(logradouroInput) logradouroInput.value = "Buscando...";
+                
+                const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+                const data = await response.json();
+                
+                if (!data.erro) {
+                    if(logradouroInput) logradouroInput.value = data.logradouro;
+                    if(bairroInput) bairroInput.value = data.bairro;
+                    if(cidadeInput) cidadeInput.value = data.localidade;
+                    
+                    // ViaCEP retorna 'uf', jogamos no input de estado
+                    if(ufInput) ufInput.value = data.uf;
+                    
+                    if(numeroInput) numeroInput.focus();
+                } else {
+                    alert("CEP não encontrado.");
+                    if(logradouroInput) logradouroInput.value = "";
+                }
+            } catch (error) {
+                console.error("Erro ao buscar CEP:", error);
+                alert("Erro ao buscar CEP.");
+            }
+        }
     }
 
     if (cepInput) {
-        cepInput.addEventListener('blur', async () => {
-            const cep = cepInput.value.replace(/\D/g, '');
-            if (cep.length === 8) {
-                try {
-                    const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
-                    const data = await response.json();
-                    if (!data.erro) {
-                        logradouroInput.value = data.logradouro;
-                        bairroInput.value = data.bairro;
-                        cidadeInput.value = data.localidade;
-                        ufInput.value = data.uf;
-                        numeroInput.focus();
-                    } else {
-                        alert("CEP não encontrado.");
-                    }
-                } catch (error) {
-                    console.error("Erro ao buscar CEP:", error);
-                }
-            }
-        });
+        cepInput.addEventListener('blur', () => buscarCep(cepInput.value));
+    }
+    
+    if (btnBuscarCep && cepInput) {
+        btnBuscarCep.addEventListener('click', () => buscarCep(cepInput.value));
     }
 
+    // --- Upload de Foto de PERFIL ---
     if(btnCamera) btnCamera.addEventListener('click', () => inputFoto.click());
+    
     if(inputFoto) {
         inputFoto.addEventListener('change', async () => {
             const file = inputFoto.files[0];
@@ -175,17 +234,51 @@ document.addEventListener("DOMContentLoaded", function() {
 
                 if (response.ok) {
                     const artistaAtt = await response.json();
-                    previewFoto.src = `${artistaAtt.fotoUrl}?t=${new Date().getTime()}`;
+                    const timestamp = new Date().getTime();
+                    const novaUrl = `${artistaAtt.fotoUrl}?t=${timestamp}`;
+
+                    previewFoto.src = novaUrl;
+                    localStorage.setItem('userPhoto', artistaAtt.fotoUrl);
+                    
+                    const headerAvatar = document.getElementById('nav-user-avatar');
+                    if (headerAvatar) headerAvatar.src = novaUrl;
+
                     uploadStatus.textContent = 'Sucesso!';
                     setTimeout(() => { uploadStatus.textContent = ''; }, 3000);
                 } else throw new Error("Falha no upload");
             } catch (error) {
+                console.error(error);
                 uploadStatus.textContent = 'Erro.';
             }
             inputFoto.value = null;
         });
     }
 
+    // --- Preview de Foto do PRODUTO (Novo) ---
+    if (inputProdutoFoto) {
+        inputProdutoFoto.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(evt) {
+                    if(imgProdutoPreview) {
+                        imgProdutoPreview.src = evt.target.result;
+                        imgProdutoPreview.style.display = 'block';
+                    }
+                    if(divUploadPlaceholder) divUploadPlaceholder.style.display = 'none';
+                }
+                reader.readAsDataURL(file);
+            } else {
+                if(imgProdutoPreview) {
+                    imgProdutoPreview.style.display = 'none';
+                    imgProdutoPreview.src = '';
+                }
+                if(divUploadPlaceholder) divUploadPlaceholder.style.display = 'flex';
+            }
+        });
+    }
+
+    // --- Renderização de Produtos ---
     function renderProdutos(produtos) {
         if (!listaMeusProdutos) return;
         listaMeusProdutos.innerHTML = '';
@@ -196,7 +289,8 @@ document.addEventListener("DOMContentLoaded", function() {
         produtos.forEach(produto => {
             const card = document.createElement('article');
             card.className = `meu-produto-item ${!produto.ativo ? 'inativo' : ''}`; 
-            const fotoUrl = produto.fotoUrl || 'https://placehold.co/150?text=Sem+Foto';
+            
+            const fotoUrl = produto.fotoUrl ? produto.fotoUrl : 'https://placehold.co/150?text=Sem+Foto';
             
             const btnStatus = produto.ativo 
                 ? `<button class="btn-toggle-status btn-inativar" data-id="${produto.id}">Inativar</button>`
@@ -217,6 +311,7 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 
+    // --- Submit: Dados Pessoais ---
     if (formEditarPerfil) {
         formEditarPerfil.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -229,80 +324,128 @@ document.addEventListener("DOMContentLoaded", function() {
                 await apiClient(`/artistas/${getUserId()}`, 'PUT', dados);
                 alert('Perfil atualizado!');
                 if(sidebarNome) sidebarNome.textContent = dados.nome;
+                localStorage.setItem('userName', dados.nome);
             } catch (err) { alert(err.message); }
         });
     }
 
+    // --- Submit: Endereço (Atualizado com Telefone e Estado) ---
     if (formEndereco) {
         formEndereco.addEventListener('submit', async (e) => {
             e.preventDefault();
+            
+            const getVal = (el) => el ? el.value : '';
+
             const dadosEndereco = {
-                cep: cepInput.value,
-                logradouro: logradouroInput.value,
-                numero: numeroInput.value,
-                complemento: complementoInput.value,
-                bairro: bairroInput.value,
-                cidade: cidadeInput.value,
-                uf: ufInput.value
+                cep: getVal(cepInput),
+                logradouro: getVal(logradouroInput),
+                numero: getVal(numeroInput),
+                complemento: getVal(complementoInput),
+                bairro: getVal(bairroInput),
+                cidade: getVal(cidadeInput),
+                estado: getVal(ufInput), // Envia como 'estado' (baseado no DTO mais comum)
+                telefone: getVal(telefoneInput) // Novo campo
             };
 
             try {
                 await apiClient(`/artistas/${getUserId()}/endereco`, 'PUT', dadosEndereco);
-                alert('Endereço atualizado com sucesso!');
+                alert('Endereço e contato atualizados com sucesso!');
             } catch (err) {
+                console.error(err);
                 alert('Erro ao salvar endereço: ' + err.message);
             }
         });
     }
 
+    // --- Submit: Novo Produto ---
     if (formNovoProduto) {
         formNovoProduto.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const formData = new FormData(formNovoProduto);
+            
+            const nome = formNovoProduto.querySelector('input[name="nome"]').value;
+            const descricao = formNovoProduto.querySelector('textarea[name="descricao"]').value;
+            const preco = formNovoProduto.querySelector('input[name="preco"]').value;
+            const categoria = formNovoProduto.querySelector('select[name="categoria"]').value;
+            const arquivoFoto = formNovoProduto.querySelector('input[name="foto"]').files[0];
+
+            if(!arquivoFoto) {
+                alert("A foto do produto é obrigatória!");
+                return;
+            }
+
+            const produtoDTO = {
+                nome: nome,
+                descricao: descricao,
+                preco: parseFloat(preco),
+                categoria: categoria
+            };
+
+            const finalFormData = new FormData();
+            // Backend espera um blob JSON na parte "dados" e arquivo na parte "foto"
+            const jsonBlob = new Blob([JSON.stringify(produtoDTO)], { type: 'application/json' });
+            finalFormData.append("dados", jsonBlob);
+            finalFormData.append("foto", arquivoFoto);
+
             try {
-                await fetch(`${API_BASE_URL}/produtos`, {
+                const res = await fetch(`${API_BASE_URL}/produtos?artistaId=${getUserId()}`, {
                     method: 'POST',
                     headers: { 'Authorization': `Bearer ${getToken()}` },
-                    body: formData
-                }).then(async res => {
-                    if(res.ok) {
-                        alert('Produto cadastrado!');
-                        formNovoProduto.reset();
-                        checkLoginAndLoadData();
-                    } else throw new Error((await res.json()).message);
+                    body: finalFormData
                 });
-            } catch (err) { alert(err.message); }
+                
+                if(res.ok) {
+                    alert('Produto cadastrado!');
+                    formNovoProduto.reset();
+                    // Limpa preview
+                    if(imgProdutoPreview) {
+                        imgProdutoPreview.style.display = 'none';
+                        imgProdutoPreview.src = '';
+                    }
+                    if(divUploadPlaceholder) divUploadPlaceholder.style.display = 'flex';
+                    
+                    checkLoginAndLoadData(); // Recarrega lista
+                } else {
+                    const erro = await res.json();
+                    throw new Error(erro.message || "Erro ao criar produto");
+                }
+            } catch (err) { 
+                alert(err.message); 
+            }
         });
     }
 
+    // --- Ações na Lista de Produtos (Inativar/Editar) ---
     if (listaMeusProdutos) {
         listaMeusProdutos.addEventListener('click', async (e) => {
             const target = e.target;
             const id = target.dataset.id;
             if (!id) return; 
 
+            // Botão Inativar/Ativar
             if (target.classList.contains('btn-toggle-status')) {
-                if (!confirm(`Alterar status?`)) return;
+                if (!confirm(`Alterar status do produto?`)) return;
                 try {
-                    await apiClient(`/produtos/${id}/toggle-status`, 'PUT');
+                    await apiClient(`/produtos/${id}/toggle-ativo?artistaId=${getUserId()}`, 'PUT');
                     checkLoginAndLoadData(); 
                 } catch (err) { alert(err.message); }
             }
-
+            
+            // Botão Editar
             if (target.classList.contains('btn-editar-produto')) {
                 openEditModal(id); 
             }
         });
     }
 
+    // --- Modal de Edição ---
     async function openEditModal(id) {
         try {
             const produto = await apiClient(`/produtos/${id}`, 'GET');
-            editProductIdInput.value = produto.id;
-            editProductNameInput.value = produto.nome;
-            editProductDescInput.value = produto.descricao;
-            editProductPriceInput.value = produto.preco;
-            editProductCategoryInput.value = produto.categoria;
+            if(editProductIdInput) editProductIdInput.value = produto.id;
+            if(editProductNameInput) editProductNameInput.value = produto.nome;
+            if(editProductDescInput) editProductDescInput.value = produto.descricao;
+            if(editProductPriceInput) editProductPriceInput.value = produto.preco;
+            if(editProductCategoryInput) editProductCategoryInput.value = produto.categoria;
             if(editModal) editModal.style.display = 'block';
         } catch (err) { alert(err.message); }
     }
@@ -322,7 +465,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 categoria: editProductCategoryInput.value
             };
             try {
-                await apiClient(`/produtos/${id}`, 'PUT', dados);
+                await apiClient(`/produtos/${id}?artistaId=${getUserId()}`, 'PUT', dados);
                 alert('Produto atualizado!');
                 closeModal(); 
                 checkLoginAndLoadData(); 
@@ -330,5 +473,6 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 
+    // Inicia a aplicação
     checkLoginAndLoadData();
 });

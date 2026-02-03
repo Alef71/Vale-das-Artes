@@ -24,6 +24,7 @@ import br.com.valedasartes.domain.artista.dto.ArtistaRequestDTO;
 import br.com.valedasartes.domain.artista.dto.ArtistaResponseDTO;
 import br.com.valedasartes.domain.artista.dto.ArtistaStatusUpdateDTO;
 import br.com.valedasartes.domain.artista.dto.ArtistaUpdateDTO;
+import br.com.valedasartes.domain.artista.dto.ArtistaEnderecoUpdateDTO; // Importe o novo DTO
 import br.com.valedasartes.domain.artista.service.ArtistaService;
 import br.com.valedasartes.domain.security.Credencial;
 import io.swagger.v3.oas.annotations.Operation;
@@ -78,7 +79,7 @@ public class ArtistaController {
     }
     
 
-    @Operation(summary = "Atualiza um artista existente", description = "Atualiza os dados cadastrais de um artista.")
+    @Operation(summary = "Atualiza um artista existente", description = "Atualiza os dados cadastrais básicos de um artista.")
     @PutMapping("/{id}")
     public ResponseEntity<ArtistaResponseDTO> atualizarArtista(@PathVariable Long id, @Valid @RequestBody ArtistaUpdateDTO dto) {
         ArtistaResponseDTO artistaAtualizado = artistaService.atualizarArtista(id, dto);
@@ -88,6 +89,17 @@ public class ArtistaController {
         return ResponseEntity.notFound().build();
     }
     
+    // --- NOVO MÉTODO CORRIGIDO ---
+    @Operation(summary = "Atualiza o endereço do artista")
+    @PutMapping("/{id}/endereco")
+    public ResponseEntity<ArtistaResponseDTO> atualizarEnderecoArtista(
+            @PathVariable Long id, 
+            @Valid @RequestBody ArtistaEnderecoUpdateDTO dto) {
+        
+        ArtistaResponseDTO artistaAtualizado = artistaService.atualizarEndereco(id, dto);
+        return ResponseEntity.ok(artistaAtualizado);
+    }
+    // -----------------------------
 
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Atualiza o status de aprovação do artista (Administrativo)")

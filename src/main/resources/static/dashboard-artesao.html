@@ -84,10 +84,17 @@
                         <h2><i class="fas fa-plus"></i> Cadastrar Novo Produto</h2>
                     </div>
                     <form id="form-novo-produto" enctype="multipart/form-data" class="form-grid">
+                        
                         <div class="form-col-img">
-                            <label class="upload-box">
-                                <i class="fas fa-cloud-upload-alt"></i>
-                                <span>Escolher Foto</span>
+                            <label class="upload-box" style="position: relative; overflow: hidden;">
+                                <div id="upload-placeholder" style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                                    <i class="fas fa-cloud-upload-alt"></i>
+                                    <span>Escolher Foto</span>
+                                </div>
+
+                                <img id="produto-preview-img" src="" alt="Preview do Produto" 
+                                     style="display: none; width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; z-index: 1;">
+                                
                                 <input type="file" id="produto-foto" name="foto" accept="image/*" required>
                             </label>
                         </div>
@@ -173,48 +180,53 @@
                         <p>Local de onde seus produtos são enviados.</p>
                     </div>
 
-                    <form id="form-endereco">
-                        <div class="form-row">
-                            <div class="form-group" style="flex: 0 0 150px;">
-                                <label>CEP</label>
-                                <div style="position: relative;">
-                                    <input type="text" id="endereco-cep" name="cep" placeholder="00000-000" maxlength="9" required>
-                                    <i class="fas fa-search" style="position: absolute; right: 10px; top: 12px; color: #999;"></i>
-                                </div>
-                            </div>
-                            <div class="form-group" style="flex: 1;">
-                                <label>Rua / Logradouro</label>
-                                <input type="text" id="endereco-logradouro" name="logradouro" readonly required style="background-color: #eee;">
+                    <form id="form-endereco" class="form-grid">
+                        <div class="form-group">
+                            <label>CEP</label>
+                            <div style="display: flex; gap: 5px;">
+                                <input type="text" id="endereco-cep" name="cep" placeholder="00000-000" maxlength="9">
+                                <button type="button" id="btn-buscar-cep" style="cursor: pointer;" title="Buscar CEP">🔍</button>
                             </div>
                         </div>
-
-                        <div class="form-row">
-                            <div class="form-group" style="flex: 0 0 100px;">
-                                <label>Número</label>
-                                <input type="text" id="endereco-numero" name="numero" required>
-                            </div>
-                            <div class="form-group" style="flex: 1;">
-                                <label>Complemento</label>
-                                <input type="text" id="endereco-complemento" name="complemento">
-                            </div>
+                    
+                        <div class="form-group">
+                            <label>Telefone</label>
+                            <input type="text" id="endereco-telefone" name="telefone" placeholder="(00) 00000-0000">
                         </div>
-
-                        <div class="form-row">
-                            <div class="form-group half">
-                                <label>Bairro</label>
-                                <input type="text" id="endereco-bairro" name="bairro" readonly required style="background-color: #eee;">
-                            </div>
-                            <div class="form-group half">
-                                <label>Cidade</label>
-                                <input type="text" id="endereco-cidade" name="cidade" readonly required style="background-color: #eee;">
-                            </div>
-                            <div class="form-group" style="flex: 0 0 80px;">
-                                <label>UF</label>
-                                <input type="text" id="endereco-uf" name="uf" readonly required style="background-color: #eee;">
-                            </div>
+                    
+                        <div class="form-group">
+                            <label>Rua / Logradouro</label>
+                            <input type="text" id="endereco-logradouro" name="logradouro">
                         </div>
-
-                        <button type="submit" class="btn-full">Salvar Endereço</button>
+                    
+                        <div class="form-group">
+                            <label>Número</label>
+                            <input type="text" id="endereco-numero" name="numero">
+                        </div>
+                    
+                        <div class="form-group">
+                            <label>Complemento</label>
+                            <input type="text" id="endereco-complemento" name="complemento">
+                        </div>
+                    
+                        <div class="form-group">
+                            <label>Bairro</label>
+                            <input type="text" id="endereco-bairro" name="bairro">
+                        </div>
+                    
+                        <div class="form-group">
+                            <label>Cidade</label>
+                            <input type="text" id="endereco-cidade" name="cidade">
+                        </div>
+                    
+                        <div class="form-group">
+                            <label>Estado (UF)</label>
+                            <input type="text" id="endereco-estado" name="estado" maxlength="2">
+                        </div>
+                    
+                        <div class="form-group full-width">
+                            <button type="submit" class="btn-salvar">Salvar Endereço</button>
+                        </div>
                     </form>
                 </div>
 
@@ -268,7 +280,6 @@
             }
         }
         
-        // Listener simples para atualizar nome/atelie no preview quando carregar
         document.addEventListener("DOMContentLoaded", function() {
             setTimeout(() => {
                 const nomeInput = document.getElementById('artesao-nome');
@@ -286,7 +297,7 @@
                 if(bioInput) {
                     document.getElementById('preview-bio').textContent = bioInput.value || 'Biografia...';
                 }
-            }, 1000); // Pequeno delay para esperar o JS principal carregar os dados
+            }, 1000); 
         });
     </script>
 

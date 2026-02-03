@@ -37,7 +37,7 @@ public class Artista {
     @Column(name = "cpf_artista", nullable = false, unique = true)
     private String cpf;
 
-    @Column(name = "cnpj_artista", unique = true)
+    @Column(name = "cnpj_artista", unique = true, nullable = true) 
     private String cnpj;
 
     @Column(name = "telefone_artista", nullable = false)
@@ -60,20 +60,18 @@ public class Artista {
     @ColumnDefault("'PENDENTE'")
     private ArtistaStatus statusAprovacao = ArtistaStatus.PENDENTE;
 
-    
     @JsonManagedReference
     @OneToMany(mappedBy = "artista", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Produto> produtos = new ArrayList<>();
 
-    
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     @JoinColumn(name = "id_credencial", referencedColumnName = "id_credencial", unique = true)
     private Credencial credencial;
 
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
-    @JoinColumn(name = "id_endereco", referencedColumnName = "id_endereco", unique = true)
+    // --- MUDANÇA IMPORTANTE AQUI ---
+    // mappedBy indica que a tabela 'endereco' é dona da chave estrangeira.
+    @OneToOne(mappedBy = "artista", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private Endereco endereco;
-
 
     public Artista() {
     }
@@ -85,8 +83,17 @@ public class Artista {
         this.nome = nome;
         this.nomeEmpresa = nomeEmpresa;
     }
-
    
+    // Método auxiliar CRÍTICO para garantir que o relacionamento seja salvo corretamente
+    public void setEndereco(Endereco endereco) {
+        this.endereco = endereco;
+        if (endereco != null) {
+            endereco.setArtista(this); // Vincula o artista dentro do endereço
+        }
+    }
+
+    public Endereco getEndereco() { return endereco; }
+
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     public String getCpf() { return cpf; }
@@ -103,8 +110,6 @@ public class Artista {
     public void setProdutos(List<Produto> produtos) { this.produtos = produtos; }
     public Credencial getCredencial() { return credencial; }
     public void setCredencial(Credencial credencial) { this.credencial = credencial; }
-    public Endereco getEndereco() { return endereco; }
-    public void setEndereco(Endereco endereco) { this.endereco = endereco; }
     public String getBiografia() { return biografia; }
     public void setBiografia(String biografia) { this.biografia = biografia; }
     public String getFotoUrl() { return fotoUrl; }

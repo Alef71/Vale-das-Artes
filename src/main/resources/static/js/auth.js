@@ -24,6 +24,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
     let tokenRecuperacaoTemp = null;
 
+    // Inicialização de visualização
     if(viewSelection) viewSelection.style.display = 'none';
     if(viewCadastro) viewCadastro.style.display = 'none';
     if(viewRecuperar) viewRecuperar.style.display = 'none';
@@ -51,31 +52,29 @@ document.addEventListener("DOMContentLoaded", function() {
         tokenRecuperacaoTemp = null;
         formRecuperar.reset();
         
-        const senhaInput = document.getElementById("nova-senha-recuperacao");
-        if (senhaInput) {
-             formRecuperar.innerHTML = `
-                <h2>Recuperar Senha</h2>
-                <p>Informe CPF e WhatsApp para confirmar sua identidade.</p>
-                <div class="input-group">
-                    <label>Seu CPF</label>
-                    <input type="text" id="recuperar-cpf" placeholder="000.000.000-00" required>
-                </div>
-                <div class="input-group">
-                    <label>Seu WhatsApp</label>
-                    <input type="text" id="recuperar-telefone" placeholder="(00) 00000-0000" required>
-                </div>
-                <button type="submit" class="btn-primary">Verificar Dados</button>
-             `;
-        }
+        formRecuperar.innerHTML = `
+            <h2>Recuperar Senha</h2>
+            <p>Informe CPF e WhatsApp para confirmar sua identidade.</p>
+            <div class="input-group">
+                <label>Seu CPF</label>
+                <input type="text" id="recuperar-cpf" placeholder="000.000.000-00" required>
+            </div>
+            <div class="input-group">
+                <label>Seu WhatsApp</label>
+                <input type="text" id="recuperar-telefone" placeholder="(00) 00000-0000" required>
+            </div>
+            <button type="submit" class="btn-primary">Verificar Dados</button>
+        `;
     }
 
+    // Navegação
     if(btnIrCadastro) btnIrCadastro.addEventListener('click', (e) => { e.preventDefault(); showView('view-selection'); });
     if(btnVoltarLoginSel) btnVoltarLoginSel.addEventListener('click', (e) => { e.preventDefault(); showView('view-login'); });
     if(btnVoltarSelecao) btnVoltarSelecao.addEventListener('click', (e) => { e.preventDefault(); showView('view-selection'); });
-    
     if(btnEsqueciSenha) btnEsqueciSenha.addEventListener('click', (e) => { e.preventDefault(); showView('view-recuperar'); });
     if(btnVoltarLoginRec) btnVoltarLoginRec.addEventListener('click', (e) => { e.preventDefault(); showView('view-login'); });
 
+    // Evento customizado para seleção de perfil
     document.addEventListener('roleSelected', (e) => {
         const role = e.detail; 
         if (role === 'cliente') {
@@ -90,10 +89,9 @@ document.addEventListener("DOMContentLoaded", function() {
         showView('view-cadastro');
     });
 
+    // Helper para chamadas API
     async function apiFetch(endpoint, method = 'POST', body = null) {
-        const token = localStorage.getItem('userToken');
         const headers = { 'Content-Type': 'application/json' };
-    
         const config = { method: method, headers: headers };
         if (body) config.body = JSON.stringify(body);
     
@@ -114,6 +112,7 @@ document.addEventListener("DOMContentLoaded", function() {
         return text ? JSON.parse(text) : {};
     }
 
+    // Lógica de Login
     if (formLogin) {
         formLogin.addEventListener("submit", async function(event) {
             event.preventDefault(); 
@@ -131,12 +130,8 @@ document.addEventListener("DOMContentLoaded", function() {
                 localStorage.setItem('userToken', data.token); 
                 localStorage.setItem('userRole', data.role);
                 localStorage.setItem('userId', data.userId);
-                
-                let fotoFinal = data.fotoUrl;
-                let nomeFinal = data.nome;
-
-                if (nomeFinal) localStorage.setItem('userName', nomeFinal);
-                if (fotoFinal) localStorage.setItem('userPhoto', fotoFinal);
+                if (data.nome) localStorage.setItem('userName', data.nome);
+                if (data.fotoUrl) localStorage.setItem('userPhoto', data.fotoUrl);
                 
                 if (data.role === 'ROLE_CLIENTE') {
                     window.location.href = 'dashboard-cliente.html';
@@ -154,6 +149,7 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 
+    // Lógica de Cadastro
     if (formCadastro) {
         formCadastro.addEventListener("submit", async function(event) {
             event.preventDefault();
@@ -161,8 +157,7 @@ document.addEventListener("DOMContentLoaded", function() {
             const dados = Object.fromEntries(formData.entries());
             const btn = formCadastro.querySelector("button[type='submit']");
             
-            if (!dados.tipoConta) dados.tipoConta = radioCliente.checked ? 'cliente' : 'artesao';
-
+            const tipoConta = radioArtesao.checked ? 'artesao' : 'cliente';
             const telefoneParaEndereco = dados.telefoneEndereco && dados.telefoneEndereco.trim() !== "" 
                 ? dados.telefoneEndereco 
                 : dados.telefone;
@@ -172,6 +167,9 @@ document.addEventListener("DOMContentLoaded", function() {
                 cpf: dados.cpf,
                 telefone: dados.telefone,
                 credencial: { email: dados.email, senha: dados.senha },
+                // Trata CNPJ e NomeEmpresa como null se estiverem vazios ou se for cliente
+                cnpj: (tipoConta === 'artesao' && dados.cnpj?.trim()) ? dados.cnpj : null,
+                nomeEmpresa: (tipoConta === 'artesao' && dados.nomeEmpresa?.trim()) ? dados.nomeEmpresa : null,
                 endereco: {
                     logradouro: dados.logradouro,
                     numero: parseInt(dados.numero) || 0,
@@ -184,11 +182,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 }
             };
             
-            if (dados.tipoConta === 'artesao') {
-                payload.nomeEmpresa = dados.nomeEmpresa;
-                payload.cnpj = dados.cnpj;
-            }
-            const endpoint = dados.tipoConta === 'cliente' ? '/api/clientes' : '/api/artistas';
+            const endpoint = tipoConta === 'cliente' ? '/api/clientes' : '/api/artistas';
 
             try {
                 btn.disabled = true;
@@ -206,14 +200,15 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 
+    // Lógica de Recuperação de Senha
     if (formRecuperar) {
         formRecuperar.addEventListener("submit", async function(event) {
             event.preventDefault();
             const btn = formRecuperar.querySelector("button");
             
+            // Fluxo 2: Definir nova senha
             if (tokenRecuperacaoTemp) {
                 const novaSenha = document.getElementById("nova-senha-recuperacao").value;
-                
                 if (!novaSenha || novaSenha.length < 3) {
                     alert("A senha deve ter pelo menos 3 caracteres.");
                     return;
@@ -222,16 +217,13 @@ document.addEventListener("DOMContentLoaded", function() {
                 try {
                     btn.innerText = "Salvando...";
                     btn.disabled = true;
-
                     await apiFetch('/api/auth/salvar-nova-senha', 'POST', {
                         token: tokenRecuperacaoTemp,
                         novaSenha: novaSenha
                     });
-
-                    alert("Sucesso! Senha alterada. Faça login com a nova senha.");
+                    alert("Sucesso! Senha alterada.");
                     showView('view-login');
                     resetRecuperacaoForm();
-
                 } catch (err) {
                     alert(err.message);
                 } finally {
@@ -241,31 +233,21 @@ document.addEventListener("DOMContentLoaded", function() {
                 return;
             }
 
+            // Fluxo 1: Verificar identidade
             const cpfInput = document.getElementById("recuperar-cpf");
             const telInput = document.getElementById("recuperar-telefone");
-            
             if (!cpfInput || !telInput) return;
-
-            const cpf = cpfInput.value;
-            const telefone = telInput.value;
-
-            if (!cpf || !telefone) {
-                alert("Preencha todos os campos.");
-                return;
-            }
 
             try {
                 btn.disabled = true;
                 btn.innerText = "Verificando...";
-
                 const data = await apiFetch('/api/auth/esqueci-senha', 'POST', { 
-                    cpf: cpf, 
-                    telefone: telefone 
+                    cpf: cpfInput.value, 
+                    telefone: telInput.value 
                 });
 
                 tokenRecuperacaoTemp = data.token;
-                
-                alert(data.mensagem || "Dados confirmados! Defina a nova senha.");
+                alert(data.mensagem || "Dados confirmados!");
 
                 formRecuperar.innerHTML = `
                     <h2>Definir Nova Senha</h2>
@@ -276,12 +258,11 @@ document.addEventListener("DOMContentLoaded", function() {
                     </div>
                     <button type="submit" class="btn-primary" style="background-color: #2ecc71;">Salvar Nova Senha</button>
                 `;
-
             } catch (error) {
                 alert("Erro: " + error.message);
-                btn.innerText = "Verificar Dados";
             } finally {
                 btn.disabled = false;
+                if (!tokenRecuperacaoTemp) btn.innerText = "Verificar Dados";
             }
         });
     }

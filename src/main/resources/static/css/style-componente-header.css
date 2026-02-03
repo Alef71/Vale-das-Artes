@@ -1,35 +1,34 @@
 /* --- HEADER --- */
 .navbar {
     /* 1. Cor de fundo (Marrom) */
-    background-color: #431f0f !important;
-
-    /* 2. IMAGEM: Tente com os dois pontos "../" se usar arquivo CSS separado */
-    /* Se não funcionar, apague os "../" e deixe só "images/..." */
-    background-image: url('../images/vale-header.png') !important;
+    background-color: #2b231a !important;
     
-    /* 3. Posição e Repetição */
-    background-position: top left !important;
-    background-repeat: repeat-x !important;
+    /* 2. REMOVIDA A IMAGEM DE FUNDO */
+    background-image: none !important;
     
-    /* 4. TAMANHO FIXO NA ALTURA */
-    /* Define 60px de altura para a faixa. A largura é automática */
-    background-size: auto 25px !important;
-    
-    /* Restante das configurações */
+    /* Configurações padrão da barra */
     padding: 10px 0;
     box-shadow: 0 4px 20px rgba(0,0,0,0.4);
     position: sticky;
     top: 0;
     z-index: 1000;
+    
+    /* Garante alinhamento vertical */
+    display: flex;
+    justify-content: center;
 }
 
 .navbar .container-fluid {
+    width: 100%;
     max-width: 1400px;
     margin: 0 auto;
     padding: 0 30px;
+    
+    /* 3. ALINHAMENTO NAS PONTAS */
     display: flex;
-    justify-content: space-between;
-    align-items: center;
+    justify-content: space-between; /* Joga Logo pra esq e User pra dir */
+    align-items: center;            /* Centraliza verticalmente */
+    /* gap removido para permitir o espaçamento total */
 }
 
 /* LOGO */
@@ -37,12 +36,14 @@
     height: 80px; 
     max-width: 200px;
     width: auto;
+    display: block; 
 }
 
 /* ÁREA DE AÇÕES */
 .navbar-actions {
     display: flex;
     align-items: center;
+    justify-content: center;
 }
 
 /* BOTÃO VISITANTE */
@@ -67,14 +68,15 @@
 #auth-logado {
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 20px; 
 }
 
-/* FOTO DE PERFIL (MANTIDA OVAL/COMPRIDA) */
+/* FOTO DE PERFIL (REDONDA) */
 .nav-avatar-img {
-    height: 50px;       
-    width: 90px;         /* 90px deixa ela oval como você pediu */
-    border-radius: 50px; /* Borda arredondada completa */
+    height: 50px;      
+    width: 50px;         /* Largura igual altura = Quadrado */
+    border-radius: 50%;  /* Transforma quadrado em círculo */
     object-fit: cover;  
     border: 2px solid #9c8b75;
     cursor: pointer;

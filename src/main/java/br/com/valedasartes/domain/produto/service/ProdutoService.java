@@ -33,6 +33,27 @@ public class ProdutoService {
         this.fileStorageService = fileStorageService;
     }
 
+    /**
+     * NOVO MÉTODO: Busca produtos para a vitrine (Home).
+     * Regras: Apenas ativos, Máximo 20 itens, Ordenados pelo mais recente (ID).
+     * Se passar categoria, filtra por ela.
+     */
+    public List<ProdutoResponseDTO> listarProdutosVitrine(String categoria) {
+        List<Produto> produtos;
+
+        // Se a categoria foi informada e não está vazia (ex: "CERAMICA")
+        if (categoria != null && !categoria.trim().isEmpty()) {
+            produtos = produtoRepository.findTop20ByCategoriaIgnoreCaseAndAtivoTrueOrderByIdDesc(categoria);
+        } else {
+            // Se não tem categoria, traz os 20 mais recentes gerais
+            produtos = produtoRepository.findTop20ByAtivoTrueOrderByIdDesc();
+        }
+
+        return produtos.stream()
+                .map(ProdutoResponseDTO::new)
+                .collect(Collectors.toList());
+    }
+
     @Transactional
     public ProdutoResponseDTO criarProduto(ProdutoRequestDTO dto, MultipartFile foto, Long artistaId) {
         
@@ -88,7 +109,7 @@ public class ProdutoService {
     }
 
     public void deletarProduto(Long id) {
-        
+        // Implementar lógica de deleção se necessário
     }
 
     @Transactional
@@ -105,7 +126,6 @@ public class ProdutoService {
                 return new ProdutoResponseDTO(produtoAtualizado);
             }).orElseThrow(() -> new RuntimeException("Produto não encontrado!"));
     }
-    
     
     public List<ProdutoResponseDTO> listarTodosOsProdutosAtivos() {
         return produtoRepository.findAll()

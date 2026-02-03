@@ -2,11 +2,16 @@ package br.com.valedasartes.domain.endereco;
 
 import java.util.Objects;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import br.com.valedasartes.domain.artista.Artista;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 
 @Entity(name = "Endereco")
@@ -42,6 +47,13 @@ public class Endereco {
     @Column(nullable = false)
     private String cep;
 
+    // --- NOVO RELACIONAMENTO ---
+    // Isso cria a coluna 'id_artista' na tabela Endereço
+    @JsonIgnore // Importante: Evita erro de loop infinito no JSON
+    @OneToOne
+    @JoinColumn(name = "id_artista")
+    private Artista artista;
+
     public Endereco() {
     }
 
@@ -56,77 +68,34 @@ public class Endereco {
         this.cep = cep;
     }
 
-    public Long getId() {
-        return id;
+    // Getters e Setters do Artista
+    public Artista getArtista() {
+        return artista;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setArtista(Artista artista) {
+        this.artista = artista;
     }
 
-    public String getLogradouro() {
-        return logradouro;
-    }
-
-    public void setLogradouro(String logradouro) {
-        this.logradouro = logradouro;
-    }
-
-    public String getComplemento() {
-        return complemento;
-    }
-
-    public void setComplemento(String complemento) {
-        this.complemento = complemento;
-    }
-
-    public String getTelefone() {
-        return telefone;
-    }
-
-    public void setTelefone(String telefone) {
-        this.telefone = telefone;
-    }
-
-    public Integer getNumero() {
-        return numero;
-    }
-
-    public void setNumero(Integer numero) {
-        this.numero = numero;
-    }
-
-    public String getBairro() {
-        return bairro;
-    }
-
-    public void setBairro(String bairro) {
-        this.bairro = bairro;
-    }
-
-    public String getCidade() {
-        return cidade;
-    }
-
-    public void setCidade(String cidade) {
-        this.cidade = cidade;
-    }
-
-    public String getEstado() {
-        return estado;
-    }
-
-    public void setEstado(String estado) {
-        this.estado = estado;
-    }
-
-    public String getCep() {
-        return cep;
-    }
-
-    public void setCep(String cep) {
-        this.cep = cep;
-    }
+    // Demais Getters e Setters
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+    public String getLogradouro() { return logradouro; }
+    public void setLogradouro(String logradouro) { this.logradouro = logradouro; }
+    public String getComplemento() { return complemento; }
+    public void setComplemento(String complemento) { this.complemento = complemento; }
+    public String getTelefone() { return telefone; }
+    public void setTelefone(String telefone) { this.telefone = telefone; }
+    public Integer getNumero() { return numero; }
+    public void setNumero(Integer numero) { this.numero = numero; }
+    public String getBairro() { return bairro; }
+    public void setBairro(String bairro) { this.bairro = bairro; }
+    public String getCidade() { return cidade; }
+    public void setCidade(String cidade) { this.cidade = cidade; }
+    public String getEstado() { return estado; }
+    public void setEstado(String estado) { this.estado = estado; }
+    public String getCep() { return cep; }
+    public void setCep(String cep) { this.cep = cep; }
 
     @Override
     public boolean equals(Object o) {
@@ -141,4 +110,3 @@ public class Endereco {
         return Objects.hash(id);
     }
 }
-

@@ -1,9 +1,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap');
 
 :root {
-    --cor-fundo: #EAE4D8;       /* Bege Fundo */
-    --cor-primaria: #3E2B22;    /* Marrom Escuro */
-    --cor-secundaria: #5A4A42;  /* Marrom Médio */
+    --cor-fundo: #EAE4D8;       
+    --cor-primaria: #3E2B22;    
+    --cor-secundaria: #5A4A42;  
     --cor-branco: #FFFFFF;
 }
 
@@ -129,7 +129,7 @@ body {
 /* Botão WhatsApp (Marrom Escuro) */
 .btn-primary {
     background-color: var(--cor-primaria);
-    color: var(--cor-branco);
+    color: rgb(8, 230, 8);
     box-shadow: 0 4px 10px rgba(62, 43, 34, 0.3);
 }
 
@@ -166,7 +166,7 @@ body {
 }
 
 .section-header h3 {
-    color: var(--cor-primaria);
+    color:  #5A4A42;
     font-size: 1.3rem;
     font-weight: 700;
 }
