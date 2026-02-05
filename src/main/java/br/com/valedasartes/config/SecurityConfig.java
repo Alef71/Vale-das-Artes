@@ -39,6 +39,14 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 .requestMatchers("/auth/**", "/api/auth/**").permitAll()
                 
+                // --- Static Resources (HTML, CSS, JS, Images) - Wildcard patterns ---
+                // pode acessar via localhost:8080/index.html ou qualquer outro .html
+                .requestMatchers("/*.html").permitAll()
+                .requestMatchers("/css/**").permitAll()
+                .requestMatchers("/js/**").permitAll()
+                .requestMatchers("/images/**").permitAll()
+                .requestMatchers("/").permitAll()
+                
                 // --- LIBERAÇÃO DOS CADASTROS (CORREÇÃO DO ERRO 403) ---
                 .requestMatchers(HttpMethod.POST, "/api/clientes").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/artistas").permitAll()

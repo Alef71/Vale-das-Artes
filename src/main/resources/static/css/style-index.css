@@ -58,13 +58,9 @@ main {
 }
 
 .carousel-item img {
-    width: 50vw;
-    max-width: 1920px;
-    aspect-ratio: 16/9;
-    height: auto;
+    /* Alterar para a altura do banner que quiser */
+    height: 407px; 
     object-fit: cover;
-    margin: 0 auto;
-    display: block;
 }
 
 .carousel-caption {

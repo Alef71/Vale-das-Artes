@@ -92,7 +92,7 @@ document.addEventListener('DOMContentLoaded', () => {
             carouselInner.innerHTML = destaquesAtivos.map((d, index) => `
                 <div class="carousel-item ${index === 0 ? 'active' : ''}">
                     <a href="${d.link || '#'}" style="display:block; width:100%; height:100%; text-decoration:none;">
-                        <img src="${d.fotoUrl || d.caminhoImagem || 'https://via.placeholder.com/1200x400?text=Artesanato'}" 
+                        <img src="${d.fotoUrl || d.caminhoImagem || 'https://t3.ftcdn.net/jpg/09/56/15/94/360_F_956159456_IikGgWagJRUhHPTLcsABoCW31k10FF3G.jpg'}" 
                              class="d-block w-100" alt="${d.titulo}">
                     </a>
                     <div class="carousel-caption d-none d-md-block" style="pointer-events: none;">
@@ -104,7 +104,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (error) {
             carouselInner.innerHTML = `
                 <div class="carousel-item active">
-                    <img src="https://via.placeholder.com/1200x400/3E2B22/FFFFFF?text=Bem-vindo+ao+Vale+das+Artes" class="d-block w-100" alt="Banner Padrão">
+                    <img src="https://t3.ftcdn.net/jpg/09/56/15/94/360_F_956159456_IikGgWagJRUhHPTLcsABoCW31k10FF3G.jpg" class="d-block w-100" alt="Banner Padrão">
                 </div>`;
         }
     }

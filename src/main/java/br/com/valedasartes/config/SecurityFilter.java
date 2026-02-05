@@ -30,6 +30,15 @@ public class SecurityFilter extends OncePerRequestFilter {
     protected void doFilterInternal(@NonNull HttpServletRequest request, 
                                     @NonNull HttpServletResponse response, 
                                     @NonNull FilterChain filterChain) throws ServletException, IOException {
+        String path = request.getRequestURI();
+        
+        // Skip security filter for static resources
+        if (path.startsWith("/css/") || path.startsWith("/js/") || path.startsWith("/images/") || 
+            path.endsWith(".html") || path.equals("/")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+        
         var token = this.recuperarToken(request);
         if (token != null) {
             var email = tokenService.validarToken(token);
