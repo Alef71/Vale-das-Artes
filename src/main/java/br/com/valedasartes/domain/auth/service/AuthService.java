@@ -28,21 +28,24 @@ public class AuthService {
 
     public void solicitarRecuperacaoSenha(String cpf, String telefone) {
         
-        Long usuarioId = null;
+        // Alterado para String para aceitar tanto Long quanto UUID
+        String usuarioId = null; 
         String tipo = null;
         String nomeUsuario = "";
 
         Optional<Cliente> clienteOpt = clienteRepository.findByCpfAndTelefone(cpf, telefone);
         
         if (clienteOpt.isPresent()) {
-            usuarioId = clienteOpt.get().getId();
+            // Converte o ID (Long) do cliente para String
+            usuarioId = String.valueOf(clienteOpt.get().getId());
             tipo = "CLIENTE";
             nomeUsuario = clienteOpt.get().getNome();
         } else {
             
             Optional<Artista> artistaOpt = artistaRepository.findByCpfAndTelefone(cpf, telefone);
             if (artistaOpt.isPresent()) {
-                usuarioId = artistaOpt.get().getId();
+                // Converte o ID (ArtistId) do artista para String
+                usuarioId = artistaOpt.get().getId().toString();
                 tipo = "ARTISTA";
                 nomeUsuario = artistaOpt.get().getNome();
             }
@@ -51,7 +54,7 @@ public class AuthService {
         if (usuarioId != null) {
             String tokenUuid = UUID.randomUUID().toString();
             
-            
+            // Certifique-se que o construtor do TokenRecuperacao aceita String no 2º parâmetro
             TokenRecuperacao novoToken = new TokenRecuperacao(
                 tokenUuid, 
                 usuarioId, 

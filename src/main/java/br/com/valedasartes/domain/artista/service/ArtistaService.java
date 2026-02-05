@@ -2,6 +2,7 @@ package br.com.valedasartes.domain.artista.service;
 
 import java.util.List;
 import java.util.Optional; 
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,7 @@ import br.com.valedasartes.domain.artista.dto.ArtistaEnderecoUpdateDTO;
 import br.com.valedasartes.domain.artista.dto.ArtistaRequestDTO;
 import br.com.valedasartes.domain.artista.dto.ArtistaResponseDTO;
 import br.com.valedasartes.domain.artista.dto.ArtistaUpdateDTO;
+import br.com.valedasartes.domain.artista.id.ArtistId; // Importação do novo ID
 import br.com.valedasartes.domain.artista.repository.ArtistaRepository;
 import br.com.valedasartes.domain.endereco.Endereco;
 import br.com.valedasartes.domain.security.Credencial;
@@ -63,6 +65,7 @@ public class ArtistaService {
         endereco.setTelefone(dto.getTelefone());
 
         Artista novoArtista = new Artista();
+        // O ID é gerado automaticamente no construtor da entidade Artista agora (ArtistId)
         novoArtista.setNome(dto.getNome());
         novoArtista.setCpf(dto.getCpf());
         novoArtista.setCnpj(dto.getCnpj());
@@ -89,7 +92,10 @@ public class ArtistaService {
                 .collect(Collectors.toList());
     }
 
-    public ArtistaResponseDTO buscarPorId(Long id) {
+    // Alterado Long -> UUID
+    public ArtistaResponseDTO buscarPorId(UUID idRaw) {
+        ArtistId id = ArtistId.from(idRaw); // Converte para Value Object
+        
         return artistaRepository.findCompletoById(id) 
                 .map(ArtistaResponseDTO::new)
                 .orElseThrow(() -> new RuntimeException("Artista não encontrado com ID: " + id));
@@ -97,7 +103,10 @@ public class ArtistaService {
   
 
     @Transactional
-    public ArtistaResponseDTO atualizarArtista(Long id, ArtistaUpdateDTO dto) {
+    // Alterado Long -> UUID
+    public ArtistaResponseDTO atualizarArtista(UUID idRaw, ArtistaUpdateDTO dto) {
+        ArtistId id = ArtistId.from(idRaw);
+
         return artistaRepository.findById(id) 
             .map(artistaExistente -> {
                 
@@ -111,43 +120,38 @@ public class ArtistaService {
             }).orElse(null);
     }
 
-    // --- MÉTODO CORRIGIDO ---
     @Transactional
-    public ArtistaResponseDTO atualizarEndereco(Long id, ArtistaEnderecoUpdateDTO dto) {
+    // Alterado Long -> UUID
+    public ArtistaResponseDTO atualizarEndereco(UUID idRaw, ArtistaEnderecoUpdateDTO dto) {
+        ArtistId id = ArtistId.from(idRaw);
+        
         Artista artista = artistaRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("Artista não encontrado"));
 
         Endereco endereco = artista.getEndereco();
         
-        // Se não existir endereço, cria um novo e vincula
         if (endereco == null) {
             endereco = new Endereco();
             endereco.setArtista(artista); 
             artista.setEndereco(endereco);
         }
 
-        // Atualiza os campos
         endereco.setCep(dto.cep());
         endereco.setLogradouro(dto.logradouro());
         endereco.setComplemento(dto.complemento());
         endereco.setBairro(dto.bairro());
         endereco.setCidade(dto.cidade());
         
-        // CORREÇÃO 1: Usa dto.estado() para bater com o DTO novo
         endereco.setEstado(dto.estado()); 
-        
-        // CORREÇÃO 2: Salva o telefone
         endereco.setTelefone(dto.telefone());
 
-        // Lógica segura de conversão de Número (String -> Integer)
         if (dto.numero() != null && !dto.numero().trim().isEmpty()) {
             try {
-                // Remove caracteres não numéricos (ex: "46A" vira "46")
                 String numeroLimpo = dto.numero().replaceAll("\\D", "");
                 if (!numeroLimpo.isEmpty()) {
                     endereco.setNumero(Integer.parseInt(numeroLimpo));
                 } else {
-                    endereco.setNumero(0); // Se for só texto (ex: "S/N"), salva 0
+                    endereco.setNumero(0); 
                 }
             } catch (NumberFormatException e) {
                 endereco.setNumero(0);
@@ -156,25 +160,30 @@ public class ArtistaService {
             endereco.setNumero(null); 
         }
 
-        // Salva explicitamente
         artistaRepository.save(artista);
         
         return new ArtistaResponseDTO(artista);
     }
     
     @Transactional
-    public ArtistaResponseDTO alterarStatusAprovacao(Long artistaId, ArtistaStatus novoStatus) {
-        return artistaRepository.findById(artistaId)
+    // Alterado Long -> UUID
+    public ArtistaResponseDTO alterarStatusAprovacao(UUID idRaw, ArtistaStatus novoStatus) {
+        ArtistId id = ArtistId.from(idRaw);
+
+        return artistaRepository.findById(id)
             .map(artistaExistente -> {
                 artistaExistente.setStatusAprovacao(novoStatus);
                 Artista artistaAtualizado = artistaRepository.save(artistaExistente);
                 return new ArtistaResponseDTO(artistaAtualizado);
-            }).orElseThrow(() -> new RuntimeException("Artista com ID " + artistaId + " não encontrado."));
+            }).orElseThrow(() -> new RuntimeException("Artista com ID " + id + " não encontrado."));
     }
 
     @Transactional
-    public ArtistaResponseDTO uploadFoto(Long artistaId, MultipartFile file, Credencial credencialLogada) {
-        Artista artista = artistaRepository.findById(artistaId)
+    // Alterado Long -> UUID
+    public ArtistaResponseDTO uploadFoto(UUID idRaw, MultipartFile file, Credencial credencialLogada) {
+        ArtistId id = ArtistId.from(idRaw);
+        
+        Artista artista = artistaRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Artista não encontrado"));
 
         if (credencialLogada.getArtista() == null || !artista.getId().equals(credencialLogada.getArtista().getId())) {
@@ -191,8 +200,11 @@ public class ArtistaService {
     }
 
     @Transactional
-    public ArtistaResponseDTO removerFoto(Long artistaId, Credencial credencialLogada) {
-        Artista artista = artistaRepository.findById(artistaId)
+    // Alterado Long -> UUID
+    public ArtistaResponseDTO removerFoto(UUID idRaw, Credencial credencialLogada) {
+        ArtistId id = ArtistId.from(idRaw);
+
+        Artista artista = artistaRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Artista não encontrado"));
 
         if (credencialLogada.getArtista() == null || !artista.getId().equals(credencialLogada.getArtista().getId())) {
@@ -206,7 +218,10 @@ public class ArtistaService {
     }
 
     @Transactional
-    public void deletarArtista(Long id) {
+    // Alterado Long -> UUID
+    public void deletarArtista(UUID idRaw) {
+        ArtistId id = ArtistId.from(idRaw);
+        
         Optional<Artista> artistaOptional = artistaRepository.findById(id);
 
         if (artistaOptional.isPresent()) {

@@ -9,8 +9,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import br.com.valedasartes.config.FileStorageService; 
+import br.com.valedasartes.config.FileStorageService;
 import br.com.valedasartes.domain.artista.Artista;
+import br.com.valedasartes.domain.artista.id.ArtistId;
 import br.com.valedasartes.domain.artista.repository.ArtistaRepository;
 import br.com.valedasartes.domain.produto.Produto;
 import br.com.valedasartes.domain.produto.dto.ProdutoRequestDTO;
@@ -25,7 +26,7 @@ public class ProdutoService {
     private final FileStorageService fileStorageService;
 
     @Autowired
-    public ProdutoService(ProdutoRepository produtoRepository, 
+    public ProdutoService(ProdutoRepository produtoRepository,
                           ArtistaRepository artistaRepository,
                           FileStorageService fileStorageService) {
         this.produtoRepository = produtoRepository;
@@ -34,18 +35,14 @@ public class ProdutoService {
     }
 
     /**
-     * NOVO MÉTODO: Busca produtos para a vitrine (Home).
-     * Regras: Apenas ativos, Máximo 20 itens, Ordenados pelo mais recente (ID).
-     * Se passar categoria, filtra por ela.
+     * Busca produtos para a vitrine (Home).
      */
     public List<ProdutoResponseDTO> listarProdutosVitrine(String categoria) {
         List<Produto> produtos;
 
-        // Se a categoria foi informada e não está vazia (ex: "CERAMICA")
         if (categoria != null && !categoria.trim().isEmpty()) {
             produtos = produtoRepository.findTop20ByCategoriaIgnoreCaseAndAtivoTrueOrderByIdDesc(categoria);
         } else {
-            // Se não tem categoria, traz os 20 mais recentes gerais
             produtos = produtoRepository.findTop20ByAtivoTrueOrderByIdDesc();
         }
 
@@ -55,32 +52,42 @@ public class ProdutoService {
     }
 
     @Transactional
-    public ProdutoResponseDTO criarProduto(ProdutoRequestDTO dto, MultipartFile foto, Long artistaId) {
+    public ProdutoResponseDTO criarProduto(ProdutoRequestDTO dto, MultipartFile foto, String artistaId) {
         
-        Artista artista = artistaRepository.findById(artistaId)
-                .orElseThrow(() -> new RuntimeException("Artista não encontrado!"));
-        
-        String nomeArquivo = fileStorageService.salvarArquivo(foto);
-        String fotoUrl = fileStorageService.getUrlCompleta(nomeArquivo);
+        // 1. Converter String para o Objeto de Valor (ArtistId)
+        ArtistId idArtista = ArtistId.from(artistaId);
 
+        // 2. Buscar a entidade Artista completa
+        Artista artista = artistaRepository.findById(idArtista)
+                .orElseThrow(() -> new RuntimeException("Artista não encontrado! ID: " + artistaId));
+        
+        // 3. Upload da foto
+        String fotoUrl = null;
+        if (foto != null && !foto.isEmpty()) {
+            String nomeArquivo = fileStorageService.salvarArquivo(foto);
+            fotoUrl = fileStorageService.getUrlCompleta(nomeArquivo);
+        }
+
+        // 4. Montar o Produto
         Produto novoProduto = new Produto();
         novoProduto.setNome(dto.getNome());
         novoProduto.setDescricao(dto.getDescricao());
         novoProduto.setPreco(dto.getPreco());
         novoProduto.setCategoria(dto.getCategoria());
-        novoProduto.setArtista(artista);
+        novoProduto.setArtista(artista); // Associa a entidade Artista
         novoProduto.setFotoUrl(fotoUrl);
-        novoProduto.setAtivo(true); 
+        novoProduto.setAtivo(true);
 
         Produto produtoSalvo = produtoRepository.save(novoProduto);
         return new ProdutoResponseDTO(produtoSalvo);
     }
 
-    
-    public List<ProdutoResponseDTO> listarProdutosPorArtistaId(Long artistaId) {
-        return produtoRepository.findAll()
-                .stream()
-                .filter(produto -> produto.getArtista() != null && produto.getArtista().getId().equals(artistaId)) 
+    public List<ProdutoResponseDTO> listarProdutosPorArtistaId(String artistaId) {
+        // Converter para garantir a busca correta no banco
+        ArtistId idBusca = ArtistId.from(artistaId);
+
+        // Usa o método otimizado do Repositório (criado no passo anterior)
+        return produtoRepository.findByArtistaId(idBusca).stream()
                 .map(ProdutoResponseDTO::new)
                 .collect(Collectors.toList());
     }
@@ -91,13 +98,17 @@ public class ProdutoService {
     }
 
     @Transactional
-    public ProdutoResponseDTO atualizarProduto(Long id, ProdutoRequestDTO dto, Long artistaId) {
+    public ProdutoResponseDTO atualizarProduto(Long id, ProdutoRequestDTO dto, String artistaId) {
         
+        ArtistId idSolicitante = ArtistId.from(artistaId);
+
         return produtoRepository.findById(id)
             .map(produtoExistente -> {
-                if (!produtoExistente.getArtista().getId().equals(artistaId)) {
-                    throw new RuntimeException("Acesso negado...");
+                // Validação de segurança: Verifica se o ID do artista dono do produto é igual ao ID de quem está logado
+                if (!produtoExistente.getArtista().getId().equals(idSolicitante)) {
+                    throw new RuntimeException("Acesso negado: Este produto não pertence a você.");
                 }
+
                 produtoExistente.setNome(dto.getNome());
                 produtoExistente.setDescricao(dto.getDescricao());
                 produtoExistente.setPreco(dto.getPreco());
@@ -108,29 +119,34 @@ public class ProdutoService {
             }).orElse(null);
     }
 
-    public void deletarProduto(Long id) {
-        // Implementar lógica de deleção se necessário
-    }
-
     @Transactional
-    public ProdutoResponseDTO toggleProdutoAtivo(Long id, Long artistaId) {
+    public ProdutoResponseDTO toggleProdutoAtivo(Long id, String artistaId) {
         
+        ArtistId idSolicitante = ArtistId.from(artistaId);
+
         return produtoRepository.findById(id)
             .map(produtoExistente -> {
-                if (!produtoExistente.getArtista().getId().equals(artistaId)) {
-                    throw new RuntimeException("Acesso negado...");
+                // Validação de segurança
+                if (!produtoExistente.getArtista().getId().equals(idSolicitante)) {
+                    throw new RuntimeException("Acesso negado: Você não pode alterar produtos de outro artista.");
                 }
-                boolean novoStatus = !produtoExistente.isAtivo(); 
+
+                boolean novoStatus = !produtoExistente.isAtivo();
                 produtoExistente.setAtivo(novoStatus);
+                
                 Produto produtoAtualizado = produtoRepository.save(produtoExistente);
                 return new ProdutoResponseDTO(produtoAtualizado);
             }).orElseThrow(() -> new RuntimeException("Produto não encontrado!"));
     }
     
+    public void deletarProduto(Long id) {
+        produtoRepository.deleteById(id);
+    }
+
     public List<ProdutoResponseDTO> listarTodosOsProdutosAtivos() {
         return produtoRepository.findAll()
                 .stream()
-                .filter(Produto::isAtivo) 
+                .filter(Produto::isAtivo)
                 .map(ProdutoResponseDTO::new)
                 .collect(Collectors.toList());
     }

@@ -26,32 +26,34 @@ public class AuthenticationService {
         
         var credencial = (Credencial) authentication.getPrincipal();
         
-        
-        
         String role = credencial.getAuthorities().stream()
             .findFirst()
             .map(GrantedAuthority::getAuthority)
             .orElse("ROLE_DESCONHECIDA");
 
-        
-        
-        
-        Long userId = null;
+        // Agora userId é String para aceitar Long (Cliente/Admin) e UUID (Artista)
+        String userId = null;
+
         if ("ROLE_CLIENTE".equals(role) && credencial.getCliente() != null) {
-            userId = credencial.getCliente().getId();
-        } else if ("ROLE_ARTISTA".equals(role) && credencial.getArtista() != null) {
-            userId = credencial.getArtista().getId();
-        } else if ("ROLE_ADMIN".equals(role) && credencial.getAdministrador() != null) {
-            userId = credencial.getAdministrador().getId();
-        } else {
+            // Converte Long para String
+            userId = String.valueOf(credencial.getCliente().getId());
             
-            userId = credencial.getId(); 
+        } else if ("ROLE_ARTISTA".equals(role) && credencial.getArtista() != null) {
+            // Converte ArtistId (UUID) para String
+            userId = credencial.getArtista().getId().toString();
+            
+        } else if ("ROLE_ADMIN".equals(role) && credencial.getAdministrador() != null) {
+            // Converte Long para String
+            userId = String.valueOf(credencial.getAdministrador().getId());
+            
+        } else {
+            // Fallback
+            userId = String.valueOf(credencial.getId()); 
         }
 
-        
         var token = tokenService.gerarToken(credencial);
 
-        
+        // O DTO deve esperar uma String no último parâmetro
         return new LoginResponseDTO("Login realizado com sucesso!", token, role, userId);
     }
 }

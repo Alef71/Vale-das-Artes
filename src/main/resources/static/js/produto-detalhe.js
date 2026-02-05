@@ -151,7 +151,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     width: 90%; max-width: 400px; text-align: center;
                     box-shadow: 0 4px 20px rgba(0,0,0,0.5);">
                     
-                    <div style="font-size: 3rem; color: #28a745; margin-bottom: 15px;">
+                    <div style="font-size: 3rem; color: #EAE4D8; margin-bottom: 15px;">
                         <i class="fas fa-check-circle"></i>
                     </div>
                     
@@ -160,7 +160,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     
                     <div style="display: flex; flex-direction: column; gap: 12px;">
                         <button id="btn-modal-carrinho" style="
-                            background: #28a745; color: white; border: none; padding: 12px;
+                            background: #EAE4D8; color: white; border: none; padding: 12px;
                             border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 1rem;
                             transition: transform 0.2s;">
                             Ir para o Carrinho
@@ -238,12 +238,9 @@ document.addEventListener('DOMContentLoaded', () => {
         
         const token = localStorage.getItem('userToken');
         const userId = localStorage.getItem('userId');
-        
-        // PEGA O NOME QUE ESTÁ SALVO NO MOMENTO DO LOGIN
-        // Se estiver "Sheva" aqui, é porque você precisa deslogar e logar de novo.
         const nomeUsuarioLogado = localStorage.getItem('userName'); 
 
-        console.log("Tentando enviar avaliação como:", nomeUsuarioLogado); // <--- OLHE O CONSOLE (F12)
+        console.log("Tentando enviar avaliação como:", nomeUsuarioLogado); 
 
         if (!token || !userId) {
             alert("Faça login para avaliar.");
@@ -259,7 +256,6 @@ document.addEventListener('DOMContentLoaded', () => {
             comentario: comentarioInput.value,
             produtoId: parseInt(produtoId),
             clienteId: parseInt(userId),
-            // AQUI ESTÁ O PULO DO GATO: Enviamos o nome que pegamos do localStorage
             nomeCliente: nomeUsuarioLogado 
         };
 

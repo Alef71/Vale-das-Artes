@@ -80,7 +80,7 @@ body {
     width: 100%;
     border-radius: 8px;
     overflow: hidden;
-    background-color: #fff; /* Fundo da imagem mantive branco para não escurecer a foto */
+    background-color: #3E2B22; /* Fundo da imagem mantive branco para não escurecer a foto */
     display: flex;
     align-items: center;
     justify-content: center;

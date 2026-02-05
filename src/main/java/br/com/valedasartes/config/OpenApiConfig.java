@@ -3,10 +3,13 @@ package br.com.valedasartes.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.info.License;
+import io.swagger.v3.oas.models.security.SecurityRequirement;
+import io.swagger.v3.oas.models.security.SecurityScheme;
 
 @Configuration
 public class OpenApiConfig {
@@ -20,9 +23,16 @@ public class OpenApiConfig {
                         .description("API para o e-commerce social Vale das Artes, focado na valorização e comercialização do artesanato do Vale do Jequitinhonha.")
                         .contact(new Contact()
                                 .name("Alef")
-                                .email("afra@aluno.ifnmg.edu.br")) 
+                                .email("afra@aluno.ifnmg.edu.br"))
                         .license(new License()
                                 .name("Apache 2.0")
-                                .url("http://springdoc.org")));
+                                .url("http://springdoc.org")))
+                .addSecurityItem(new SecurityRequirement().addList("bearer-key"))
+                .components(new Components()
+                        .addSecuritySchemes("bearer-key",
+                                new SecurityScheme()
+                                        .type(SecurityScheme.Type.HTTP)
+                                        .scheme("bearer")
+                                        .bearerFormat("JWT")));
     }
 }

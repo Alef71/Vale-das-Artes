@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import br.com.valedasartes.domain.artista.id.ArtistId; // Importar ArtistId
 import br.com.valedasartes.domain.pedido.PedidoProduto;
 import br.com.valedasartes.domain.pedido.repository.PedidoProdutoRepository;
 import br.com.valedasartes.domain.relatorio.dto.RelatorioArtesaoDTO;
@@ -21,9 +22,14 @@ public class RelatorioService {
         this.pedidoProdutoRepository = pedidoProdutoRepository;
     }
 
-    public RelatorioArtesaoDTO gerarRelatorioParaArtesao(Long artistaId) {
-       
-        List<PedidoProduto> vendasDoArtesao = pedidoProdutoRepository.findByProdutoArtistaId(artistaId);
+    // Alterado: Recebe String, converte para ArtistId
+    public RelatorioArtesaoDTO gerarRelatorioParaArtesao(String artistaId) {
+        
+        // Conversão de String para o objeto de valor ArtistId
+        ArtistId id = ArtistId.from(artistaId);
+
+        // Passa o objeto correto para o repositório
+        List<PedidoProduto> vendasDoArtesao = pedidoProdutoRepository.findByProdutoArtistaId(id);
 
         List<RelatorioVendaItemDTO> itensVendidosDTO = vendasDoArtesao.stream()
                 .map(RelatorioVendaItemDTO::new)
@@ -31,6 +37,4 @@ public class RelatorioService {
 
         return new RelatorioArtesaoDTO(itensVendidosDTO);
     }
-
-    
 }

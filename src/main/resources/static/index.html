@@ -13,55 +13,62 @@
 </head>
 <body>
 
+ <img src="images/decorativa.jpeg" alt="" class="decoracao-lateral">
+    
     <header id="header-placeholder"></header>
 
-    <main>
-        <section id="destaques">
-            <div id="destaques-carousel" class="carousel slide" data-bs-ride="carousel">
-                <div class="carousel-inner">
-                    <div class="carousel-item active">
-                        <img src="https://via.placeholder.com/1200x400/EAE4D8/3E2B22?text=Carregando..." class="d-block w-100" alt="Loading">
+    <section id="destaques">
+        <div id="destaques-carousel" class="carousel slide" data-bs-ride="carousel">
+            <div class="carousel-inner">
+                <div class="carousel-item active">
+                    <img src="https://via.placeholder.com/1920x600/EAE4D8/3E2B22?text=Banner+Full+Width+1" class="d-block w-100" alt="Destaque 1">
+                    <div class="carousel-caption d-none d-md-block">
+                        <h5>Arte em Cerâmica</h5>
+                        <p>Peças únicas feitas à mão com amor e tradição.</p>
                     </div>
                 </div>
-                <button class="carousel-control-prev" type="button" data-bs-target="#destaques-carousel" data-bs-slide="prev">
-                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                    <span class="visually-hidden">Anterior</span>
-                </button>
-                <button class="carousel-control-next" type="button" data-bs-target="#destaques-carousel" data-bs-slide="next">
-                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                    <span class="visually-hidden">Próximo</span>
-                </button>
+                <div class="carousel-item">
+                    <img src="https://via.placeholder.com/1920x600/3E2B22/EAE4D8?text=Banner+Full+Width+2" class="d-block w-100" alt="Destaque 2">
+                </div>
             </div>
-        </section>
+            
+            <button class="carousel-control-prev" type="button" data-bs-target="#destaques-carousel" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Anterior</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#destaques-carousel" data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Próximo</span>
+            </button>
+        </div>
+    </section>
 
+    <main>
         <section id="produtos-recentes">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>Novidades</h2>
-        
-        <div class="filtro-container">
-            <select id="filtro-categoria" class="form-select" style="max-width: 200px;">
-                <option value="">Todas as Categorias</option>
-                <option value="CERAMICA">Cerâmica</option>
-                                        <option value="MADEIRA">Madeira</option>
-                                        <option value="TECIDO">Tecido/Tricô</option>
-                                        <option value="JOALHERIA">Joalheria</option>
-                                        <option value="PINTURA">Pintura</option>
-                                        <option value="OUTROS">Outros</option>
-            </select>
-        </div>
-    </div>
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>Novidades</h2>
+                
+                <div class="filtro-container">
+                    <select id="filtro-categoria" class="form-select" style="max-width: 200px;">
+                        <option value="">Todas as Categorias</option>
+                        <option value="CERAMICA">Cerâmica</option>
+                        <option value="MADEIRA">Madeira</option>
+                        <option value="TECIDO">Tecido/Tricô</option>
+                        <option value="JOALHERIA">Joalheria</option>
+                        <option value="PINTURA">Pintura</option>
+                        <option value="OUTROS">Outros</option>
+                    </select>
+                </div>
+            </div>
 
-    <div class="grid-produtos">
-        </div>
-</section>
-
-       
+            <div class="grid-produtos">
+                </div>
+        </section>
     </main>
 
     <footer id="footer-placeholder"></footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    
     <script src="js/main.js"></script>
     <script src="js/index.js"></script> 
 

@@ -43,11 +43,12 @@ public class ProdutoController {
 
     @Operation(summary = "Lista produtos do artista logado (Rota específica 'meus-produtos')")
     @GetMapping("/meus-produtos")
-    public ResponseEntity<List<ProdutoResponseDTO>> listarMeusProdutos(@RequestParam Long artistaId) {
+    // ALTERADO: De Long para String (ArtistId é UUID)
+    public ResponseEntity<List<ProdutoResponseDTO>> listarMeusProdutos(@RequestParam String artistaId) {
         return ResponseEntity.ok(produtoService.listarProdutosPorArtistaId(artistaId));
     }
 
-    @Operation(summary = "Busca produto por ID")
+    @Operation(summary = "Busca produto por ID (ID do Produto continua Long)")
     @GetMapping("/{id}")
     public ResponseEntity<ProdutoResponseDTO> buscarPorId(@PathVariable Long id) {
         return produtoService.buscarProdutoPorId(id)
@@ -57,7 +58,8 @@ public class ProdutoController {
 
     @Operation(summary = "Lista produtos de um artista específico (Via URL)")
     @GetMapping("/artista/{artistaId}")
-    public ResponseEntity<List<ProdutoResponseDTO>> listarPorArtista(@PathVariable Long artistaId) {
+    // ALTERADO: De Long para String
+    public ResponseEntity<List<ProdutoResponseDTO>> listarPorArtista(@PathVariable String artistaId) {
         return ResponseEntity.ok(produtoService.listarProdutosPorArtistaId(artistaId));
     }
 
@@ -66,7 +68,8 @@ public class ProdutoController {
     public ResponseEntity<ProdutoResponseDTO> criarProduto(
             @RequestPart("dados") ProdutoRequestDTO dto,
             @RequestPart("foto") MultipartFile foto,
-            @RequestParam Long artistaId) {
+            // ALTERADO: De Long para String
+            @RequestParam String artistaId) {
         
         ProdutoResponseDTO novoProduto = produtoService.criarProduto(dto, foto, artistaId);
         return ResponseEntity.ok(novoProduto);
@@ -77,7 +80,8 @@ public class ProdutoController {
     public ResponseEntity<ProdutoResponseDTO> atualizarProduto(
             @PathVariable Long id,
             @RequestBody ProdutoRequestDTO dto,
-            @RequestParam Long artistaId) {
+            // ALTERADO: De Long para String
+            @RequestParam String artistaId) {
         
         ProdutoResponseDTO atualizado = produtoService.atualizarProduto(id, dto, artistaId);
         if (atualizado == null) return ResponseEntity.notFound().build();
@@ -88,7 +92,8 @@ public class ProdutoController {
     @PutMapping("/{id}/toggle-ativo")
     public ResponseEntity<ProdutoResponseDTO> toggleAtivo(
             @PathVariable Long id, 
-            @RequestParam Long artistaId) {
+            // ALTERADO: De Long para String
+            @RequestParam String artistaId) {
         return ResponseEntity.ok(produtoService.toggleProdutoAtivo(id, artistaId));
     }
 

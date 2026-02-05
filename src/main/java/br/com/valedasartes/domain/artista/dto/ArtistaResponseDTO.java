@@ -10,7 +10,7 @@ import br.com.valedasartes.domain.produto.dto.ProdutoResponseDTO;
 
 public class ArtistaResponseDTO {
 
-    private final Long id;
+    private final String id; // Mudou de Long para String
     private final String nome;
     private final String cpf;
     private final String cnpj;
@@ -20,21 +20,19 @@ public class ArtistaResponseDTO {
     private final EnderecoDTO endereco; 
     private final CredencialDTO credencial;
     private final List<ProdutoResponseDTO> produtos;
-
     private final String fotoUrl;
 
     public ArtistaResponseDTO(Artista artista) {
-        this.id = artista.getId();
+        // Converte o ArtistId para String para enviar no JSON
+        this.id = artista.getId() != null ? artista.getId().toString() : null;
+        
         this.nome = artista.getNome();
         this.cpf = artista.getCpf();
         this.cnpj = artista.getCnpj();
         this.telefone = artista.getTelefone();
         this.nomeEmpresa = artista.getNomeEmpresa();
         this.biografia = artista.getBiografia();
-
-
         this.fotoUrl = artista.getFotoUrl(); 
-       
 
         if (artista.getEndereco() != null) {
             this.endereco = new EnderecoDTO(artista.getEndereco());
@@ -86,7 +84,9 @@ public class ArtistaResponseDTO {
         public String getCep() { return cep; }
     }
 
-    public Long getId() { return id; }
+    // Getter atualizado para retornar String
+    public String getId() { return id; }
+    
     public String getNome() { return nome; }
     public String getCpf() { return cpf; }
     public String getCnpj() { return cnpj; }
@@ -96,8 +96,5 @@ public class ArtistaResponseDTO {
     public EnderecoDTO getEndereco() { return endereco; }
     public CredencialDTO getCredencial() { return credencial; }
     public List<ProdutoResponseDTO> getProdutos() { return produtos; }
-
-    
     public String getFotoUrl() { return fotoUrl; }
-    
 }

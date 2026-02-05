@@ -1,6 +1,7 @@
 package br.com.valedasartes.controller;
 
 import java.util.List;
+import java.util.UUID; // Importante para o novo ID
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,11 +21,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import br.com.valedasartes.domain.artista.dto.ArtistaEnderecoUpdateDTO;
 import br.com.valedasartes.domain.artista.dto.ArtistaRequestDTO;
 import br.com.valedasartes.domain.artista.dto.ArtistaResponseDTO;
 import br.com.valedasartes.domain.artista.dto.ArtistaStatusUpdateDTO;
 import br.com.valedasartes.domain.artista.dto.ArtistaUpdateDTO;
-import br.com.valedasartes.domain.artista.dto.ArtistaEnderecoUpdateDTO; // Importe o novo DTO
 import br.com.valedasartes.domain.artista.service.ArtistaService;
 import br.com.valedasartes.domain.security.Credencial;
 import io.swagger.v3.oas.annotations.Operation;
@@ -73,7 +74,7 @@ public class ArtistaController {
         @ApiResponse(responseCode = "404", description = "Artista não encontrado")
     })
     @GetMapping("/{id}")
-    public ResponseEntity<ArtistaResponseDTO> buscarPorId(@PathVariable Long id) {
+    public ResponseEntity<ArtistaResponseDTO> buscarPorId(@PathVariable UUID id) { // Alterado para UUID
         ArtistaResponseDTO artista = artistaService.buscarPorId(id);
         return ResponseEntity.ok(artista);
     }
@@ -81,7 +82,7 @@ public class ArtistaController {
 
     @Operation(summary = "Atualiza um artista existente", description = "Atualiza os dados cadastrais básicos de um artista.")
     @PutMapping("/{id}")
-    public ResponseEntity<ArtistaResponseDTO> atualizarArtista(@PathVariable Long id, @Valid @RequestBody ArtistaUpdateDTO dto) {
+    public ResponseEntity<ArtistaResponseDTO> atualizarArtista(@PathVariable UUID id, @Valid @RequestBody ArtistaUpdateDTO dto) { // Alterado para UUID
         ArtistaResponseDTO artistaAtualizado = artistaService.atualizarArtista(id, dto);
         if (artistaAtualizado != null) {
             return ResponseEntity.ok(artistaAtualizado);
@@ -89,17 +90,15 @@ public class ArtistaController {
         return ResponseEntity.notFound().build();
     }
     
-    // --- NOVO MÉTODO CORRIGIDO ---
     @Operation(summary = "Atualiza o endereço do artista")
     @PutMapping("/{id}/endereco")
     public ResponseEntity<ArtistaResponseDTO> atualizarEnderecoArtista(
-            @PathVariable Long id, 
+            @PathVariable UUID id, // Alterado para UUID
             @Valid @RequestBody ArtistaEnderecoUpdateDTO dto) {
         
         ArtistaResponseDTO artistaAtualizado = artistaService.atualizarEndereco(id, dto);
         return ResponseEntity.ok(artistaAtualizado);
     }
-    // -----------------------------
 
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Atualiza o status de aprovação do artista (Administrativo)")
@@ -109,7 +108,7 @@ public class ArtistaController {
     })
     @PatchMapping("/{id}/status") 
     public ResponseEntity<ArtistaResponseDTO> alterarStatusAprovacao(
-            @PathVariable Long id, 
+            @PathVariable UUID id, // Alterado para UUID
             @Valid @RequestBody ArtistaStatusUpdateDTO dto) {
         
         ArtistaResponseDTO artistaAtualizado = artistaService.alterarStatusAprovacao(id, dto.getStatus());
@@ -119,7 +118,7 @@ public class ArtistaController {
     @Operation(summary = "Upload de foto de perfil do artista", description = "Faz upload de uma nova foto para o artista.")
     @PostMapping(value = "/{id}/foto", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ArtistaResponseDTO> uploadFoto(
-            @PathVariable Long id, 
+            @PathVariable UUID id, // Alterado para UUID
             @RequestParam("foto") MultipartFile file,
             Authentication authentication) {
         
@@ -131,7 +130,7 @@ public class ArtistaController {
     @Operation(summary = "Remove a foto de perfil do artista")
     @DeleteMapping(value = "/{id}/foto")
     public ResponseEntity<ArtistaResponseDTO> removerFoto(
-            @PathVariable Long id,
+            @PathVariable UUID id, // Alterado para UUID
             Authentication authentication) {
         
         Credencial credencial = (Credencial) authentication.getPrincipal();
@@ -146,7 +145,7 @@ public class ArtistaController {
         @ApiResponse(responseCode = "404", description = "Artista não encontrado")
     })
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletarArtista(@PathVariable Long id) {
+    public ResponseEntity<Void> deletarArtista(@PathVariable UUID id) { // Alterado para UUID
         artistaService.deletarArtista(id);
         return ResponseEntity.noContent().build();
     }

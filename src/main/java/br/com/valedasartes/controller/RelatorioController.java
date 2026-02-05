@@ -35,7 +35,9 @@ public class RelatorioController {
     })
     @GetMapping("/artesao/{artistaId}")
     public ResponseEntity<RelatorioArtesaoDTO> getRelatorioArtesao(
-            @Parameter(description = "ID do artista para o qual o relatório será gerado") @PathVariable Long artistaId) {
+            // Alterado de Long para String, pois o ID agora é um UUID vindo da URL
+            @Parameter(description = "ID do artista para o qual o relatório será gerado") @PathVariable String artistaId) {
+        
         RelatorioArtesaoDTO relatorio = relatorioService.gerarRelatorioParaArtesao(artistaId);
         return ResponseEntity.ok(relatorio);
     }

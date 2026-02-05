@@ -8,6 +8,7 @@ import org.hibernate.annotations.ColumnDefault;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
+import br.com.valedasartes.domain.artista.id.ArtistId;
 import br.com.valedasartes.domain.endereco.Endereco;
 import br.com.valedasartes.domain.produto.Produto;
 import br.com.valedasartes.domain.security.Credencial;
@@ -17,8 +18,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
@@ -30,9 +29,9 @@ import jakarta.persistence.Table;
 public class Artista {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    // @GeneratedValue removido pois o ID é gerado na aplicação (UUID)
     @Column(name = "id_artista")
-    private Long id;
+    private ArtistId id;
 
     @Column(name = "cpf_artista", nullable = false, unique = true)
     private String cpf;
@@ -68,15 +67,16 @@ public class Artista {
     @JoinColumn(name = "id_credencial", referencedColumnName = "id_credencial", unique = true)
     private Credencial credencial;
 
-    // --- MUDANÇA IMPORTANTE AQUI ---
-    // mappedBy indica que a tabela 'endereco' é dona da chave estrangeira.
     @OneToOne(mappedBy = "artista", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private Endereco endereco;
 
     public Artista() {
+        // Gera um UUID novo automaticamente ao instanciar
+        this.id = ArtistId.generate();
     }
 
     public Artista(String cpf, String cnpj, String telefone, String nome, String nomeEmpresa) {
+        this.id = ArtistId.generate(); // Garante o ID na criação
         this.cpf = cpf;
         this.cnpj = cnpj;
         this.telefone = telefone;
@@ -84,18 +84,19 @@ public class Artista {
         this.nomeEmpresa = nomeEmpresa;
     }
    
-    // Método auxiliar CRÍTICO para garantir que o relacionamento seja salvo corretamente
     public void setEndereco(Endereco endereco) {
         this.endereco = endereco;
         if (endereco != null) {
-            endereco.setArtista(this); // Vincula o artista dentro do endereço
+            endereco.setArtista(this); 
         }
     }
 
     public Endereco getEndereco() { return endereco; }
 
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    // Getters e Setters atualizados para ArtistId
+    public ArtistId getId() { return id; }
+    public void setId(ArtistId id) { this.id = id; }
+
     public String getCpf() { return cpf; }
     public void setCpf(String cpf) { this.cpf = cpf; }
     public String getCnpj() { return cnpj; }

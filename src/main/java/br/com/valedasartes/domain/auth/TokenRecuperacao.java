@@ -8,7 +8,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
-
 @Entity
 @Table(name = "tokens_recuperacao")
 public class TokenRecuperacao {
@@ -19,7 +18,9 @@ public class TokenRecuperacao {
 
     private String token;
 
-    private Long usuarioId;
+    // ALTERADO: De Long para String
+    // Motivo: Permitir salvar IDs numéricos (Cliente) e UUIDs (Artista)
+    private String usuarioId;
 
     private String tipoUsuario; 
 
@@ -29,14 +30,15 @@ public class TokenRecuperacao {
     public TokenRecuperacao() {
     }
 
-    public TokenRecuperacao(String token, Long usuarioId, String tipoUsuario, LocalDateTime dataExpiracao) {
+    // ALTERADO: O construtor agora aceita String no usuarioId
+    public TokenRecuperacao(String token, String usuarioId, String tipoUsuario, LocalDateTime dataExpiracao) {
         this.token = token;
         this.usuarioId = usuarioId;
         this.tipoUsuario = tipoUsuario;
         this.dataExpiracao = dataExpiracao;
     }
 
-    
+    // --- Getters e Setters ---
 
     public Long getId() {
         return id;
@@ -54,11 +56,13 @@ public class TokenRecuperacao {
         this.token = token;
     }
 
-    public Long getUsuarioId() {
+    // ALTERADO: Getter retorna String
+    public String getUsuarioId() {
         return usuarioId;
     }
 
-    public void setUsuarioId(Long usuarioId) {
+    // ALTERADO: Setter recebe String
+    public void setUsuarioId(String usuarioId) {
         this.usuarioId = usuarioId;
     }
 

@@ -1,21 +1,21 @@
 /* --- HEADER --- */
 .navbar {
-    /* 1. Cor de fundo (Marrom) */
+    /* 1. Cor de fundo (Barra Marrom Fina) */
     background-color: #2b231a !important;
-    
-    /* 2. REMOVIDA A IMAGEM DE FUNDO */
     background-image: none !important;
     
-    /* Configurações padrão da barra */
-    padding: 10px 0;
+    /* Altura da barra marrom (Mantenha pequeno para ficar elegante) */
+    height: 90px; 
+    padding: 0; /* Remove padding extra */
+    
     box-shadow: 0 4px 20px rgba(0,0,0,0.4);
     position: sticky;
     top: 0;
     z-index: 1000;
     
-    /* Garante alinhamento vertical */
     display: flex;
     justify-content: center;
+    align-items: center;
 }
 
 .navbar .container-fluid {
@@ -24,29 +24,47 @@
     margin: 0 auto;
     padding: 0 30px;
     
-    /* 3. ALINHAMENTO NAS PONTAS */
+    /* Configuração para posicionar os elementos */
+    position: relative; /* Necessário para o logo absoluto funcionar */
     display: flex;
-    justify-content: space-between; /* Joga Logo pra esq e User pra dir */
-    align-items: center;            /* Centraliza verticalmente */
-    /* gap removido para permitir o espaçamento total */
+    justify-content: flex-end; /* Empurra o Login/Sair para a direita */
+    align-items: center;
+    height: 100%;
 }
 
-/* LOGO */
+/* LOGO GIGANTE (FLUTUANTE) */
 .logo-header {
-    height: 80px; 
-    max-width: 200px;
-    width: auto;
-    display: block; 
+    position: absolute;  /* Tira do fluxo: O logo não empurra mais a barra! */
+    left: 20px;          /* Cola na esquerda */
+    top: -45px;            /* Ajuste vertical: desce um pouco */
+    
+    /* O Zoom que você queria */
+    height: 180px;       /* Aumentei bastante (ajuste se quiser maior: 200px) */
+    width: auto;         /* Mantém a proporção */
+    max-width: none;     /* Tira o limite de largura para o nome aparecer todo */
+    
+    z-index: 1100;       /* Fica na frente da barra marrom */
+    
+    /* Sombra para o texto "Vale das Artes" ficar legível se vazar para o fundo bege */
+    filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.6));
+    
+    /* Efeito suave ao passar o mouse */
+    transition: transform 0.3s ease;
 }
 
-/* ÁREA DE AÇÕES */
+.logo-header:hover {
+    transform: scale(1.05); /* Zoom extra ao passar o mouse */
+}
+
+/* ÁREA DE AÇÕES (Login/Perfil) */
 .navbar-actions {
     display: flex;
     align-items: center;
     justify-content: center;
+    /* Não precisa mexer aqui, o justify-content: flex-end do pai já resolve */
 }
 
-/* BOTÃO VISITANTE */
+/* ... Mantenha o restante do CSS dos botões igual ... */
 .btn-login-unico {
     background-color: #9c8b75;
     color: #fff;
@@ -64,7 +82,6 @@
     transform: translateY(-2px);
 }
 
-/* LOGADO */
 #auth-logado {
     display: flex;
     align-items: center;
@@ -72,11 +89,10 @@
     gap: 20px; 
 }
 
-/* FOTO DE PERFIL (REDONDA) */
 .nav-avatar-img {
     height: 50px;      
-    width: 50px;         /* Largura igual altura = Quadrado */
-    border-radius: 50%;  /* Transforma quadrado em círculo */
+    width: 50px;        
+    border-radius: 50%;  
     object-fit: cover;  
     border: 2px solid #9c8b75;
     cursor: pointer;
@@ -88,7 +104,6 @@
     border-color: #fff;
 }
 
-/* TEXTO SAIR */
 .btn-sair-texto {
     color: #bda88d;
     text-decoration: none;
@@ -104,7 +119,6 @@
     text-decoration: underline;
 }
 
-/* SACOLA */
 .btn-sacola-icon svg {
     display: block;
     transition: stroke 0.3s;

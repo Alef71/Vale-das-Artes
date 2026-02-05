@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.com.valedasartes.domain.artista.Artista;
+import br.com.valedasartes.domain.artista.id.ArtistId; // Importar o ID do Artista
 import br.com.valedasartes.domain.artista.repository.ArtistaRepository;
 import br.com.valedasartes.domain.auth.TokenRecuperacao;
 import br.com.valedasartes.domain.auth.dto.EsqueciSenhaDTO;
@@ -44,33 +45,41 @@ public class AuthController {
         String cpfLimpo = dados.cpf().replaceAll("[^0-9]", "");
         String telLimpo = dados.telefone().replaceAll("[^0-9]", "");
 
+        // 1. Busca Cliente (Ainda é Long)
         Optional<Cliente> clienteOpt = clienteRepository.findByCpf(cpfLimpo);
         if (clienteOpt.isPresent()) {
             String telBanco = clienteOpt.get().getEndereco().getTelefone().replaceAll("[^0-9]", "");
             
             if (telBanco.contains(telLimpo) || telLimpo.contains(telBanco)) {
-                return gerarTokenResposta(clienteOpt.get().getId(), "CLIENTE");
+                // Converte o ID Long para String para salvar no Token
+                return gerarTokenResposta(String.valueOf(clienteOpt.get().getId()), "CLIENTE");
             }
         }
 
+        // 2. Busca Artista (Já é UUID / ArtistId)
         Optional<Artista> artistaOpt = artistaRepository.findByCpf(cpfLimpo);
         if (artistaOpt.isPresent()) {
             String telBanco = artistaOpt.get().getEndereco().getTelefone().replaceAll("[^0-9]", "");
             
             if (telBanco.contains(telLimpo) || telLimpo.contains(telBanco)) {
-                return gerarTokenResposta(artistaOpt.get().getId(), "ARTISTA");
+                // Converte o ArtistId (UUID) para String
+                return gerarTokenResposta(artistaOpt.get().getId().toString(), "ARTISTA");
             }
         }
 
         return ResponseEntity.badRequest().body("{\"mensagem\": \"CPF ou WhatsApp não conferem com nossos registros.\"}");
     }
 
-    private ResponseEntity<?> gerarTokenResposta(Long userId, String tipoUsuario) {
+    // Recebe String userId para aceitar tanto Long quanto UUID
+    private ResponseEntity<?> gerarTokenResposta(String userId, String tipoUsuario) {
         String tokenString = UUID.randomUUID().toString();
         
         TokenRecuperacao token = new TokenRecuperacao();
         token.setToken(tokenString);
-        token.setUsuarioId(userId);
+        
+        // Importante: A entidade TokenRecuperacao deve ter o campo usuarioId como String (VARCHAR no banco)
+        token.setUsuarioId(userId); 
+        
         token.setTipoUsuario(tipoUsuario);
         token.setDataExpiracao(LocalDateTime.now().plusMinutes(30));
         
@@ -101,13 +110,18 @@ public class AuthController {
         }
 
         String senhaCriptografada = passwordEncoder.encode(novaSenha);
+        String usuarioIdStr = tokenDb.getUsuarioId(); // Pega o ID como String
         
         if ("CLIENTE".equals(tokenDb.getTipoUsuario())) {
-            Cliente c = clienteRepository.findById(tokenDb.getUsuarioId()).orElseThrow();
+            // Se for CLIENTE, converte String de volta para Long (pois ainda não mudamos o Cliente)
+            Long idCliente = Long.parseLong(usuarioIdStr);
+            Cliente c = clienteRepository.findById(idCliente).orElseThrow();
             c.getCredencial().setSenha(senhaCriptografada); 
             clienteRepository.save(c);
         } else {
-            Artista a = artistaRepository.findById(tokenDb.getUsuarioId()).orElseThrow();
+            // Se for ARTISTA, converte String de volta para ArtistId (UUID)
+            ArtistId idArtista = ArtistId.from(usuarioIdStr);
+            Artista a = artistaRepository.findById(idArtista).orElseThrow();
             a.getCredencial().setSenha(senhaCriptografada);
             artistaRepository.save(a);
         }
